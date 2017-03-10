@@ -1,0 +1,7 @@
+{
+  "name": "Project Stable",
+  "short_name": "Project Stable",
+  "description": "Easily allow students to select presentations to view.",
+  "start_url": "/",
+  "display": "standalone"
+}
