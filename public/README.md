@@ -1,6 +1,6 @@
 # \<Project Stable\>
 
-Easily allow students to select presentations to view.
+
 
 ## Install the Polymer-CLI
 
