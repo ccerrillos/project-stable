@@ -41,15 +41,26 @@ Example:
         padding-left: 4px;
         padding-right: 8px;
       }
+      .noselect {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+      .handle {
+        cursor: pointer;
+      }
     </style>
     <div class="layout horizontal">
-      <h3 id="number" class="vcenter number">[[number]]</h3>
-      <iron-icon icon="icons:reorder" class="handle vcenter handle-icon"></iron-icon>
+      <h3 id="number" class="vcenter number noselect">[[number]]</h3>
+      <iron-icon icon="icons:reorder" class="handle vcenter handle-icon noselect"></iron-icon>
       <div hidden>
         <paper-icon-button icon="icons:arrow-upward" disabled="[[first]]" on-tap="_moveUp"></paper-icon-button>
         <paper-icon-button icon="icons:arrow-downward" disabled="[[last]]" on-tap="_moveDown"></paper-icon-button>
       </div>
-      <div class="vcenter">[[data.title]]</div>
+      <div class="vcenter noselect">[[data.title]]</div>
       <div class="flex"></div>
       <div>
         <paper-icon-button icon="icons:info" on-tap="_showInfo"></paper-icon-button>
