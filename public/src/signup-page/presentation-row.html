@@ -27,23 +27,28 @@ Example:
         display: block;
         padding: 4px;
       }
-      .handle {
-        
+      .handle-icon {
+        width: 32px;
+        height: 32px;
+
       }
       .vcenter {
         margin-top: auto;
         margin-bottom: auto;
+        padding-left: 8px;
       }
       .number {
         padding-left: 4px;
-        padding-right: 16px;
+        padding-right: 8px;
       }
     </style>
     <div class="layout horizontal">
       <h3 id="number" class="vcenter number">[[number]]</h3>
-      <iron-icon icon="icons:reorder" class="handle vcenter"></iron-icon>
-      <paper-icon-button icon="icons:arrow-upward" disabled="[[first]]" on-tap="_moveUp"></paper-icon-button>
-      <paper-icon-button icon="icons:arrow-downward" disabled="[[last]]" on-tap="_moveDown"></paper-icon-button>
+      <iron-icon icon="icons:reorder" class="handle vcenter handle-icon"></iron-icon>
+      <div hidden>
+        <paper-icon-button icon="icons:arrow-upward" disabled="[[first]]" on-tap="_moveUp"></paper-icon-button>
+        <paper-icon-button icon="icons:arrow-downward" disabled="[[last]]" on-tap="_moveDown"></paper-icon-button>
+      </div>
       <div class="vcenter">[[data.title]]</div>
     </div>
   </template>
