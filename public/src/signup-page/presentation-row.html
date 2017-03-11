@@ -50,6 +50,10 @@ Example:
         <paper-icon-button icon="icons:arrow-downward" disabled="[[last]]" on-tap="_moveDown"></paper-icon-button>
       </div>
       <div class="vcenter">[[data.title]]</div>
+      <div class="flex"></div>
+      <div>
+        <paper-icon-button icon="icons:info" on-tap="_showInfo"></paper-icon-button>
+      </div>
     </div>
   </template>
   <script>
@@ -116,6 +120,9 @@ Example:
       },
       _moveDown: function(e, f, g) {
         this.fire('move-down', { id: this.data.id, date: this.data.date, block: this.data.block });
+      },
+      _showInfo: function(e) {
+        this.fire('show-info', { id: this.data.id });
       }
       
     });

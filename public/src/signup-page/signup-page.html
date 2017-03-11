@@ -1,6 +1,11 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/polymer-sortablejs/polymer-sortablejs.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+
 <link rel="import" href="presentation-row.html">
 <!--
 A comment describing this element
@@ -20,13 +25,13 @@ Example:
 
 <dom-module id="signup-page">
   <template>
-    <style>
+    <style include="iron-flex iron-flex-alignment">
       :host {
         display: block;
       }
       paper-material {
         padding: 8px;
-        margin-bottom: 16px;
+        margin-bottom: 32px;
       }
       h1, h2, h3, h4, h5, h6 {
         margin: 0;
@@ -34,14 +39,54 @@ Example:
       presentation-row:hover {
         background-color: #e6e6e6;
       }
+      #content {
+        margin-left: auto;
+        max-width: 960px;
+        margin-right: auto;
+      }
+      paper-dialog {
+        padding: 16px;
+        max-width: 400px;
+
+      }
+      .center {
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .close-btn {
+        position: absolute;
+        right: 0;
+        top: 0;
+        margin: 0;
+        padding: 0;
+      }
     </style>
-    Signup Page
+    <div class="layout horizontal">
+      <h4 class="center" style="margin-bottom: 32px;">Signup Page UI Test</h4>
+    </div>
+
+    <paper-dialog id="infoDialog" modal>
+      <paper-icon-button icon="icons:close" dialog-dismiss class="close-btn"></paper-icon-button>
+      <div class="layout vertical" style="margin: 0;">
+        <h2 class="center">[[infoData.title]]</h2>
+        <div>Presenter: <b>Name Name</b></div>
+        <div>Location: <b>Location</b></div>
+        <div>Bio:<br>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur et augue vitae urna elementum tristique. Aliquam finibus semper ligula, molestie hendrerit leo dictum id. Duis nisi quam, eleifend in arcu at, fermentum cursus massa. Phasellus blandit ligula eu odio scelerisque aliquam. Vivamus porta at mi ornare lobortis. Nam ante eros.</div>
+      </div>
+    </paper-dialog>
+
     <div id="content">
       <template is="dom-repeat" items="[[dates]]" as="date">
         <template is="dom-repeat" items="[[blocks]]" as="block">
           <paper-material elevation="1">
             <h3>[[_parseDate(date.date)]] - [[block.text]] Block</h3>
-            <sortable-js class$="[[_computeSorter(date.date, block.id)]]" draggable="presentation-row" handle=".handle" data-id-attr="data-id" on-update="_sortableUpdate">
+            <sortable-js
+            class$="[[_computeSorter(date.date, block.id)]]"
+            draggable="presentation-row"
+            handle=".handle"
+            filter=".no-drag"
+            data-id-attr="data-id"
+            on-update="_sortableUpdate">
               <template is="dom-repeat" items="[[_filterPresentations(date.date, block.id, presentations)]]" as="presentation">
                 <presentation-row
                   data="[[presentation]]"
@@ -49,6 +94,7 @@ Example:
                   data-id$="[[presentation.id]]"
                   on-move-up="_doMoveUp"
                   on-move-down="_doMoveDown"
+                  on-show-info="_showInfo"
                   ></presentation-row>
               </template>
             </sortable-js>
@@ -106,6 +152,10 @@ Example:
             "20": { id: 20, date: "03 27 2017", block: 3, title: "Geneology 3" },
             "21": { id: 21, date: "03 27 2017", block: 3, title: "Voice Acting 3" }
           }
+        },
+        infoData: {
+          type: Object,
+          value: {}
         }
       },
       _parseDate: function(e) {
@@ -129,10 +179,12 @@ Example:
         return result;
       },
       _sortableUpdate: function(e) {
-        console.log(e);
-        console.log(e.target.sortable.toArray());
-        console.log(e.model.set('block.order', e.target.sortable.toArray()));
-        console.log(e.model.get('block.order'));
+        var order = e.target.sortable.toArray();
+        //TODO: save the order
+        e.model.set('block.order', order);
+        //
+
+
       },
       _sortableAdd: function(e) {
         console.log(e);
@@ -148,6 +200,10 @@ Example:
       },
       _computeSorter: function(date, block) {
         return (date + "-" + block).replace(/\s/g, "-");
+      },
+      _showInfo: function(e) {
+        this.infoData = this.presentations[e.detail.id];
+        this.$.infoDialog.open();
       }
     });
   </script>
