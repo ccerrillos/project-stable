@@ -1,0 +1,118 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<!--
+A comment describing this element
+
+Example:
+
+    <my-elem></my-elem>
+
+Example:
+
+    <my-elem>
+      <h2>Hello my-elem</h2>
+    </my-elem>
+
+@demo demo/index.html
+-->
+
+<dom-module id="presentation-row">
+  <template>
+    <style include="iron-flex iron-flex-alignment">
+      :host {
+        display: block;
+        padding: 4px;
+      }
+      .handle {
+        
+      }
+      .vcenter {
+        margin-top: auto;
+        margin-bottom: auto;
+      }
+      .number {
+        padding-left: 4px;
+        padding-right: 16px;
+      }
+    </style>
+    <div class="layout horizontal">
+      <h3 id="number" class="vcenter number">[[number]]</h3>
+      <iron-icon icon="icons:reorder" class="handle vcenter"></iron-icon>
+      <paper-icon-button icon="icons:arrow-upward" disabled="[[first]]" on-tap="_moveUp"></paper-icon-button>
+      <paper-icon-button icon="icons:arrow-downward" disabled="[[last]]" on-tap="_moveDown"></paper-icon-button>
+      <div class="vcenter">[[data.title]]</div>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is: 'presentation-row',
+      properties: {
+        data: {
+          type: Object,
+          observer: '_onDataChanged'
+        },
+        first: {
+          type: Boolean,
+          value: false
+        },
+        last: {
+          type: Boolean,
+          value: false
+        },
+        order: {
+          type: Array,
+          value: []
+        },
+        number: {
+          type: String,
+          computed: '_computeNumber(order, data)',
+          value: "*"
+        }
+      },
+      observers: [
+        '_computeFirstLast(order, data)'
+      ],
+      _computeNumber: function (order, data) {
+        var number = -1;
+        if(order && order.length > 0) {
+          for(var x = 0; x < order.length; x++) {
+            if(parseInt(order[x]) === data.id) {
+              number = (x + 1);
+              break;
+            }
+          }
+        }
+
+        if(number == -1) {
+          this.$.number.style.color = "rgb(0,0,0)";
+        } else {
+          var number_z = number - 1;
+          var size = order.length - 1;
+          var red = 255.0 * (number_z / size);
+          var green = 255.0 * ( (size - number_z) / size);
+          var blue = 100;
+          //green = 0;
+          //console.log("RED: " + red + " GREEN: " + green);
+          this.$.number.style.color = "rgb(" + parseInt(red) + ", " + parseInt(green) + ", " + parseInt(blue) + ")"; 
+        }
+
+        return number;
+      },
+      _computeFirstLast: function(order, data) {
+        this.first = parseInt(order[0]) === data.id;
+        this.last = parseInt(order[order.length - 1]) === data.id;
+      },
+      _moveUp: function(e) {
+        this.fire('move-up', { id: this.data.id, date: this.data.date, block: this.data.block });
+      },
+      _moveDown: function(e, f, g) {
+        this.fire('move-down', { id: this.data.id, date: this.data.date, block: this.data.block });
+      }
+      
+    });
+  </script>
+</dom-module>
