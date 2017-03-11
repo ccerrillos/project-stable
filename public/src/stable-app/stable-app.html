@@ -1,13 +1,23 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../signup-page/signup-page.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
 
 <dom-module id="stable-app">
   <template>
-    <style>
+    <style include="iron-flex iron-flex-alignment">
       :host {
         display: block;
       }
+      .center {
+        margin-left: auto;
+        margin-right: auto;
+      }
     </style>
-    <h2>Hello [[prop1]]</h2>
+    <div class="layout horizontal">
+      <h2 class="center">Project Stable</h2>
+    </div>
+    <signup-page></signup-page>
   </template>
 
   <script>
@@ -16,10 +26,7 @@
       is: 'stable-app',
 
       properties: {
-        prop1: {
-          type: String,
-          value: 'stable-app',
-        },
+        
       },
 
     });
