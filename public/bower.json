@@ -4,7 +4,10 @@
   "dependencies": {
     "polymer": "Polymer/polymer#^1.4.0",
     "skel": "^3.0.1",
-    "polymer-sortablejs": "^0.1.3"
+    "polymer-sortablejs": "^0.1.3",
+    "paper-dialog": "^1.1.0",
+    "paper-icon-button": "^1.1.4",
+    "iron-icons": "^1.2.0"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
