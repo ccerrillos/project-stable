@@ -13,8 +13,10 @@
     "function-runtime" : "dotnetcore1.0",
     "function-memory-size" : 256,
     "function-timeout"     : 30,
-    "function-handler"     : "Houses-API::HousesAPI.Function::FunctionHandler",
-    "function-name"        : "ProjectStable-API-Houses",
-    "function-role"        : "arn:aws:iam::056481398114:role/lambda_basic_execution",
-    "environment-variables" : ""
+    "function-handler"     : "MySQLEntityTest::MySQLEntityTest.Function::FunctionHandler",
+    "function-name"        : "MySQLEntityTest",
+    "function-role"        : "arn:aws:iam::056481398114:role/projectstable_lambda",
+    "function-subnets"     : "subnet-b28001db,subnet-04da117f,subnet-ddf41690",
+    "function-security-groups" : "sg-ebbed982",
+    "environment-variables"    : ""
 }

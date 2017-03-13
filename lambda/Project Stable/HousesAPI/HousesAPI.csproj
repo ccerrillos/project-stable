@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp1.0</TargetFramework>
-    <AssemblyName>Houses-API</AssemblyName>
-    <RootNamespace>Houses-API</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,7 +9,6 @@
     <PackageReference Include="Amazon.Lambda.Core" Version="1.0.0" />
     <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.0.1" />
     <PackageReference Include="MySql.Data" Version="7.0.6-IR31" />
-    <PackageReference Include="System.Data.Common" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
