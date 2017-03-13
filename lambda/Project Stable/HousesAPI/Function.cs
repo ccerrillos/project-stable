@@ -20,45 +20,23 @@ namespace HousesAPI {
 	public class House {
 		public int house_id;
 		public string house_name;
-		public static Dictionary<int, House> GetHouses() {
+		public static Dictionary<int, House> GetHouses(MySqlConnection dbCon) {
 			Dictionary<int, House> houses = new Dictionary<int, House>();
 			House house;
 
-			MySqlConnectionStringBuilder conStr = new MySqlConnectionStringBuilder();
+			string query = "SELECT `house_id`, `house_name` FROM `houses`;";
 
-			conStr.Server = Environment.GetEnvironmentVariable("DB_ADDRESS");
-			conStr.Port = uint.Parse(Environment.GetEnvironmentVariable("DB_PORT"));
-			conStr.UserID = Environment.GetEnvironmentVariable("DB_USER");
-			conStr.Password = Environment.GetEnvironmentVariable("DB_PASSWORD");
-			conStr.Database = Environment.GetEnvironmentVariable("DB_NAME");
+			using(MySqlCommand cmd = new MySqlCommand(query, dbCon)) {
 
-			conStr.ConnectionTimeout = 20;
-
-			try {
-
-				using(MySqlConnection dbCon = new MySqlConnection(conStr.ToString())) {
-					dbCon.Open();
-
-					string query = "SELECT `house_id`, `house_name` FROM `houses`;";
-
-					using(MySqlCommand cmd = new MySqlCommand(query, dbCon)) {
-
-						using(MySqlDataReader r = cmd.ExecuteReader()) {
-							while(r.Read()) {
-								house = new House() {
-									house_id = r.GetInt32(0),
-									house_name = r.GetString(1)
-								};
-								houses.Add(house.house_id, house);
-							}
-						}
+				using(MySqlDataReader r = cmd.ExecuteReader()) {
+					while(r.Read()) {
+						house = new House() {
+							house_id = r.GetInt32(0),
+							house_name = r.GetString(1)
+						};
+						houses.Add(house.house_id, house);
 					}
-
-					dbCon.Close();
 				}
-			} catch(Exception e) {
-				LambdaLogger.Log(e.ToString());
-				throw;
 			}
 
 			return houses;
@@ -75,18 +53,43 @@ namespace HousesAPI {
 			object resultObject = new object();
 			int resultCode = 405;
 
+			MySqlConnectionStringBuilder conStr = new MySqlConnectionStringBuilder();
+
+			conStr.Server = Environment.GetEnvironmentVariable("DB_ADDRESS");
+			conStr.Port = uint.Parse(Environment.GetEnvironmentVariable("DB_PORT"));
+			conStr.UserID = Environment.GetEnvironmentVariable("DB_USER");
+			conStr.Password = Environment.GetEnvironmentVariable("DB_PASSWORD");
+			conStr.Database = Environment.GetEnvironmentVariable("DB_NAME");
+
 			switch(apigProxyEvent.HttpMethod) {
 				case "GET":
-					resultObject = House.GetHouses();
-					resultCode = 200;
-					break;
 				case "POST":
-					resultCode = 200;
+				case "PUT":
 					break;
 				default:
-					resultCode = 405;
-					break;
+					return new APIGatewayProxyResponse {
+						Body = "{}",
+						StatusCode = 405
+					};
+			}
 
+			using(MySqlConnection dbCon = new MySqlConnection(conStr.ToString())) {
+				dbCon.Open();
+
+				switch(apigProxyEvent.HttpMethod) {
+					case "GET":
+						resultObject = House.GetHouses(dbCon);
+						resultCode = 200;
+						break;
+					case "POST":
+						resultCode = 200;
+						break;
+					default:
+						resultCode = 405;
+						break;
+				}
+
+				dbCon.Close();
 			}
 			
 			return new APIGatewayProxyResponse {
