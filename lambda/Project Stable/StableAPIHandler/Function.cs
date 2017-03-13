@@ -10,6 +10,8 @@ using ProjectStableLibrary;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System.Net;
+using Newtonsoft.Json.Linq;
+using Microsoft.EntityFrameworkCore;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializerAttribute(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -23,7 +25,10 @@ namespace StableAPIHandler {
 		/// <param name="input"></param>
 		/// <param name="context"></param>
 		/// <returns></returns>
+		///
+		ILambdaLogger Logger;
 		public APIGatewayProxyResponse FunctionHandler(APIGatewayProxyRequest apigProxyEvent, ILambdaContext context) {
+			Logger = context.Logger;
 			object resultObject = new object();
 			int resultCode = 405;
 
@@ -139,25 +144,172 @@ namespace StableAPIHandler {
 							default:
 								break;
 						}
+						#endregion
+						break;
+					case "POST":
+						#region POSTs
+						switch(apigProxyEvent.Path.ToLower()) {
+							case "/dates":
+							case "/dates/":
+								response = HandlePOST<Date>(apigProxyEvent, ctx);
+								/*
+								try {
+									JObject body = JObject.Parse(apigProxyEvent.Body);
+									int date = int.Parse((string)body["date"]);
 
+									
+									try {
+										ctx.dates.Add(new Date() {
+											date = date
+										});
+										int status = ctx.SaveChanges();
+										response = new APIGatewayProxyResponse() {
+											Body = JsonConvert.SerializeObject((status == 1)),
+											StatusCode = (int)HttpStatusCode.OK
+										};
+									} catch(Exception e) {
+										Logger.LogLine(e.ToString());
+										response = new APIGatewayProxyResponse() {
+											Body = JsonConvert.SerializeObject(e),
+											StatusCode = (int)HttpStatusCode.InternalServerError
+										};
+									}
+									
+								} catch(Exception e) {
+									Logger.LogLine(e.ToString());
+									response = new APIGatewayProxyResponse() {
+										Body = JsonConvert.SerializeObject(e),
+										StatusCode = (int)HttpStatusCode.BadRequest
+									};
+								}
+								*/
+
+								break;
+						}
+						#endregion
+						break;
+					case "DELETE":
+						#region DELETEs
+						switch(apigProxyEvent.Path.ToLower()) {
+							case "/dates":
+							case "/dates/":
+								response = HandleDELETE<Date>(apigProxyEvent, ctx);
+								/*
+								try {
+									
+									JObject body = JObject.Parse(apigProxyEvent.Body);
+									int date = int.Parse((string)body["date"]);
+
+									
+
+									try {
+										//Date dtoremove = ctx.dates.Single(thus => thus.date == date);
+										//ctx.dates.Remove(dtoremove);
+										//int status = ctx.SaveChanges();
+										int status = ctx.Database.ExecuteSqlCommand($"DELETE FROM `dates` WHERE `dates`.`date` = {date}");
+										response = new APIGatewayProxyResponse() {
+											Body = JsonConvert.SerializeObject((status == 1)),
+											StatusCode = (int)HttpStatusCode.OK
+										};
+									} catch(Exception e) {
+										Logger.LogLine(e.ToString());
+										response = new APIGatewayProxyResponse() {
+											Body = JsonConvert.SerializeObject(e),
+											StatusCode = (int)HttpStatusCode.InternalServerError
+										};
+									}
+
+								} catch(Exception e) {
+									Logger.LogLine(e.ToString());
+									response = new APIGatewayProxyResponse() {
+										Body = JsonConvert.SerializeObject(e),
+										StatusCode = (int)HttpStatusCode.BadRequest
+									};
+								}
+								*/
+								break;
+							default:
+								break;
+						}
 						#endregion
 						break;
 					default:
 						break;
 				}
-
-
-
-
-
-
-
-				
-
 			}
-			
 
 			return response;
+		}
+
+		//You gotta love generic typing!! :D
+
+		private APIGatewayProxyResponse HandlePOST<E> (APIGatewayProxyRequest request, StableContext ctx) where E : class {
+			try {
+				E obj = JsonConvert.DeserializeObject<E>(request.Body);
+
+
+				try {
+					ctx.Add(obj);
+					int status = ctx.SaveChanges();
+					return new APIGatewayProxyResponse() {
+						Body = JsonConvert.SerializeObject((status == 1)),
+						StatusCode = (int)HttpStatusCode.OK
+					};
+				} catch(Exception e) {
+					Logger.LogLine(e.ToString());
+					return new APIGatewayProxyResponse() {
+						Body = JsonConvert.SerializeObject(e),
+						StatusCode = (int)HttpStatusCode.InternalServerError
+					};
+				}
+
+			} catch(Exception e) {
+				Logger.LogLine(e.ToString());
+				return new APIGatewayProxyResponse() {
+					Body = JsonConvert.SerializeObject(e),
+					StatusCode = (int)HttpStatusCode.BadRequest
+				};
+			}
+		}
+		private APIGatewayProxyResponse HandleDELETE<E>(APIGatewayProxyRequest request, StableContext ctx) where E : class {
+			try {
+				E obj = JsonConvert.DeserializeObject<E>(request.Body);
+				/*
+				 * Gotta wrap DB ops in a transaction
+				 * otherwise, if they die in a try catch
+				 * it could leave an uncommitted tx on the db
+				 * causing problems with future requests
+				using(var tx = ctx.Database.BeginTransaction()) {
+					
+				}
+				*/
+				try {
+					//Logger.LogLine(obj.GetType().ToString());
+					ctx.Remove(obj);
+					//ctx.Attach(obj);
+					//ctx.Remove(obj);
+					//ctx.dates.Remove(ctx.dates.Single(thus => thus.date == date));
+					int status = ctx.SaveChanges();
+					return new APIGatewayProxyResponse() {
+						Body = JsonConvert.SerializeObject((status == 1)),
+						StatusCode = (int)HttpStatusCode.OK
+					};
+				} catch(Exception e) {
+					
+					Logger.LogLine(e.ToString());
+					return new APIGatewayProxyResponse() {
+						Body = JsonConvert.SerializeObject(e),
+						StatusCode = (int)HttpStatusCode.InternalServerError
+					};
+				}
+
+			} catch(Exception e) {
+				Logger.LogLine(e.ToString());
+				return new APIGatewayProxyResponse() {
+					Body = JsonConvert.SerializeObject(e),
+					StatusCode = (int)HttpStatusCode.BadRequest
+				};
+			}
 		}
 	}
 }

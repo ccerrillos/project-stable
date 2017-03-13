@@ -12,5 +12,8 @@ namespace ProjectStableLibrary {
 			get;
 			set;
 		}
+		public override string ToString() {
+			return $"date: {date}";
+		}
 	}
 }
