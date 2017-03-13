@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using MySQL.Data.EntityFrameworkCore.Extensions;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
+using System.Linq;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializerAttribute(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -61,7 +62,8 @@ namespace MySQLEntityTest {
 			Dictionary<int, Houses> houses = new Dictionary<int, Houses>();
 
 			using(ProjectStableContext ctx = new ProjectStableContext(options.Options)) {
-				foreach(Houses h in ctx.houses) {
+				
+				foreach(Houses h in ctx.houses.ToList()) {
 					houses.Add(h.house_id, h);
 					context.Logger.LogLine(h.ToString());
 				}
