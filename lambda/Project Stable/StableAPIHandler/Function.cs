@@ -247,20 +247,23 @@ namespace StableAPIHandler {
 			try {
 				E obj = JsonConvert.DeserializeObject<E>(request.Body);
 
-
-				try {
-					ctx.Add(obj);
-					int status = ctx.SaveChanges();
-					return new APIGatewayProxyResponse() {
-						Body = JsonConvert.SerializeObject((status == 1)),
-						StatusCode = (int)HttpStatusCode.OK
-					};
-				} catch(Exception e) {
-					Logger.LogLine(e.ToString());
-					return new APIGatewayProxyResponse() {
-						Body = JsonConvert.SerializeObject(e),
-						StatusCode = (int)HttpStatusCode.InternalServerError
-					};
+				using(var tx = ctx.Database.BeginTransaction()) {
+					try {
+						ctx.Add(obj);
+						int status = ctx.SaveChanges();
+						tx.Commit();
+						return new APIGatewayProxyResponse() {
+							Body = JsonConvert.SerializeObject((status == 1)),
+							StatusCode = (int)HttpStatusCode.OK
+						};
+					} catch(Exception e) {
+						tx.Rollback();
+						Logger.LogLine(e.ToString());
+						return new APIGatewayProxyResponse() {
+							Body = JsonConvert.SerializeObject(e),
+							StatusCode = (int)HttpStatusCode.InternalServerError
+						};
+					}
 				}
 
 			} catch(Exception e) {
@@ -283,24 +286,27 @@ namespace StableAPIHandler {
 					
 				}
 				*/
-				try {
-					//Logger.LogLine(obj.GetType().ToString());
-					ctx.Remove(obj);
-					//ctx.Attach(obj);
-					//ctx.Remove(obj);
-					//ctx.dates.Remove(ctx.dates.Single(thus => thus.date == date));
-					int status = ctx.SaveChanges();
-					return new APIGatewayProxyResponse() {
-						Body = JsonConvert.SerializeObject((status == 1)),
-						StatusCode = (int)HttpStatusCode.OK
-					};
-				} catch(Exception e) {
-					
-					Logger.LogLine(e.ToString());
-					return new APIGatewayProxyResponse() {
-						Body = JsonConvert.SerializeObject(e),
-						StatusCode = (int)HttpStatusCode.InternalServerError
-					};
+				using(var tx = ctx.Database.BeginTransaction()) {
+					try {
+						//Logger.LogLine(obj.GetType().ToString());
+						ctx.Remove(obj);
+						//ctx.Attach(obj);
+						//ctx.Remove(obj);
+						//ctx.dates.Remove(ctx.dates.Single(thus => thus.date == date));
+						int status = ctx.SaveChanges();
+						tx.Commit();
+						return new APIGatewayProxyResponse() {
+								Body = JsonConvert.SerializeObject((status == 1)),
+								StatusCode = (int)HttpStatusCode.OK
+							};
+					} catch(Exception e) {
+						tx.Rollback();
+						Logger.LogLine(e.ToString());
+						return new APIGatewayProxyResponse() {
+							Body = JsonConvert.SerializeObject(e),
+							StatusCode = (int)HttpStatusCode.InternalServerError
+						};
+					}
 				}
 
 			} catch(Exception e) {
