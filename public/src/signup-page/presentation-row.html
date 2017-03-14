@@ -60,7 +60,7 @@ Example:
         <paper-icon-button icon="icons:arrow-upward" disabled="[[first]]" on-tap="_moveUp"></paper-icon-button>
         <paper-icon-button icon="icons:arrow-downward" disabled="[[last]]" on-tap="_moveDown"></paper-icon-button>
       </div>
-      <div class="vcenter noselect">[[data.title]]</div>
+      <div class="vcenter noselect">[[data.topic]]</div>
       <div class="flex"></div>
       <div>
         <paper-icon-button icon="icons:info" on-tap="_showInfo"></paper-icon-button>
@@ -100,7 +100,7 @@ Example:
         var number = -1;
         if(order && order.length > 0) {
           for(var x = 0; x < order.length; x++) {
-            if(parseInt(order[x]) === data.id) {
+            if(parseInt(order[x]) === data.presentation_id) {
               number = (x + 1);
               break;
             }
@@ -123,17 +123,17 @@ Example:
         return number;
       },
       _computeFirstLast: function(order, data) {
-        this.first = parseInt(order[0]) === data.id;
-        this.last = parseInt(order[order.length - 1]) === data.id;
+        this.first = parseInt(order[0]) === data.presentation_id;
+        this.last = parseInt(order[order.length - 1]) === data.presentation_id;
       },
       _moveUp: function(e) {
-        this.fire('move-up', { id: this.data.id, date: this.data.date, block: this.data.block });
+        this.fire('move-up', { presentation_id: this.data.presentation_id, date: this.data.date, block: this.data.block_id });
       },
       _moveDown: function(e, f, g) {
-        this.fire('move-down', { id: this.data.id, date: this.data.date, block: this.data.block });
+        this.fire('move-down', { presentation_id: this.data.presentation_id, date: this.data.date, block: this.data.block_id });
       },
       _showInfo: function(e) {
-        this.fire('show-info', { id: this.data.id });
+        this.fire('show-info', { presentation_id: this.data.presentation_id });
       }
       
     });

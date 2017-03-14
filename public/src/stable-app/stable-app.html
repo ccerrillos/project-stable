@@ -1,7 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../signup-page/signup-page.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
-
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 
 <dom-module id="stable-app">
   <template>
@@ -14,10 +14,29 @@
         margin-right: auto;
       }
     </style>
+    <iron-ajax
+      auto
+      url="[[_computeAPI('/dates')]]"
+      handle-as="json"
+      last-response="{{dates}}"></iron-ajax>
+    <iron-ajax
+      auto
+      url="[[_computeAPI('/blocks')]]"
+      handle-as="json"
+      last-response="{{blocks}}"></iron-ajax>
+    <iron-ajax
+      auto
+      url="[[_computeAPI('/presentations')]]"
+      handle-as="json"
+      last-response="{{presentations}}"></iron-ajax>
     <div class="layout horizontal">
       <h2 class="center">Project Stable</h2>
     </div>
-    <signup-page></signup-page>
+    <signup-page
+      dates="[[dates]]"
+      blocks="[[blocks]]"
+      presentations="[[presentations]]"
+      ></signup-page>
   </template>
 
   <script>
@@ -26,9 +45,23 @@
       is: 'stable-app',
 
       properties: {
-        
+        dates: {
+          type: Array
+        },
+        blocks: {
+          type: Object
+        },
+        presentations: {
+          type: Object
+        }
       },
-
+      _computeAPI: function (path) {
+        var apiRootPath = 'https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1';
+        return apiRootPath + path;
+      },
+      handleResponse: function(e) {
+        console.log(e.detail.response);
+      }
     });
   </script>
 </dom-module>
