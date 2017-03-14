@@ -24,14 +24,9 @@ namespace ProjectStableLibrary {
 			get;
 			set;
 		}
-		public List<uint> Dates {
+		public List<Date> Dates {
 			get {
-				List<uint> dates = new List<uint>();
-				var list = from d in this.dates orderby d.date select d.date;
-				foreach(uint i in list) {
-					dates.Add(i);
-				}
-				return dates;
+				return dates.ToList();
 			}
 		}
 		public DbSet<Block> blocks {
@@ -88,6 +83,20 @@ namespace ProjectStableLibrary {
 				}
 
 				return locations;
+			}
+		}
+		public DbSet<Presentation> presentations {
+			get;
+			set;
+		}
+		public Dictionary<uint, Presentation> Presentations {
+			get {
+				Dictionary<uint, Presentation> presentations = new Dictionary<uint, Presentation>();
+				foreach(Presentation p in this.presentations) {
+					presentations.Add(p.presentation_id, p);
+				}
+
+				return presentations;
 			}
 		}
 		public DbSet<Viewer> viewers {

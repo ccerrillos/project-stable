@@ -37,7 +37,7 @@ namespace StableAPIHandler {
 
 			switch(apigProxyEvent.Path.ToLower()) {
 				case "/":
-					return new APIGatewayProxyResponse {
+					return new StableAPIResponse {
 						Body = "What are you doing here?",
 						StatusCode = (int)HttpStatusCode.OK
 					};
@@ -59,13 +59,13 @@ namespace StableAPIHandler {
 					break;
 
 				default:
-					return new APIGatewayProxyResponse {
+					return new StableAPIResponse {
 						Body = "{}",
 						StatusCode = (int)HttpStatusCode.NotFound
 					};
 			}
 
-			APIGatewayProxyResponse response = new APIGatewayProxyResponse {
+			StableAPIResponse response = new StableAPIResponse {
 				Body = "{}",
 				StatusCode = (int)HttpStatusCode.NotFound
 			};
@@ -89,7 +89,7 @@ namespace StableAPIHandler {
 
 							case "/dates":
 							case "/dates/":
-								response = new APIGatewayProxyResponse() {
+								response = new StableAPIResponse() {
 									Body = JsonConvert.SerializeObject(ctx.Dates),
 									StatusCode = (int)HttpStatusCode.OK
 								};
@@ -97,7 +97,7 @@ namespace StableAPIHandler {
 
 							case "/blocks":
 							case "/blocks/":
-								response = new APIGatewayProxyResponse() {
+								response = new StableAPIResponse() {
 									Body = JsonConvert.SerializeObject(ctx.Blocks),
 									StatusCode = (int)HttpStatusCode.OK
 								};
@@ -105,7 +105,7 @@ namespace StableAPIHandler {
 
 							case "/grades":
 							case "/grades/":
-								response = new APIGatewayProxyResponse() {
+								response = new StableAPIResponse() {
 									Body = JsonConvert.SerializeObject(ctx.Grades),
 									StatusCode = (int)HttpStatusCode.OK
 								};
@@ -113,7 +113,7 @@ namespace StableAPIHandler {
 
 							case "/houses":
 							case "/houses/":
-								response = new APIGatewayProxyResponse() {
+								response = new StableAPIResponse() {
 									Body = JsonConvert.SerializeObject(ctx.Houses),
 									StatusCode = (int)HttpStatusCode.OK
 								};
@@ -121,7 +121,7 @@ namespace StableAPIHandler {
 
 							case "/locations":
 							case "/locations/":
-								response = new APIGatewayProxyResponse() {
+								response = new StableAPIResponse() {
 									Body = JsonConvert.SerializeObject(ctx.Locations),
 									StatusCode = (int)HttpStatusCode.OK
 								};
@@ -129,11 +129,15 @@ namespace StableAPIHandler {
 
 							case "/presentations":
 							case "/presentations/":
+								response = new StableAPIResponse() {
+									Body = JsonConvert.SerializeObject(ctx.Presentations),
+									StatusCode = (int)HttpStatusCode.OK
+								};
 								break;
 
 							case "/viewers":
 							case "/viewers/":
-								response = new APIGatewayProxyResponse() {
+								response = new StableAPIResponse() {
 									Body = JsonConvert.SerializeObject(ctx.Viewers),
 									StatusCode = (int)HttpStatusCode.OK
 								};
@@ -171,7 +175,7 @@ namespace StableAPIHandler {
 								break;
 							case "/presentations":
 							case "/presentations/":
-								//response = HandlePOST<Presentation>(apigProxyEvent, ctx);
+								response = HandlePOST<Presentation>(apigProxyEvent, ctx);
 								break;
 							case "/viewers":
 							case "/viewers/":
@@ -205,7 +209,7 @@ namespace StableAPIHandler {
 								break;
 							case "/presentations":
 							case "/presentations/":
-								//response = HandleDELETE<Presentation>(apigProxyEvent, ctx);
+								response = HandleDELETE<Presentation>(apigProxyEvent, ctx);
 								break;
 							case "/viewers":
 							case "/viewers/":
@@ -226,7 +230,7 @@ namespace StableAPIHandler {
 
 		//You gotta love generic typing!! :D
 
-		private APIGatewayProxyResponse HandlePOST<E> (APIGatewayProxyRequest request, StableContext ctx) where E : class {
+		private StableAPIResponse HandlePOST<E> (APIGatewayProxyRequest request, StableContext ctx) where E : class {
 			try {
 				E obj = JsonConvert.DeserializeObject<E>(request.Body);
 
@@ -235,14 +239,14 @@ namespace StableAPIHandler {
 						ctx.Add(obj);
 						int status = ctx.SaveChanges();
 						tx.Commit();
-						return new APIGatewayProxyResponse() {
+						return new StableAPIResponse() {
 							Body = JsonConvert.SerializeObject((status == 1)),
 							StatusCode = (int)HttpStatusCode.OK
 						};
 					} catch(Exception e) {
 						tx.Rollback();
 						Logger.LogLine(e.ToString());
-						return new APIGatewayProxyResponse() {
+						return new StableAPIResponse() {
 							Body = JsonConvert.SerializeObject(new Result(e)),
 							StatusCode = (int)HttpStatusCode.InternalServerError
 						};
@@ -251,13 +255,13 @@ namespace StableAPIHandler {
 
 			} catch(Exception e) {
 				Logger.LogLine(e.ToString());
-				return new APIGatewayProxyResponse() {
+				return new StableAPIResponse() {
 					Body = JsonConvert.SerializeObject(new Result(e)),
 					StatusCode = (int)HttpStatusCode.BadRequest
 				};
 			}
 		}
-		private APIGatewayProxyResponse HandleDELETE<E>(APIGatewayProxyRequest request, StableContext ctx) where E : class {
+		private StableAPIResponse HandleDELETE<E>(APIGatewayProxyRequest request, StableContext ctx) where E : class {
 			try {
 				E obj = JsonConvert.DeserializeObject<E>(request.Body);
 				/*
@@ -278,14 +282,14 @@ namespace StableAPIHandler {
 						//ctx.dates.Remove(ctx.dates.Single(thus => thus.date == date));
 						int status = ctx.SaveChanges();
 						tx.Commit();
-						return new APIGatewayProxyResponse() {
+						return new StableAPIResponse() {
 								Body = JsonConvert.SerializeObject((status == 1)),
 								StatusCode = (int)HttpStatusCode.OK
 							};
 					} catch(Exception e) {
 						tx.Rollback();
 						Logger.LogLine(e.ToString());
-						return new APIGatewayProxyResponse() {
+						return new StableAPIResponse() {
 							Body = JsonConvert.SerializeObject(new Result(e)),
 							StatusCode = (int)HttpStatusCode.InternalServerError
 						};
@@ -294,11 +298,18 @@ namespace StableAPIHandler {
 
 			} catch(Exception e) {
 				Logger.LogLine(e.ToString());
-				return new APIGatewayProxyResponse() {
+				return new StableAPIResponse() {
 					Body = JsonConvert.SerializeObject(new Result(e)),
 					StatusCode = (int)HttpStatusCode.BadRequest
 				};
 			}
+		}
+	}
+	public class StableAPIResponse : APIGatewayProxyResponse {
+		public StableAPIResponse() {
+			Headers = new Dictionary<string, string>() {
+				{ "access-control-allow-origin", Environment.GetEnvironmentVariable("SITE_DOMAIN") }
+			};
 		}
 	}
 }
