@@ -260,7 +260,7 @@ namespace StableAPIHandler {
 						tx.Rollback();
 						Logger.LogLine(e.ToString());
 						return new APIGatewayProxyResponse() {
-							Body = JsonConvert.SerializeObject(e),
+							Body = JsonConvert.SerializeObject(new Result(e)),
 							StatusCode = (int)HttpStatusCode.InternalServerError
 						};
 					}
@@ -269,7 +269,7 @@ namespace StableAPIHandler {
 			} catch(Exception e) {
 				Logger.LogLine(e.ToString());
 				return new APIGatewayProxyResponse() {
-					Body = JsonConvert.SerializeObject(e),
+					Body = JsonConvert.SerializeObject(new Result(e)),
 					StatusCode = (int)HttpStatusCode.BadRequest
 				};
 			}
@@ -303,7 +303,7 @@ namespace StableAPIHandler {
 						tx.Rollback();
 						Logger.LogLine(e.ToString());
 						return new APIGatewayProxyResponse() {
-							Body = JsonConvert.SerializeObject(e),
+							Body = JsonConvert.SerializeObject(new Result(e)),
 							StatusCode = (int)HttpStatusCode.InternalServerError
 						};
 					}
@@ -312,7 +312,7 @@ namespace StableAPIHandler {
 			} catch(Exception e) {
 				Logger.LogLine(e.ToString());
 				return new APIGatewayProxyResponse() {
-					Body = JsonConvert.SerializeObject(e),
+					Body = JsonConvert.SerializeObject(new Result(e)),
 					StatusCode = (int)HttpStatusCode.BadRequest
 				};
 			}
