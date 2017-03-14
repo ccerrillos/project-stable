@@ -8,7 +8,7 @@ namespace ProjectStableLibrary {
 	[Table("viewers")]
 	public class Viewer {
 		[Key]
-		public int viewer_id {
+		public uint viewer_id {
 			get;
 			set;
 		}
@@ -22,5 +22,21 @@ namespace ProjectStableLibrary {
 			get;
 			set;
 		}
+		public uint house_id {
+			get;
+			set;
+		}
+		// public virtual House House {
+		// 	get;
+		// 	set;
+		// }
+		public uint grade_id {
+			get;
+			set;
+		}
+		// public virtual Grade Grade {
+		// 	get;
+		// 	set;
+		// }
 	}
 }

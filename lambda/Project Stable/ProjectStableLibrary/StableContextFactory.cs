@@ -24,11 +24,11 @@ namespace ProjectStableLibrary {
 			get;
 			set;
 		}
-		public List<int> Dates {
+		public List<uint> Dates {
 			get {
-				List<int> dates = new List<int>();
+				List<uint> dates = new List<uint>();
 				var list = from d in this.dates orderby d.date select d.date;
-				foreach(int i in list) {
+				foreach(uint i in list) {
 					dates.Add(i);
 				}
 				return dates;
@@ -38,9 +38,9 @@ namespace ProjectStableLibrary {
 			get;
 			set;
 		}
-		public Dictionary<int, Block> Blocks {
+		public Dictionary<uint, Block> Blocks {
 			get {
-				Dictionary<int, Block> blocks = new Dictionary<int, Block>();
+				Dictionary<uint, Block> blocks = new Dictionary<uint, Block>();
 				foreach(Block b in this.blocks) {
 					blocks.Add(b.block_id, b);
 				}
@@ -48,14 +48,14 @@ namespace ProjectStableLibrary {
 				return blocks;
 			}
 		}
-		public DbSet<Grade> grade_levels {
+		public DbSet<Grade> grades {
 			get;
 			set;
 		}
-		public Dictionary<int, Grade> Grades {
+		public Dictionary<uint, Grade> Grades {
 			get {
-				Dictionary<int, Grade> grades = new Dictionary<int, Grade>();
-				foreach(Grade g in this.grade_levels) {
+				Dictionary<uint, Grade> grades = new Dictionary<uint, Grade>();
+				foreach(Grade g in this.grades) {
 					grades.Add(g.grade_id, g);
 				}
 
@@ -66,9 +66,9 @@ namespace ProjectStableLibrary {
 			get;
 			set;
 		}
-		public Dictionary<int, House> Houses {
+		public Dictionary<uint, House> Houses {
 			get {
-				Dictionary<int, House> houses = new Dictionary<int, House>();
+				Dictionary<uint, House> houses = new Dictionary<uint, House>();
 				foreach(House h in this.houses) {
 					houses.Add(h.house_id, h);
 				}
@@ -80,9 +80,9 @@ namespace ProjectStableLibrary {
 			get;
 			set;
 		}
-		public Dictionary<int, Location> Locations {
+		public Dictionary<uint, Location> Locations {
 			get {
-				Dictionary<int, Location> locations = new Dictionary<int, Location>();
+				Dictionary<uint, Location> locations = new Dictionary<uint, Location>();
 				foreach(Location l in this.locations) {
 					locations.Add(l.location_id, l);
 				}
@@ -94,9 +94,9 @@ namespace ProjectStableLibrary {
 			get;
 			set;
 		}
-		public Dictionary<int, Viewer> Viewers {
+		public Dictionary<uint, Viewer> Viewers {
 			get {
-				Dictionary<int, Viewer> viewers = new Dictionary<int, Viewer>();
+				Dictionary<uint, Viewer> viewers = new Dictionary<uint, Viewer>();
 				foreach(Viewer v in this.viewers) {
 					viewers.Add(v.viewer_id, v);
 				}

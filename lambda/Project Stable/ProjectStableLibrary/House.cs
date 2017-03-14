@@ -12,7 +12,7 @@ namespace ProjectStableLibrary {
 	[Table("houses")]
 	public class House {
 		[Key]
-		public int house_id {
+		public uint house_id {
 			get;
 			set;
 		}

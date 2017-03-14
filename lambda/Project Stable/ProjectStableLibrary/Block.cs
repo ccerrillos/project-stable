@@ -8,7 +8,7 @@ namespace ProjectStableLibrary {
 	[Table("blocks")]
 	public class Block {
 		[Key]
-		public int block_id {
+		public uint block_id {
 			get;
 			set;
 		}

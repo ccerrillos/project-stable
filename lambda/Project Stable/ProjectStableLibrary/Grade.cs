@@ -8,12 +8,16 @@ namespace ProjectStableLibrary {
 	[Table("grades")]
 	public class Grade {
 		[Key]
-		public int grade_id {
+		public uint grade_id {
 			get;
 			set;
 		}
 		[MaxLength(255)]
 		public string grade_name {
+			get;
+			set;
+		}
+		public uint default_amount {
 			get;
 			set;
 		}

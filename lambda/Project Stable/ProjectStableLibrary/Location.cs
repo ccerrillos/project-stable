@@ -8,7 +8,7 @@ namespace ProjectStableLibrary {
 	[Table("locations")]
 	public class Location {
 		[Key]
-		public int location_id {
+		public uint location_id {
 			get;
 			set;
 		}

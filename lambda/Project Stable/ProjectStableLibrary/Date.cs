@@ -8,7 +8,7 @@ namespace ProjectStableLibrary {
 	[Table("dates")]
 	public class Date {
 		[Key]
-		public int date {
+		public uint date {
 			get;
 			set;
 		}
