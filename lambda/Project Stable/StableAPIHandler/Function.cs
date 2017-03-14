@@ -152,38 +152,30 @@ namespace StableAPIHandler {
 							case "/dates":
 							case "/dates/":
 								response = HandlePOST<Date>(apigProxyEvent, ctx);
-								/*
-								try {
-									JObject body = JObject.Parse(apigProxyEvent.Body);
-									int date = int.Parse((string)body["date"]);
-
-									
-									try {
-										ctx.dates.Add(new Date() {
-											date = date
-										});
-										int status = ctx.SaveChanges();
-										response = new APIGatewayProxyResponse() {
-											Body = JsonConvert.SerializeObject((status == 1)),
-											StatusCode = (int)HttpStatusCode.OK
-										};
-									} catch(Exception e) {
-										Logger.LogLine(e.ToString());
-										response = new APIGatewayProxyResponse() {
-											Body = JsonConvert.SerializeObject(e),
-											StatusCode = (int)HttpStatusCode.InternalServerError
-										};
-									}
-									
-								} catch(Exception e) {
-									Logger.LogLine(e.ToString());
-									response = new APIGatewayProxyResponse() {
-										Body = JsonConvert.SerializeObject(e),
-										StatusCode = (int)HttpStatusCode.BadRequest
-									};
-								}
-								*/
-
+								break;
+							case "/blocks":
+							case "/blocks/":
+								response = HandlePOST<Block>(apigProxyEvent, ctx);
+								break;
+							case "/grades":
+							case "/grades/":
+								response = HandlePOST<Grade>(apigProxyEvent, ctx);
+								break;
+							case "/houses":
+							case "/houses/":
+								response = HandlePOST<House>(apigProxyEvent, ctx);
+								break;
+							case "/locations":
+							case "/locations/":
+								response = HandlePOST<Location>(apigProxyEvent, ctx);
+								break;
+							case "/presentations":
+							case "/presentations/":
+								//response = HandlePOST<Presentation>(apigProxyEvent, ctx);
+								break;
+							case "/viewers":
+							case "/viewers/":
+								//response = HandlePOST<Viewer>(apigProxyEvent, ctx);
 								break;
 						}
 						#endregion
@@ -194,39 +186,30 @@ namespace StableAPIHandler {
 							case "/dates":
 							case "/dates/":
 								response = HandleDELETE<Date>(apigProxyEvent, ctx);
-								/*
-								try {
-									
-									JObject body = JObject.Parse(apigProxyEvent.Body);
-									int date = int.Parse((string)body["date"]);
-
-									
-
-									try {
-										//Date dtoremove = ctx.dates.Single(thus => thus.date == date);
-										//ctx.dates.Remove(dtoremove);
-										//int status = ctx.SaveChanges();
-										int status = ctx.Database.ExecuteSqlCommand($"DELETE FROM `dates` WHERE `dates`.`date` = {date}");
-										response = new APIGatewayProxyResponse() {
-											Body = JsonConvert.SerializeObject((status == 1)),
-											StatusCode = (int)HttpStatusCode.OK
-										};
-									} catch(Exception e) {
-										Logger.LogLine(e.ToString());
-										response = new APIGatewayProxyResponse() {
-											Body = JsonConvert.SerializeObject(e),
-											StatusCode = (int)HttpStatusCode.InternalServerError
-										};
-									}
-
-								} catch(Exception e) {
-									Logger.LogLine(e.ToString());
-									response = new APIGatewayProxyResponse() {
-										Body = JsonConvert.SerializeObject(e),
-										StatusCode = (int)HttpStatusCode.BadRequest
-									};
-								}
-								*/
+								break;
+							case "/blocks":
+							case "/blocks/":
+								response = HandleDELETE<Block>(apigProxyEvent, ctx);
+								break;
+							case "/grades":
+							case "/grades/":
+								response = HandleDELETE<Grade>(apigProxyEvent, ctx);
+								break;
+							case "/houses":
+							case "/houses/":
+								response = HandleDELETE<House>(apigProxyEvent, ctx);
+								break;
+							case "/locations":
+							case "/locations/":
+								response = HandleDELETE<Location>(apigProxyEvent, ctx);
+								break;
+							case "/presentations":
+							case "/presentations/":
+								//response = HandleDELETE<Presentation>(apigProxyEvent, ctx);
+								break;
+							case "/viewers":
+							case "/viewers/":
+								response = HandleDELETE<Viewer>(apigProxyEvent, ctx);
 								break;
 							default:
 								break;
