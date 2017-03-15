@@ -1,0 +1,143 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-styles/color.html">
+
+<!--
+A comment describing this element
+
+Example:
+
+    <my-elem></my-elem>
+
+Example:
+
+    <my-elem>
+      <h2>Hello my-elem</h2>
+    </my-elem>
+
+@demo demo/index.html
+-->
+
+<dom-module id="signup-form">
+  <template>
+    <style include="iron-flex iron-flex-alignment">
+      :host {
+        display: block;
+        background-color: white;
+        max-width: 300px;
+      }
+      paper-input {
+        margin: 0;
+        
+      }
+      paper-material {
+        padding: 16px;
+      }
+      paper-button[disabled] {
+        background-color: var(--paper-grey-500);
+        color: white;
+      }
+      h4 {
+        margin: 0;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .start {
+        background-color: var(--paper-blue-500);
+        color: white;
+      }
+      .reset {
+        background-color: var(--paper-red-500);
+        color: white;
+      }
+    </style>
+    <paper-material elevation="1">
+      <div class="layout vertical">
+        <h4>Signup!</h4>
+        <paper-input label="First Name" value="{{firstname::input}}"></paper-input>
+        <paper-input label="Last Name" value="{{lastname::input}}"></paper-input>
+        <paper-dropdown-menu label="Grade">
+          <paper-listbox class="dropdown-content" selected="{{grade}}">
+            <paper-item data-id="1">9th</paper-item>
+            <paper-item data-id="2">10th</paper-item>
+            <paper-item data-id="3">11th</paper-item>
+            <paper-item data-id="4">12th</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu>
+        <paper-dropdown-menu label="House">
+          <paper-listbox class="dropdown-content" selected="{{house}}">
+            <paper-item data-id="1">North</paper-item>
+            <paper-item data-id="2">South</paper-item>
+            <paper-item data-id="3">East</paper-item>
+            <paper-item data-id="4">West</paper-item>
+          </paper-listbox>
+        </paper-dropdown-menu>
+        <div class="layout horizontal">
+          <div class="flex"></div>
+          <paper-button id="submit" class="start" raised on-tap="_submit">Start!</paper-button>
+          <paper-button id="reset" class="reset" raised on-tap="_reset">Reset</paper-button>
+        </div>
+        
+      </div>
+      
+    </paper-material>
+  </template>
+  <script>
+    Polymer({
+      is: 'signup-form',
+      properties: {
+        firstname: {
+          type: String,
+          value: ''
+        },
+        lastname: {
+          type: String,
+          value: ''
+        },
+        grade: {
+          type: String,
+          value: '-1'
+        },
+        house: {
+          type: String,
+          value: '-1'
+        }
+      },
+      observers: [
+        '_inputChanged(firstname, lastname, grade, house)'
+      ],
+      _inputChanged: function(firstname, lastname, grade, house) {
+        console.log(firstname);
+        console.log(lastname);
+        console.log(grade);
+        console.log(house);
+
+        this.$.submit.disabled = firstname.length == 0 || lastname.length == 0 || grade == '-1' || house == '-1';
+        this.$.reset.disabled = firstname.length == 0 && lastname.length == 0 && grade == '-1' && house == '-1';
+
+        if(firstname.length != 0 && this._toTitleCase(firstname) != firstname)
+          this.firstname = this._toTitleCase(firstname);
+
+        if(lastname.length != 0 && this._toTitleCase(lastname) != lastname)
+          this.lastname = this._toTitleCase(lastname);
+      },
+      _reset: function() {
+        this.firstname = '';
+        this.lastname = '';
+        this.grade = '-1';
+        this.house = '-1';
+      },
+      _toTitleCase: function(str) {
+        return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+      },
+      _submit: function() {
+
+      }
+    });
+  </script>
+</dom-module>
