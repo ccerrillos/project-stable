@@ -39,7 +39,7 @@ namespace StableAPIHandler {
 				case "/":
 					return new StableAPIResponse {
 						Body = "What are you doing here?",
-						StatusCode = (int)HttpStatusCode.OK
+						StatusCode = HttpStatusCode.OK
 					};
 
 				case "/dates":
@@ -61,13 +61,13 @@ namespace StableAPIHandler {
 				default:
 					return new StableAPIResponse {
 						Body = "{}",
-						StatusCode = (int)HttpStatusCode.NotFound
+						StatusCode = HttpStatusCode.NotFound
 					};
 			}
 
 			StableAPIResponse response = new StableAPIResponse {
 				Body = "{}",
-				StatusCode = (int)HttpStatusCode.NotFound
+				StatusCode = HttpStatusCode.NotFound
 			};
 
 			string conStr = new MySqlConnectionStringBuilder() {
@@ -91,7 +91,7 @@ namespace StableAPIHandler {
 							case "/dates/":
 								response = new StableAPIResponse() {
 									Body = JsonConvert.SerializeObject(ctx.Dates),
-									StatusCode = (int)HttpStatusCode.OK
+									StatusCode = HttpStatusCode.OK
 								};
 								break;
 
@@ -99,7 +99,7 @@ namespace StableAPIHandler {
 							case "/blocks/":
 								response = new StableAPIResponse() {
 									Body = JsonConvert.SerializeObject(ctx.Blocks),
-									StatusCode = (int)HttpStatusCode.OK
+									StatusCode = HttpStatusCode.OK
 								};
 								break;
 
@@ -107,7 +107,7 @@ namespace StableAPIHandler {
 							case "/grades/":
 								response = new StableAPIResponse() {
 									Body = JsonConvert.SerializeObject(ctx.Grades),
-									StatusCode = (int)HttpStatusCode.OK
+									StatusCode = HttpStatusCode.OK
 								};
 								break;
 
@@ -115,7 +115,7 @@ namespace StableAPIHandler {
 							case "/houses/":
 								response = new StableAPIResponse() {
 									Body = JsonConvert.SerializeObject(ctx.Houses),
-									StatusCode = (int)HttpStatusCode.OK
+									StatusCode = HttpStatusCode.OK
 								};
 								break;
 
@@ -123,7 +123,7 @@ namespace StableAPIHandler {
 							case "/locations/":
 								response = new StableAPIResponse() {
 									Body = JsonConvert.SerializeObject(ctx.Locations),
-									StatusCode = (int)HttpStatusCode.OK
+									StatusCode = HttpStatusCode.OK
 								};
 								break;
 
@@ -131,7 +131,7 @@ namespace StableAPIHandler {
 							case "/presentations/":
 								response = new StableAPIResponse() {
 									Body = JsonConvert.SerializeObject(ctx.Presentations),
-									StatusCode = (int)HttpStatusCode.OK
+									StatusCode = HttpStatusCode.OK
 								};
 								break;
 
@@ -139,7 +139,7 @@ namespace StableAPIHandler {
 							case "/viewers/":
 								response = new StableAPIResponse() {
 									Body = JsonConvert.SerializeObject(ctx.Viewers),
-									StatusCode = (int)HttpStatusCode.OK
+									StatusCode = HttpStatusCode.OK
 								};
 								break;
 
@@ -241,14 +241,14 @@ namespace StableAPIHandler {
 						tx.Commit();
 						return new StableAPIResponse() {
 							Body = JsonConvert.SerializeObject((status == 1)),
-							StatusCode = (int)HttpStatusCode.OK
+							StatusCode = HttpStatusCode.OK
 						};
 					} catch(Exception e) {
 						tx.Rollback();
 						Logger.LogLine(e.ToString());
 						return new StableAPIResponse() {
 							Body = JsonConvert.SerializeObject(new Result(e)),
-							StatusCode = (int)HttpStatusCode.InternalServerError
+							StatusCode = HttpStatusCode.InternalServerError
 						};
 					}
 				}
@@ -257,7 +257,7 @@ namespace StableAPIHandler {
 				Logger.LogLine(e.ToString());
 				return new StableAPIResponse() {
 					Body = JsonConvert.SerializeObject(new Result(e)),
-					StatusCode = (int)HttpStatusCode.BadRequest
+					StatusCode = HttpStatusCode.BadRequest
 				};
 			}
 		}
@@ -284,14 +284,14 @@ namespace StableAPIHandler {
 						tx.Commit();
 						return new StableAPIResponse() {
 								Body = JsonConvert.SerializeObject((status == 1)),
-								StatusCode = (int)HttpStatusCode.OK
+								StatusCode = HttpStatusCode.OK
 							};
 					} catch(Exception e) {
 						tx.Rollback();
 						Logger.LogLine(e.ToString());
 						return new StableAPIResponse() {
 							Body = JsonConvert.SerializeObject(new Result(e)),
-							StatusCode = (int)HttpStatusCode.InternalServerError
+							StatusCode = HttpStatusCode.InternalServerError
 						};
 					}
 				}
@@ -300,7 +300,7 @@ namespace StableAPIHandler {
 				Logger.LogLine(e.ToString());
 				return new StableAPIResponse() {
 					Body = JsonConvert.SerializeObject(new Result(e)),
-					StatusCode = (int)HttpStatusCode.BadRequest
+					StatusCode = HttpStatusCode.BadRequest
 				};
 			}
 		}
@@ -310,6 +310,14 @@ namespace StableAPIHandler {
 			Headers = new Dictionary<string, string>() {
 				{ "access-control-allow-origin", Environment.GetEnvironmentVariable("SITE_DOMAIN") }
 			};
+		}
+		new public HttpStatusCode StatusCode {
+			get {
+				return (HttpStatusCode)StatusCode;
+			}
+			set {
+				base.StatusCode = (int)value;
+			}
 		}
 	}
 }
