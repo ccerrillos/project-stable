@@ -335,6 +335,7 @@ namespace StableAPIHandler {
 
 							return new StableAPIResponse() {
 								Body = JsonConvert.SerializeObject(new SignupResponse() {
+									status = true,
 									viewer_id = v.viewer_id,
 									viewer_key = v.viewer_key
 								}),

@@ -264,8 +264,21 @@ Example:
       },
       _response: function(e) {
         console.log(e);
+        if(e.detail.response) {
+          if(e.detail.response.status) {
+            this.$.confirmDialog.close();
+            //load presentation data & go to preferences page
+          } else {
+            if(e.detail.response.details) {
+              this.$.errorToast.text = "An error occurred. " + e.detail.response.details;
+            } else {
+              this.$.errorToast.text = "An error occurred.";
+            }
+            this.$.errorToast.show();
+          }
+        }
         this._enableConfirm();
-        this.$.confirmDialog.close();
+        
       },
       _error: function(e) {
         console.log(e);

@@ -19,6 +19,10 @@ namespace ProjectStableLibrary {
 		}
 	}
 	public class SignupResponse {
+		public bool status {
+			get;
+			set;
+		}
 		public uint viewer_id {
 			get;
 			set;
