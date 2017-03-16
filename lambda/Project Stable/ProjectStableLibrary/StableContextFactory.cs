@@ -103,11 +103,11 @@ namespace ProjectStableLibrary {
 			get;
 			set;
 		}
-		public Dictionary<uint, Viewer> Viewers {
+		public Dictionary<uint, SanitizedViewer> Viewers {
 			get {
-				Dictionary<uint, Viewer> viewers = new Dictionary<uint, Viewer>();
+				Dictionary<uint, SanitizedViewer> viewers = new Dictionary<uint, SanitizedViewer>();
 				foreach(Viewer v in this.viewers) {
-					viewers.Add(v.viewer_id, v);
+					viewers.Add(v.viewer_id, v.Sanitize());
 				}
 
 				return viewers;
