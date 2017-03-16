@@ -78,7 +78,7 @@
       <paper-header-panel main>
         <paper-toolbar>
           <paper-icon-button icon="icons:menu" paper-drawer-toggle></paper-icon-button>
-          <div>Project Stable</div>
+          <div>Project Stable [[titleText]]</div>
         </paper-toolbar>
         <div class="container">
           <div class="content">
@@ -159,11 +159,21 @@
         userData: {
           type: Object,
           observer: '_userDataChanged'
+        },
+        titleText: {
+          type: String,
+          computed: '_computeTitleText(houses, grades, userData)'
         }
       },
       observers: [
         '_dataReady(dates, blocks, presentations)'
       ],
+      _getAttrFromObj: function(key, attr, obj) {
+        if(obj && obj[key] && obj[key][attr]) {
+          return obj[key][attr];
+        }
+        return "error";
+      },
       _computeAPI: function (path) {
         var apiRootPath = 'https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1';
         return apiRootPath + path;
@@ -206,7 +216,16 @@
         } else {
           this.$.signupForm.hidden = false;
           this.$.signupPage.hidden = true;
+          this.titleText = '';
         }
+      },
+      _computeTitleText: function(houses, grades, userData) {
+        if(userData && userData.viewer_id) {
+          return '- ' + userData.last_name + ', ' + userData.first_name
+            + ' (' + this._getAttrFromObj(userData.grade_id, 'grade_name', grades) + ', '
+            + this._getAttrFromObj(userData.house_id, 'house_name', houses) + ')';
+        }
+        return '';
       },
       _signupDone: function(e) {
         this.userData = null;
