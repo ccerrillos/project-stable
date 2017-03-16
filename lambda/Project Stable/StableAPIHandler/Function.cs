@@ -334,10 +334,8 @@ namespace StableAPIHandler {
 							tx.Commit();
 
 							return new StableAPIResponse() {
-								Body = JsonConvert.SerializeObject(new SignupResponse() {
-									status = true,
-									viewer_id = v.viewer_id,
-									viewer_key = v.viewer_key
+								Body = JsonConvert.SerializeObject(new SignupResponse(v) {
+									status = true
 								}),
 								StatusCode = HttpStatusCode.OK
 							};
