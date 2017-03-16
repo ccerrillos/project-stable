@@ -15,7 +15,9 @@
     "paper-styles": "^1.2.0",
     "paper-dropdown-menu": "^1.5.0",
     "paper-listbox": "^1.1.2",
-    "paper-item": "^1.2.1"
+    "paper-item": "^1.2.1",
+    "paper-spinner": "^1.2.1",
+    "paper-toast": "^1.3.0"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

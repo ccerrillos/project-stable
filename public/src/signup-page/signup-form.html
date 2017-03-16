@@ -6,6 +6,10 @@
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-styles/color.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 
 <!--
 A comment describing this element
@@ -55,42 +59,111 @@ Example:
         background-color: var(--paper-red-500);
         color: white;
       }
+      h2 {
+        margin: 0;
+      }
+      p {
+        margin-top: 0;
+      }
+      h3 {
+        margin: 0;
+        margin-bottom: 4px;
+      }
+      #placeholder {
+        width: 268px;
+        height: 308px;
+      }
+      .center {
+        margin-left: auto;
+        margin-right: auto;
+      }
     </style>
+    <iron-ajax
+      id="signupAjax"
+      url="https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1/signup"
+      method="POST"
+      content-type="application/json"
+      handle-as="json"
+      on-request="_request"
+      on-response="_response"
+      on-error="_error"></iron-ajax>
     <paper-material elevation="1">
-      <div class="layout vertical">
+      <div class="layout vertical" id="mainForm" hidden="[[!_dataReady]]">
         <h4>Signup!</h4>
         <paper-input label="First Name" value="{{firstname::input}}"></paper-input>
         <paper-input label="Last Name" value="{{lastname::input}}"></paper-input>
         <paper-dropdown-menu label="Grade">
-          <paper-listbox class="dropdown-content" selected="{{grade}}">
-            <paper-item data-id="1">9th</paper-item>
-            <paper-item data-id="2">10th</paper-item>
-            <paper-item data-id="3">11th</paper-item>
-            <paper-item data-id="4">12th</paper-item>
+          <paper-listbox class="dropdown-content" attr-for-selected="data-id" selected="{{grade}}">
+            <template is="dom-repeat" items="[[_objToArray(grades)]]">
+              <paper-item data-id="[[item.grade_id]]">[[item.grade_name]]</paper-item>
+            </template>
           </paper-listbox>
         </paper-dropdown-menu>
         <paper-dropdown-menu label="House">
-          <paper-listbox class="dropdown-content" selected="{{house}}">
-            <paper-item data-id="1">North</paper-item>
-            <paper-item data-id="2">South</paper-item>
-            <paper-item data-id="3">East</paper-item>
-            <paper-item data-id="4">West</paper-item>
+          <paper-listbox class="dropdown-content" attr-for-selected="data-id" selected="{{house}}">
+            <template is="dom-repeat" items="[[_objToArray(houses)]]">
+              <paper-item data-id="[[item.house_id]]">[[item.house_name]]</paper-item>
+            </template>
           </paper-listbox>
         </paper-dropdown-menu>
         <div class="layout horizontal">
           <div class="flex"></div>
-          <paper-button id="submit" class="start" raised on-tap="_submit">Start!</paper-button>
+          <paper-button id="submit" class="start" raised on-tap="_confirm">Start!</paper-button>
           <paper-button id="reset" class="reset" raised on-tap="_reset">Reset</paper-button>
         </div>
         
       </div>
+      <div class="layout vertical" id="placeholder" hidden="[[_dataReady]]">
+        <div class="flex"></div>
+          <div class="layout horizontal">
+            <div class="flex"></div>
+            <h3>Fetching Data...</h3>
+            <div class="flex"></div>
+          </div>
+          <div class="layout horizontal">
+            <div class="flex"></div>
+            <paper-spinner active></paper-spinner>
+            <div class="flex"></div>
+          </div>
+        <div class="flex"></div>
+      </div>
       
     </paper-material>
+    <paper-dialog id="confirmDialog" modal>
+      <div class="layout vertical">
+        <h2>Confirm</h2>
+        <p>Are you sure this information is correct?</p>
+        <div>First Name: <b>[[firstname]]</b></div>
+        <div>Last Name: <b>[[lastname]]</b></div>
+        <div>Grade: <b>[[_getAttrFromObj(grade, 'grade_name', grades)]]</b></div>
+        <div>House: <b>[[_getAttrFromObj(house, 'house_name', houses)]]</b></div>
+        <div class="layout horizontal" style="margin-top: 16px;">
+          <div class="flex"></div>
+          <paper-button id="confirmButton" raised class="start" on-tap="_submit">
+            <paper-spinner id="spinner" active hidden></paper-spinner>
+            <div id="confirmText">Confirm</div>
+          </paper-button>
+          <paper-button id="cancelButton" raised on-tap="_cancel" class="reset">Cancel</paper-button>
+        </div>
+      </div>
+      
+    </paper-dialog>
+    <paper-toast id="errorToast" text="An error occurred."></paper-toast>
+    <paper-dialog>
+      <h2>Getting Ready...</h2>
+      
+    </paper-dialog>
   </template>
   <script>
     Polymer({
       is: 'signup-form',
       properties: {
+        grades: {
+          type: Object
+        },
+        houses: {
+          type: Object
+        },
         firstname: {
           type: String,
           value: ''
@@ -106,17 +179,30 @@ Example:
         house: {
           type: String,
           value: '-1'
+        },
+        _ajaxRequest: {
+          type: Object,
+          value: null
+        },
+        _dataReady: {
+          type: Boolean,
+          value: false,
+          computed: '_computeDataReady(houses, grades)'
         }
       },
       observers: [
         '_inputChanged(firstname, lastname, grade, house)'
       ],
+      _objToArray: function(obj) {
+        return Object.keys(obj).map(function (key) { return obj[key]; });
+      },
+      _getAttrFromObj: function(key, attr, obj) {
+        if(obj && obj[key] && obj[key][attr]) {
+          return obj[key][attr];
+        }
+        return "error";
+      },
       _inputChanged: function(firstname, lastname, grade, house) {
-        console.log(firstname);
-        console.log(lastname);
-        console.log(grade);
-        console.log(house);
-
         this.$.submit.disabled = firstname.length == 0 || lastname.length == 0 || grade == '-1' || house == '-1';
         this.$.reset.disabled = firstname.length == 0 && lastname.length == 0 && grade == '-1' && house == '-1';
 
@@ -125,6 +211,11 @@ Example:
 
         if(lastname.length != 0 && this._toTitleCase(lastname) != lastname)
           this.lastname = this._toTitleCase(lastname);
+      },
+      _computeDataReady: function(houses, grades) {
+        console.log(houses);
+        console.log(grades);
+        return houses && grades;
       },
       _reset: function() {
         this.firstname = '';
@@ -135,8 +226,57 @@ Example:
       _toTitleCase: function(str) {
         return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
       },
+      _confirm: function() {
+        this.$.confirmDialog.open();
+      },
+      _cancel: function() {
+        if(this._ajaxRequest != null)
+          this._ajaxRequest.abort();
+        else
+          this.$.confirmDialog.close();
+      },
       _submit: function() {
+        this._disableConfirm();
+        this.$.signupAjax.body = JSON.stringify({
+          'first_name': this.firstname,
+          'last_name': this.lastname,
+          'grade': this.grade,
+          'house': this.house
+        });
+        this._ajaxRequest = this.$.signupAjax.generateRequest();
+      },
+      _log: function(e) {
+        console.log(e);
+      },
+      _request: function(e) {
+        console.log(e);
+      },
+      _disableConfirm: function() {
+        this.$.confirmButton.disabled = true;
+        this.$.confirmText.hidden = true;
+        this.$.spinner.hidden = false;
+      },
+      _enableConfirm: function() {
+        this.$.confirmButton.disabled = false;
+        this.$.confirmText.hidden = false;
+        this.$.spinner.hidden = true;
+        this._ajaxRequest = null;
+      },
+      _response: function(e) {
+        console.log(e);
+        this._enableConfirm();
+        this.$.confirmDialog.close();
+      },
+      _error: function(e) {
+        console.log(e);
+        this._enableConfirm();
 
+        if(e.detail.error.message) {
+          this.$.errorToast.text = "An error occurred. " + e.detail.error.message;
+        } else {
+          this.$.errorToast.text = "An error occurred.";
+        }
+        this.$.errorToast.show();
       }
     });
   </script>

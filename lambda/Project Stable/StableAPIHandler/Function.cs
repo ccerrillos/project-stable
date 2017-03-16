@@ -58,6 +58,10 @@ namespace StableAPIHandler {
 				case "/viewers/":
 					break;
 
+				case "/signup":
+				case "/signup/":
+					break;
+
 				default:
 					return new StableAPIResponse {
 						Body = "{}",
@@ -181,6 +185,11 @@ namespace StableAPIHandler {
 							case "/viewers/":
 								//response = HandlePOST<Viewer>(apigProxyEvent, ctx);
 								break;
+
+							case "/signup":
+							case "/signup/":
+								response = startSignup(apigProxyEvent, ctx);
+								break;
 						}
 						#endregion
 						break;
@@ -298,6 +307,28 @@ namespace StableAPIHandler {
 
 			} catch(Exception e) {
 				Logger.LogLine(e.ToString());
+				return new StableAPIResponse() {
+					Body = JsonConvert.SerializeObject(new Result(e)),
+					StatusCode = HttpStatusCode.BadRequest
+				};
+			}
+		}
+		private StableAPIResponse startSignup(APIGatewayProxyRequest request, StableContext ctx) {
+			try {
+				SignupRequest sr = JsonConvert.DeserializeObject<SignupRequest>(request.Body);
+				try {
+
+				} catch (Exception e) {
+					return new StableAPIResponse() {
+						Body = JsonConvert.SerializeObject(new Result(e)),
+						StatusCode = HttpStatusCode.InternalServerError
+					};
+				}
+				return new StableAPIResponse() {
+					Body = JsonConvert.SerializeObject(sr),
+					StatusCode = HttpStatusCode.OK
+				};
+			} catch(Exception e) {
 				return new StableAPIResponse() {
 					Body = JsonConvert.SerializeObject(new Result(e)),
 					StatusCode = HttpStatusCode.BadRequest

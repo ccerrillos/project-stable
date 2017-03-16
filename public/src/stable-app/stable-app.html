@@ -29,20 +29,30 @@
       }
     </style>
     <iron-ajax
-      auto
+      
       url="[[_computeAPI('/dates')]]"
       handle-as="json"
       last-response="{{dates}}"></iron-ajax>
     <iron-ajax
-      auto
+      
       url="[[_computeAPI('/blocks')]]"
       handle-as="json"
       last-response="{{blocks}}"></iron-ajax>
     <iron-ajax
-      auto
+      
       url="[[_computeAPI('/presentations')]]"
       handle-as="json"
       last-response="{{presentations}}"></iron-ajax>
+    <iron-ajax
+      auto
+      url="[[_computeAPI('/houses')]]"
+      handle-as="json"
+      last-response="{{houses}}"></iron-ajax>
+    <iron-ajax
+      auto
+      url="[[_computeAPI('/grades')]]"
+      handle-as="json"
+      last-response="{{grades}}"></iron-ajax>
     
     <paper-drawer-panel force-narrow>
       <paper-header-panel drawer>
@@ -61,7 +71,7 @@
         </paper-toolbar>
         <div class="container">
           <div class="content">
-            <signup-form></signup-form>
+            <signup-form id="signupForm" houses="[[houses]]" grades="[[grades]]"></signup-form>
             <!-- <signup-page
               dates="[[dates]]"
               blocks="[[blocks]]"
@@ -92,6 +102,12 @@
           type: Object
         },
         presentations: {
+          type: Object
+        },
+        house: {
+          type: Object
+        },
+        grades: {
           type: Object
         }
       },
