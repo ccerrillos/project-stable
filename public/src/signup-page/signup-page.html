@@ -5,6 +5,7 @@
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
 
 <link rel="import" href="presentation-row.html">
 <!--
@@ -28,6 +29,7 @@ Example:
     <style include="iron-flex iron-flex-alignment">
       :host {
         display: block;
+        padding-bottom: 48px;
       }
       paper-material {
         padding: 8px;
@@ -60,6 +62,13 @@ Example:
         top: 0;
         margin: 0;
         padding: 0;
+      }
+      paper-fab {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 10000;
+        background-color: var(--paper-green-500);
       }
     </style>
     <div class="layout horizontal">
@@ -102,10 +111,10 @@ Example:
             
           </paper-material>
         </template>
-
-        
       </template>
     </div>
+
+    <paper-fab icon="save" on-tap="_save"></paper-fab>
   </template>
   <script>
     Polymer({
@@ -184,6 +193,9 @@ Example:
       _showInfo: function(e) {
         this.infoData = this.presentations[e.detail.presentation_id];
         this.$.infoDialog.open();
+      },
+      _save: function(e) {
+        this.fire('signup-done');
       }
     });
   </script>

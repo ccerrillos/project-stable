@@ -9,6 +9,7 @@
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../signup-page/signup-form.html">
+<link rel="import" href="../../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
 
 <dom-module id="stable-app">
   <template>
@@ -34,6 +35,7 @@
         color: #eeff41;
       }
     </style>
+    <app-localstorage-document id="userDataSorage" key="stable" data="{{userData}}">
     <iron-ajax
       auto
       id="datesAjax"
@@ -91,6 +93,7 @@
               dates="[[dates]]"
               blocks="[[blocks]]"
               presentations="[[presentations]]"
+              on-signup-done="_signupDone"
               hidden
               ></signup-page>
           </div>
@@ -152,10 +155,14 @@
         },
         grades: {
           type: Object
+        },
+        userData: {
+          type: Object,
+          observer: '_userDataChanged'
         }
       },
       observers: [
-        
+        '_dataReady(dates, blocks, presentations)'
       ],
       _computeAPI: function (path) {
         var apiRootPath = 'https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1';
@@ -169,12 +176,14 @@
       },
       _doSignup: function(e) {
         console.log(e);
-        this.$.postBeginDialog.open();
-        this.$.presentationsAjax.generateRequest();
-        //this.$.signupPage.signup();
+        this.userData = e.detail;
+        this.$.userDataSorage.save();
+        // this.$.postBeginDialog.open();
+        // this.$.presentationsAjax.generateRequest();
+        // this.$.signupPage.signup();
       },
-      _presentationsLoaded: function(e) {
-        if(e.detail.response) {
+      _dataReady: function(dates, blocks, presentations) {
+        if(dates && blocks && presentations) {
           this.$.postBeginDialog.close();
           this.$.signupForm.hidden = true;
           this.$.signupPage.hidden = false;
@@ -188,6 +197,20 @@
       },
       _closeInstructions: function(e) {
         this.$.instructions.hide();
+      },
+      _userDataChanged: function(e) {
+        console.log(e);
+        if(e && e.viewer_id && e.viewer_key) {
+          this.$.postBeginDialog.open();
+          this.$.presentationsAjax.generateRequest();
+        } else {
+          this.$.signupForm.hidden = false;
+          this.$.signupPage.hidden = true;
+        }
+      },
+      _signupDone: function(e) {
+        this.userData = null;
+        this.$.userDataSorage.save();
       }
     });
   </script>
