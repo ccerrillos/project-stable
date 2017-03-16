@@ -317,17 +317,44 @@ namespace StableAPIHandler {
 			try {
 				SignupRequest sr = JsonConvert.DeserializeObject<SignupRequest>(request.Body);
 				try {
+					// Create viewer entry first, so if they don't submit properly
+					// we'll have their info and can randomly place them.
+					Viewer v = new Viewer() {
+						first_name = sr.first_name,
+						last_name = sr.last_name,
+						grade_id = sr.grade,
+						house_id = sr.house,
+						viewer_key = Guid.NewGuid().ToString().Substring(0, 16)
+					};
 
+					using(var tx = ctx.Database.BeginTransaction()) {
+						try {
+							ctx.viewers.Add(v);
+							ctx.SaveChanges();
+							tx.Commit();
+
+							return new StableAPIResponse() {
+								Body = JsonConvert.SerializeObject(new SignupResponse() {
+									viewer_id = v.viewer_id,
+									viewer_key = v.viewer_key
+								}),
+								StatusCode = HttpStatusCode.OK
+							};
+
+						} catch(Exception e) {
+							tx.Rollback();
+							return new StableAPIResponse() {
+								Body = JsonConvert.SerializeObject(new Result(e)),
+								StatusCode = HttpStatusCode.InternalServerError
+							};
+						}
+					}
 				} catch (Exception e) {
 					return new StableAPIResponse() {
 						Body = JsonConvert.SerializeObject(new Result(e)),
 						StatusCode = HttpStatusCode.InternalServerError
 					};
 				}
-				return new StableAPIResponse() {
-					Body = JsonConvert.SerializeObject(sr),
-					StatusCode = HttpStatusCode.OK
-				};
 			} catch(Exception e) {
 				return new StableAPIResponse() {
 					Body = JsonConvert.SerializeObject(new Result(e)),

@@ -18,4 +18,14 @@ namespace ProjectStableLibrary {
 			set;
 		}
 	}
+	public class SignupResponse {
+		public uint viewer_id {
+			get;
+			set;
+		}
+		public string viewer_key {
+			get;
+			set;
+		}
+	}
 }
