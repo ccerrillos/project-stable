@@ -229,6 +229,7 @@
       },
       _signupDone: function(e) {
         this.userData = {};
+        this.$.signupForm.reset();
         this.$.userDataSorage.save();
       }
     });
