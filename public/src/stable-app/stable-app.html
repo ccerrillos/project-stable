@@ -41,28 +41,33 @@
       id="datesAjax"
       url="[[_computeAPI('/dates')]]"
       handle-as="json"
+      on-error="_onError"
       last-response="{{dates}}"></iron-ajax>
     <iron-ajax
       auto
       id="blocksAjax"
       url="[[_computeAPI('/blocks')]]"
       handle-as="json"
+      on-error="_onError"
       last-response="{{blocks}}"></iron-ajax>
     <iron-ajax
       id="presentationsAjax"
       url="[[_computeAPI('/presentations')]]"
       handle-as="json"
       on-response="_presentationsLoaded"
+      on-error="_onError"
       last-response="{{presentations}}"></iron-ajax>
     <iron-ajax
       auto
       url="[[_computeAPI('/houses')]]"
       handle-as="json"
+      on-error="_onError"
       last-response="{{houses}}"></iron-ajax>
     <iron-ajax
       auto
       url="[[_computeAPI('/grades')]]"
       handle-as="json"
+      on-error="_onError"
       last-response="{{grades}}"></iron-ajax>
     
     <paper-drawer-panel force-narrow>
@@ -94,6 +99,7 @@
               blocks="[[blocks]]"
               presentations="[[presentations]]"
               on-signup-done="_signupDone"
+              user-data="[[userData]]"
               hidden
               ></signup-page>
           </div>
@@ -198,6 +204,7 @@
           this.$.signupForm.hidden = true;
           this.$.signupPage.hidden = false;
           this.$.instructions.show();
+          this.$.signupPage.reset();
         } else {
           console.log(presentations);
         }
@@ -231,6 +238,13 @@
         this.userData = {};
         this.$.signupForm.reset();
         this.$.userDataSorage.save();
+      },
+      _onError: function(e) {
+        console.log(e);
+        var ajax = e.target;
+        // setTimeout(function() {
+        //   ajax.generateRequest();
+        // }, 500);
       }
     });
   </script>
