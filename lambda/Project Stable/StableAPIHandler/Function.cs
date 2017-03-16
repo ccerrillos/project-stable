@@ -66,6 +66,10 @@ namespace StableAPIHandler {
 				case "/signup/finish/":
 					break;
 
+				case "/preferences":
+				case "/preferences/":
+					break;
+
 				default:
 					return new StableAPIResponse {
 						Body = "{}",
@@ -151,6 +155,21 @@ namespace StableAPIHandler {
 								};
 								break;
 
+							case "/preferences":
+							case "/preferences/":
+								try {
+									uint viewer_id = uint.Parse(apigProxyEvent.QueryStringParameters["viewer_id"]);
+									response = new StableAPIResponse() {
+										Body = JsonConvert.SerializeObject(ctx.GetPreferences(viewer_id)),
+										StatusCode = HttpStatusCode.OK
+									};
+								} catch (Exception e) {
+									response = new StableAPIResponse() {
+										Body = JsonConvert.SerializeObject(new Result(e)),
+										StatusCode = HttpStatusCode.BadRequest
+									};
+								}
+								break;
 
 
 							default:

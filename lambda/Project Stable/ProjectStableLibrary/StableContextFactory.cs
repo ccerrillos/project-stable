@@ -19,6 +19,15 @@ namespace ProjectStableLibrary {
 		public StableContext(DbContextOptions<StableContext> options) : base(options) {
 			//Model.
 		}
+		protected override void OnModelCreating(ModelBuilder modelBuilder) {
+			modelBuilder.Entity<Preference>()
+				.HasKey(c => new {
+					c.viewer_id,
+					c.date,
+					c.block_id,
+					c.order
+				});
+		}
 
 		public DbSet<Date> dates {
 			get;
@@ -112,6 +121,35 @@ namespace ProjectStableLibrary {
 
 				return viewers;
 			}
+		}
+		public DbSet<Preference> preferences {
+			get;
+			set;
+		}
+		public Dictionary<uint, Dictionary<uint, List<uint>>> GetPreferences(uint viewer_id) {
+			var data = new Dictionary<uint, Dictionary<uint, List<uint>>>();
+			var fetchedDates = dates.ToList();
+			var fetchedBlocks = blocks.ToList();
+			foreach(Date date in fetchedDates) {
+				foreach(Block block in fetchedBlocks) {
+					if(!data.ContainsKey(date.date))
+						data.Add(date.date, new Dictionary<uint, List<uint>>());
+
+					data[date.date].Add(block.block_id, GetPreferences(viewer_id, date.date, block.block_id));
+				}
+			}
+
+			return data;
+		}
+		public List<uint> GetPreferences(uint viewer_id, uint date, uint block_id) {
+			var subset = from thus in preferences
+						 where thus.viewer_id == viewer_id
+							 && thus.date == date
+							 && thus.block_id == block_id
+						 orderby thus.order
+						 select thus.presentation_id;
+
+			return subset.ToList();
 		}
 
 	}
