@@ -190,7 +190,9 @@ Example:
         '_inputChanged(firstname, lastname, grade, house)'
       ],
       _objToArray: function(obj) {
-        return Object.keys(obj).map(function (key) { return obj[key]; });
+        if(obj)
+          return Object.keys(obj).map(function (key) { return obj[key]; });
+        return [];
       },
       _getAttrFromObj: function(key, attr, obj) {
         if(obj && obj[key] && obj[key][attr]) {
