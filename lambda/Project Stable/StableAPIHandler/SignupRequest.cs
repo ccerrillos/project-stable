@@ -1,4 +1,6 @@
 
+using System.Collections.Generic;
+
 namespace ProjectStableLibrary {
 	public class SignupRequest {
 		public string first_name {
@@ -26,6 +28,24 @@ namespace ProjectStableLibrary {
 			last_name = v.last_name;
 			house_id = v.house_id;
 			grade_id = v.grade_id;
+		}
+		public bool status {
+			get;
+			set;
+		}
+	}
+	public class FinishSignupRequest {
+		public string viewer_id {
+			get;
+			set;
+		}
+		public string Viewer_key {
+			get;
+			set;
+		}
+		public Dictionary<uint, Dictionary<uint, List<uint>>> data {
+			get;
+			set;
 		}
 		public bool status {
 			get;

@@ -216,10 +216,19 @@ namespace StableAPIHandler {
 
 							case "/signup/finish":
 							case "/signup/finish/":
-								response = new StableAPIResponse() {
-									StatusCode = HttpStatusCode.OK,
-									Body = apigProxyEvent.Body
-								};
+								try {
+									var req = JsonConvert.DeserializeObject<FinishSignupRequest>(apigProxyEvent.Body);
+									req.status = true;
+									response = new StableAPIResponse() {
+										StatusCode = HttpStatusCode.OK,
+										Body = JsonConvert.SerializeObject(req)
+									};
+								} catch(Exception e) {
+									response = new StableAPIResponse() {
+										Body = JsonConvert.SerializeObject(new Result(e)),
+										StatusCode = HttpStatusCode.BadRequest
+									};
+								}
 								break;
 						}
 						#endregion
@@ -264,6 +273,7 @@ namespace StableAPIHandler {
 						break;
 				}
 			}
+			//Logger.LogLine($"RESPONSE CODE: {((HttpStatusCode)response.StatusCode).ToString()}{Environment.NewLine}{response.Body}");
 
 			return response;
 		}
