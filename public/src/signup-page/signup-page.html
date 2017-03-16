@@ -70,10 +70,28 @@ Example:
         z-index: 10000;
         background-color: var(--paper-green-500);
       }
+      paper-button[disabled] {
+        background-color: var(--paper-grey-500);
+        color: white;
+      }
+      .start {
+        background-color: var(--paper-blue-500);
+        color: white;
+      }
+      .reset {
+        background-color: var(--paper-red-500);
+        color: white;
+      }
     </style>
-    <div class="layout horizontal">
-      <h4 class="center" style="margin-bottom: 32px;">Signup Page UI Test</h4>
-    </div>
+    <iron-ajax
+      id="signupAjax"
+      url="https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1/signup/finish"
+      method="POST"
+      content-type="application/json"
+      handle-as="json"
+      on-request="_request"
+      on-response="_response"
+      on-error="_error"></iron-ajax>
 
     <paper-dialog id="infoDialog" modal>
       <paper-icon-button icon="icons:close" dialog-dismiss class="close-btn"></paper-icon-button>
@@ -82,6 +100,20 @@ Example:
         <div>Presenter: <b>[[infoData.first_name]] [[infoData.last_name]]</b></div>
         <div>Location: <b>Location</b></div>
         <div>Bio:<br>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur et augue vitae urna elementum tristique. Aliquam finibus semper ligula, molestie hendrerit leo dictum id. Duis nisi quam, eleifend in arcu at, fermentum cursus massa. Phasellus blandit ligula eu odio scelerisque aliquam. Vivamus porta at mi ornare lobortis. Nam ante eros.</div>
+      </div>
+    </paper-dialog>
+    <paper-dialog id="confirmDialog">
+      <div class="layout vertical">
+        <h2>Confirmation</h2>
+        <p>Are you sure you're ready to submit?</p>
+        <div class="layout horizontal" style="margin-top: 16px;">
+          <div class="flex"></div>
+          <paper-button id="confirmButton" raised class="start" on-tap="_submit">
+            <paper-spinner id="spinner" active hidden></paper-spinner>
+            <div id="confirmText">Confirm</div>
+          </paper-button>
+          <paper-button id="cancelButton" raised on-tap="_cancel" class="reset">Cancel</paper-button>
+        </div>
       </div>
     </paper-dialog>
 
@@ -114,7 +146,8 @@ Example:
       </template>
     </div>
 
-    <paper-fab icon="save" on-tap="_save"></paper-fab>
+    <paper-toast id="errorToast" text="An error occurred."></paper-toast>
+    <paper-fab icon="save" on-tap="_confirm"></paper-fab>
   </template>
   <script>
     Polymer({
@@ -132,7 +165,17 @@ Example:
         infoData: {
           type: Object,
           value: {}
+        },
+        toSave: {
+          type: Object,
+          value: {}
+        },
+        userData: {
+          type: Object
         }
+      },
+      reset: function() {
+        this.toSave = {};
       },
       _objToArray: function(obj) {
         return Object.keys(obj).map(function (key) { return obj[key]; });
@@ -173,6 +216,14 @@ Example:
         e.model.set('block.order', order);
         //
 
+        var date = e.model.get('date');
+        var block_id = e.model.get('block.block_id');
+
+        if(!this.toSave[date]) {
+          this.toSave[date] = {};
+        }
+        // if(!this.toSave[date][block_id])
+        this.toSave[date][block_id] = order;
 
       },
       _sortableAdd: function(e) {
@@ -194,8 +245,78 @@ Example:
         this.infoData = this.presentations[e.detail.presentation_id];
         this.$.infoDialog.open();
       },
+      _confirm: function(e) {
+        this._enableConfirm();
+        this.$.confirmDialog.open();
+      },
       _save: function(e) {
-        this.fire('signup-done');
+        //open confirm dialog
+        //this.$.confirmationDialog.open();
+        //this.fire('signup-done');
+      },
+      _disableConfirm: function() {
+        this.$.confirmButton.disabled = true;
+        this.$.confirmText.hidden = true;
+        this.$.spinner.hidden = false;
+      },
+      _enableConfirm: function() {
+        this.$.confirmButton.disabled = false;
+        this.$.confirmText.hidden = false;
+        this.$.spinner.hidden = true;
+        this._ajaxRequest = null;
+      },
+      _cancel: function() {
+        if(this._ajaxRequest != null)
+          this._ajaxRequest.abort();
+        else
+          this.$.confirmDialog.close();
+      },
+      _submit: function() {
+        this._disableConfirm();
+        this.$.signupAjax.body = JSON.stringify({
+          'status': true,
+          'viewer_id': this.userData.viewer_id,
+          'viewer_key': this.userData.viewer_key,
+          'data': this.toSave
+        });
+        this._ajaxRequest = this.$.signupAjax.generateRequest();
+      },
+      _response: function(e) {
+        console.log(e);
+        if(e.detail.response) {
+          if(e.detail.response.status) {
+            
+            //load presentation data & go to preferences page
+            //this.fire('do-signup', e.detail.response);
+            this.$.errorToast.text = "Saved!";
+            this.$.errorToast.show();
+            var thus = this;
+            setTimeout(function(){
+              thus.fire('signup-done');
+              thus.$.confirmDialog.close();
+            }, 3500);
+            
+          } else {
+            if(e.detail.response.details) {
+              this.$.errorToast.text = "An error occurred. " + e.detail.response.details;
+            } else {
+              this.$.errorToast.text = "An error occurred.";
+            }
+            this.$.errorToast.show();
+            this._enableConfirm();
+          }
+        }
+      },
+      _error: function(e) {
+        console.log(e);
+        this._enableConfirm();
+
+        if(e.detail.error.message) {
+          this.$.errorToast.text = "An error occurred. " + e.detail.error.message;
+        } else {
+          this.$.errorToast.text = "An error occurred.";
+        }
+        this.$.errorToast.show();
       }
     });
   </script>
