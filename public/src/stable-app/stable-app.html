@@ -6,6 +6,8 @@
 <link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
 <link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../signup-page/signup-form.html">
 
 <dom-module id="stable-app">
@@ -27,21 +29,28 @@
         margin-left: auto;
         margin-right: auto;
       }
+      .dismiss-button {
+        text-transform: none;
+        color: #eeff41;
+      }
     </style>
     <iron-ajax
-      
+      auto
+      id="datesAjax"
       url="[[_computeAPI('/dates')]]"
       handle-as="json"
       last-response="{{dates}}"></iron-ajax>
     <iron-ajax
-      
+      auto
+      id="blocksAjax"
       url="[[_computeAPI('/blocks')]]"
       handle-as="json"
       last-response="{{blocks}}"></iron-ajax>
     <iron-ajax
-      
+      id="presentationsAjax"
       url="[[_computeAPI('/presentations')]]"
       handle-as="json"
+      on-response="_presentationsLoaded"
       last-response="{{presentations}}"></iron-ajax>
     <iron-ajax
       auto
@@ -71,17 +80,51 @@
         </paper-toolbar>
         <div class="container">
           <div class="content">
-            <signup-form id="signupForm" houses="[[houses]]" grades="[[grades]]"></signup-form>
-            <!-- <signup-page
+            <signup-form
+              id="signupForm"
+              houses="[[houses]]"
+              grades="[[grades]]"
+              on-do-signup="_doSignup"
+              ></signup-form>
+            <signup-page
+              id="signupPage"
               dates="[[dates]]"
               blocks="[[blocks]]"
               presentations="[[presentations]]"
-              ></signup-page> -->
+              hidden
+              ></signup-page>
           </div>
         </div>
       </paper-header-panel>
     </paper-drawer-panel>
-    
+    <paper-dialog id="postBeginDialog" modal>
+      <div class="layout horizontal">
+        <div class="flex"></div>
+        <h2>Getting Ready!</h2>
+        <div class="flex"></div>
+      </div>
+      <div class="layout horizontal" style="margin-top: 8px; margin-bottom: 4px;">
+        <div class="flex"></div>
+        <p style="margin: 0px;">Fetching presentation data...</p>
+        <div class="flex"></div>
+      </div>
+      <div class="layout horizontal" style="margin-top: 4px; margin-bottom: 8px;">
+        <div class="flex"></div>
+        <b>Please don't reload.</b  >
+        <div class="flex"></div>
+      </div>
+      <div class="layout horizontal" style="margin-top: 8px;">
+        <div class="flex"></div>
+        <paper-spinner active></paper-spinner>
+        <div class="flex"></div>
+      </div>
+    </paper-dialog>
+    <paper-toast id="instructions" duration="0" style="padding: 8px;">
+      <div>
+        Drag the <iron-icon icon="icons:reorder"></iron-icon> to sort your preferences.
+        <paper-icon-button icon="icons:close" on-tap="_closeInstructions" class="dismiss-button"></paper-icon-button>
+      </div>
+    </paper-toast>
     <!-- <sample-content size="10"></sample-content> -->
     <!-- <signup-page
       dates="[[dates]]"
@@ -111,6 +154,9 @@
           type: Object
         }
       },
+      observers: [
+        
+      ],
       _computeAPI: function (path) {
         var apiRootPath = 'https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1';
         return apiRootPath + path;
@@ -120,6 +166,28 @@
       },
       tog: function(e) {
         this.$.drawer.toggle();
+      },
+      _doSignup: function(e) {
+        console.log(e);
+        this.$.postBeginDialog.open();
+        this.$.presentationsAjax.generateRequest();
+        //this.$.signupPage.signup();
+      },
+      _presentationsLoaded: function(e) {
+        if(e.detail.response) {
+          this.$.postBeginDialog.close();
+          this.$.signupForm.hidden = true;
+          this.$.signupPage.hidden = false;
+          this.$.instructions.show();
+        } else {
+          console.log(e);
+        }
+      },
+      ready: function(e) {
+        
+      },
+      _closeInstructions: function(e) {
+        this.$.instructions.hide();
       }
     });
   </script>
