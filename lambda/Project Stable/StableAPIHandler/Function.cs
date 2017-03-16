@@ -62,6 +62,10 @@ namespace StableAPIHandler {
 				case "/signup/":
 					break;
 
+				case "/signup/finish":
+				case "/signup/finish/":
+					break;
+
 				default:
 					return new StableAPIResponse {
 						Body = "{}",
@@ -189,6 +193,14 @@ namespace StableAPIHandler {
 							case "/signup":
 							case "/signup/":
 								response = startSignup(apigProxyEvent, ctx);
+								break;
+
+							case "/signup/finish":
+							case "/signup/finish/":
+								response = new StableAPIResponse() {
+									StatusCode = HttpStatusCode.OK,
+									Body = apigProxyEvent.Body
+								};
 								break;
 						}
 						#endregion
