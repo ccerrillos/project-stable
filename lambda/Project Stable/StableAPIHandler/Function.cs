@@ -216,19 +216,7 @@ namespace StableAPIHandler {
 
 							case "/signup/finish":
 							case "/signup/finish/":
-								try {
-									var req = JsonConvert.DeserializeObject<FinishSignupRequest>(apigProxyEvent.Body);
-									req.status = true;
-									response = new StableAPIResponse() {
-										StatusCode = HttpStatusCode.OK,
-										Body = JsonConvert.SerializeObject(req)
-									};
-								} catch(Exception e) {
-									response = new StableAPIResponse() {
-										Body = JsonConvert.SerializeObject(new Result(e)),
-										StatusCode = HttpStatusCode.BadRequest
-									};
-								}
+								response = finishSignup(apigProxyEvent, ctx, context);
 								break;
 						}
 						#endregion
@@ -395,6 +383,65 @@ namespace StableAPIHandler {
 						StatusCode = HttpStatusCode.InternalServerError
 					};
 				}
+			} catch(Exception e) {
+				return new StableAPIResponse() {
+					Body = JsonConvert.SerializeObject(new Result(e)),
+					StatusCode = HttpStatusCode.BadRequest
+				};
+			}
+		}
+		private StableAPIResponse finishSignup(APIGatewayProxyRequest apigProxyEvent, StableContext ctx, ILambdaContext context) {
+			try {
+				var req = JsonConvert.DeserializeObject<FinishSignupRequest>(apigProxyEvent.Body);
+				req.status = true;
+				try {
+					List<Preference> toAdd = new List<Preference>();
+					foreach(var kv_1 in req.data) {
+						foreach(var kv_2 in kv_1.Value) {
+							for(int x = 0; x < kv_2.Value.Count; x++) {
+								toAdd.Add(new Preference() {
+									viewer_id = req.viewer_id,
+									date = kv_1.Key,
+									block_id = kv_2.Key,
+									order = (uint)(x + 1),
+									presentation_id = kv_2.Value[x]
+								});
+							}
+						}
+					}
+					using(var tx = ctx.Database.BeginTransaction()) {
+						try {
+							foreach(Preference p in toAdd) {
+								ctx.preferences.Add(p);
+							}
+							ctx.SaveChanges();
+							tx.Commit();
+						} catch(Exception e) {
+							tx.Rollback();
+							var expt = e;
+							while(expt != null) {
+								context.Logger.LogLine(expt.Message);
+								expt = expt.InnerException;
+							}
+							return new StableAPIResponse() {
+								Body = JsonConvert.SerializeObject(new Result(e)),
+								StatusCode = HttpStatusCode.InternalServerError
+							};
+							
+						}
+					}
+
+				} catch(Exception e) {
+					return new StableAPIResponse() {
+						Body = JsonConvert.SerializeObject(new Result(e)),
+						StatusCode = HttpStatusCode.InternalServerError
+					};
+					
+				}
+				return new StableAPIResponse() {
+					StatusCode = HttpStatusCode.OK,
+					Body = JsonConvert.SerializeObject(req)
+				};
 			} catch(Exception e) {
 				return new StableAPIResponse() {
 					Body = JsonConvert.SerializeObject(new Result(e)),
