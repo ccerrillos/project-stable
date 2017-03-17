@@ -119,7 +119,7 @@ Example:
 
     <div id="content">
       <template is="dom-repeat" items="[[dates]]" as="date">
-        <template is="dom-repeat" items="[[_objToArray(blocks)]]" as="block">
+        <template is="dom-repeat" items="[[blocksArr]]" as="block">
           <paper-material elevation="1">
             <h3>[[_parseDate(date.date)]] - [[block.block_name]] Block</h3>
             <sortable-js
@@ -159,6 +159,10 @@ Example:
         blocks: {
           type: Object
         },
+        blocksArr: {
+          type: Array,
+          computed: '_computeBlocksArr(blocks)'
+        },
         presentations: {
           type: Object
         },
@@ -176,9 +180,11 @@ Example:
       },
       reset: function() {
         this.toSave = {};
+        this.blocksArr = this._computeBlocksArr(this.blocks);
       },
       _objToArray: function(obj) {
-        return Object.keys(obj).map(function (key) { return obj[key]; });
+        if(obj)
+          return Object.keys(obj).map(function (key) { return obj[key]; });
       },
       _parseDate: function(e) {
         var str = e.toString();
@@ -192,6 +198,9 @@ Example:
             d = str.substr(6,2);
             console.log(y + " " + m + " " + d);
         return new Date(y,parseInt(m) - 1,d).toDateString();
+      },
+      _computeBlocksArr: function(blocks) {
+        return this._objToArray(blocks);
       },
       _getPresentations: function(dateblock, presentations) {
         return presentations[dateblock.guid];
@@ -224,6 +233,9 @@ Example:
         }
         // if(!this.toSave[date][block_id])
         this.toSave[date][block_id] = order;
+        for(var x = 0; x < this.toSave[date][block_id].length; x++) {
+          this.toSave[date][block_id][x] = parseInt(this.toSave[date][block_id][x]);
+        }
 
       },
       _sortableAdd: function(e) {
@@ -275,7 +287,7 @@ Example:
         this._disableConfirm();
         this.$.signupAjax.body = JSON.stringify({
           'status': true,
-          'viewer_id': this.userData.viewer_id,
+          'viewer_id': parseInt(this.userData.viewer_id),
           'viewer_key': this.userData.viewer_key,
           'data': this.toSave
         });

@@ -35,7 +35,7 @@ namespace ProjectStableLibrary {
 		}
 	}
 	public class FinishSignupRequest {
-		public string viewer_id {
+		public uint viewer_id {
 			get;
 			set;
 		}
