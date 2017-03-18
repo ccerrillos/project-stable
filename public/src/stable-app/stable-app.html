@@ -172,7 +172,7 @@
         }
       },
       observers: [
-        '_dataReady(dates, blocks, presentations)'
+        '_dataReady(dates, blocks, presentations, userData)'
       ],
       _getAttrFromObj: function(key, attr, obj) {
         if(obj && obj[key] && obj[key][attr]) {
@@ -198,8 +198,8 @@
         // this.$.presentationsAjax.generateRequest();
         // this.$.signupPage.signup();
       },
-      _dataReady: function(dates, blocks, presentations) {
-        if(dates && blocks && presentations) {
+      _dataReady: function(dates, blocks, presentations, userData) {
+        if(dates && blocks && presentations && userData && userData.viewer_id) {
           this.$.postBeginDialog.close();
           this.$.signupForm.hidden = true;
           this.$.signupPage.hidden = false;
