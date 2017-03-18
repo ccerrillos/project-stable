@@ -34,6 +34,10 @@
         text-transform: none;
         color: #eeff41;
       }
+      .vcenter {
+        margin-top: auto;
+        margin-bottom: auto;
+      }
     </style>
     <app-localstorage-document id="userDataSorage" key="stable" data="{{userData}}">
     <iron-ajax
@@ -129,9 +133,24 @@
       </div>
     </paper-dialog>
     <paper-toast id="instructions" duration="0" style="padding: 8px;">
-      <div>
-        Drag the <iron-icon icon="icons:reorder"></iron-icon> to sort your preferences.
-        <paper-icon-button icon="icons:close" on-tap="_closeInstructions" class="dismiss-button"></paper-icon-button>
+      <div class="layout horizontal">
+        <div class="vcenter">Drag the <iron-icon icon="icons:reorder"></iron-icon> to sort your preferences.</div>
+        <div class="flex"></div>
+        <paper-icon-button icon="icons:close" on-tap="_closeToastI" class="dismiss-button"></paper-icon-button>
+      </div>
+    </paper-toast>
+    <paper-toast id="completedToast" duration="0" style="padding: 8px;">
+      <div class="layout horizontal">
+        <div class="vcenter">Your data has been saved!</div>
+        <div class="flex"></div>
+        <paper-icon-button icon="icons:close" on-tap="_closeToastC" class="dismiss-button"></paper-icon-button>
+      </div>
+    </paper-toast>
+    <paper-toast id="errorToast" duration="0" style="padding: 8px;">
+      <div class="layout horizontal">
+        <div class="vcenter">Your data was already saved!</div>
+        <div class="flex"></div>
+        <paper-icon-button icon="icons:close" on-tap="_closeToastE" class="dismiss-button"></paper-icon-button>
       </div>
     </paper-toast>
     <!-- <sample-content size="10"></sample-content> -->
@@ -212,8 +231,14 @@
       ready: function(e) {
         
       },
-      _closeInstructions: function(e) {
+      _closeToastI: function(e) {
         this.$.instructions.hide();
+      },
+      _closeToastC: function(e) {
+        this.$.completedToast.hide();
+      },
+      _closeToastE: function(e) {
+        this.$.errorToast.hide();
       },
       _userDataChanged: function(e) {
         console.log(e);
@@ -235,6 +260,12 @@
         return '';
       },
       _signupDone: function(e) {
+        if(e.detail !== undefined) {
+          if(e.detail.error)
+            this.$.errorToast.show();
+          else
+            this.$.completedToast.show();
+        }
         this.userData = {};
         this.$.signupForm.reset();
         this.$.userDataSorage.save();

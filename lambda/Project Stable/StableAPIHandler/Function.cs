@@ -416,6 +416,21 @@ namespace StableAPIHandler {
 							}
 							ctx.SaveChanges();
 							tx.Commit();
+						} catch (DbUpdateException e) {
+							tx.Rollback();
+							if(e.InnerException != null) {
+								if(e.InnerException.GetType() == typeof(MySqlException)) {
+									var me = e.InnerException as MySqlException;
+									return new StableAPIResponse() {
+										Body = JsonConvert.SerializeObject(new SignupErrorResponse(me.Number)),
+										StatusCode = HttpStatusCode.OK
+									};
+								}
+							}
+							return new StableAPIResponse() {
+								Body = JsonConvert.SerializeObject(e),
+								StatusCode = HttpStatusCode.InternalServerError
+							};
 						} catch(Exception e) {
 							tx.Rollback();
 							var expt = e;

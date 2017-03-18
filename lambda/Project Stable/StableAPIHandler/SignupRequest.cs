@@ -1,7 +1,7 @@
 
 using System.Collections.Generic;
 
-namespace ProjectStableLibrary {
+namespace StableAPIHandler {
 	public class SignupRequest {
 		public string first_name {
 			get;
@@ -20,8 +20,8 @@ namespace ProjectStableLibrary {
 			set;
 		}
 	}
-	public class SignupResponse : Viewer {
-		public SignupResponse(Viewer v) {
+	public class SignupResponse : ProjectStableLibrary.Viewer {
+		public SignupResponse(ProjectStableLibrary.Viewer v) {
 			viewer_id = v.viewer_id;
 			viewer_key = v.viewer_key;
 			first_name = v.first_name;
@@ -30,6 +30,20 @@ namespace ProjectStableLibrary {
 			grade_id = v.grade_id;
 		}
 		public bool status {
+			get;
+			set;
+		}
+	}
+	public class SignupErrorResponse {
+		public SignupErrorResponse(int code) {
+			this.status = false;
+			this.code = code;
+		}
+		public bool status {
+			get;
+			set;
+		}
+		public int code {
 			get;
 			set;
 		}

@@ -300,21 +300,23 @@ Example:
             
             //load presentation data & go to preferences page
             //this.fire('do-signup', e.detail.response);
-            this.$.errorToast.text = "Saved!";
-            this.$.errorToast.show();
-            var thus = this;
-            setTimeout(function(){
-              thus.fire('signup-done');
-              thus.$.confirmDialog.close();
-            }, 3500);
+
+            this.$.confirmDialog.close();
+            this.fire('signup-done', { error: false });
             
           } else {
-            if(e.detail.response.details) {
-              this.$.errorToast.text = "An error occurred. " + e.detail.response.details;
+            if(e.detail.response.code !== undefined) {
+              this.fire('signup-done', { error: true });
+              this.$.confirmDialog.close();
             } else {
-              this.$.errorToast.text = "An error occurred.";
+              if(e.detail.response.details) {
+                this.$.errorToast.text = "An error occurred. " + e.detail.response.details;
+              } else {
+                this.$.errorToast.text = "An error occurred.";
+              }
+              this.$.errorToast.show();
             }
-            this.$.errorToast.show();
+            
             this._enableConfirm();
           }
         }
