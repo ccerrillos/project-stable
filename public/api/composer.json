@@ -1,6 +1,0 @@
-{
-    "require": {
-        "slim/slim": "^3.7",
-        "monolog/monolog": "^1.22"
-    }
-}
