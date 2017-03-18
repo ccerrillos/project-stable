@@ -212,7 +212,7 @@
       _doSignup: function(e) {
         console.log(e);
         this.userData = e.detail;
-        this.$.userDataSorage.save();
+        this.$.userDataSorage.save("stable");
         // this.$.postBeginDialog.open();
         // this.$.presentationsAjax.generateRequest();
         // this.$.signupPage.signup();
@@ -260,6 +260,7 @@
         return '';
       },
       _signupDone: function(e) {
+        // this.presentation = null;
         if(e.detail !== undefined) {
           if(e.detail.error)
             this.$.errorToast.show();
@@ -268,7 +269,7 @@
         }
         this.userData = {};
         this.$.signupForm.reset();
-        this.$.userDataSorage.save();
+        this.$.userDataSorage.save("stable");
       },
       _onError: function(e) {
         console.log(e);
