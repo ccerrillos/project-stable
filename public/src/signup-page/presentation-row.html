@@ -54,8 +54,8 @@ Example:
       }
     </style>
     <div class="layout horizontal">
-      <h3 id="number" class="vcenter number noselect">[[number]]</h3>
-      <iron-icon icon="icons:reorder" class="handle vcenter handle-icon noselect"></iron-icon>
+      <h3 id="number" class="vcenter number noselect" hidden="[[!sortable]]">[[number]]</h3>
+      <iron-icon icon="icons:reorder" class="handle vcenter handle-icon noselect" hidden="[[!sortable]]"></iron-icon>
       <div hidden>
         <paper-icon-button icon="icons:arrow-upward" disabled="[[first]]" on-tap="_moveUp"></paper-icon-button>
         <paper-icon-button icon="icons:arrow-downward" disabled="[[last]]" on-tap="_moveDown"></paper-icon-button>
@@ -91,6 +91,11 @@ Example:
           type: String,
           computed: '_computeNumber(order, data)',
           value: "*"
+        },
+        sortable: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
         }
       },
       observers: [
