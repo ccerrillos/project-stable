@@ -6,6 +6,8 @@
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../bower_components/app-route/app-location.html">
 
 <link rel="import" href="../signup-page/registration-page.html">
 <link rel="import" href="../presentations-page/presentations-page.html">
@@ -27,14 +29,16 @@
         margin-right: auto;
       }
     </style>
+    <app-location route="{{route}}" use-hash-as-path></app-location>
+    <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{tail}}"></app-route>
 
-    <paper-drawer-panel force-narrow>
+    <paper-drawer-panel force-narrow id="paperDrawerPanel">
       <paper-header-panel drawer>
         <paper-toolbar>
           <div>Project Stable</div>
         </paper-toolbar>
         <div>
-          <paper-menu attr-for-selected="name" selected="{{page}}">
+          <paper-menu attr-for-selected="name" selected="{{routeData.page}}" on-tap="_closeDrawer">
             <paper-item name="registration">Registration</paper-item>
             <paper-item name="presentations">Presentations</paper-item>
             <paper-item name="viewers">Viewers</paper-item>
@@ -49,7 +53,7 @@
         </paper-toolbar>
         <div class="container">
           <div class="content">
-            <iron-pages attr-for-selected="name" selected="{{page}}">
+            <iron-pages attr-for-selected="name" selected="[[routeData.page]]">
               <registration-page name="registration"></registration-page>
               <presentations-page name="presentations"></presentations-page>
               <viewers-page name="viewers"></viewers-page>
@@ -72,7 +76,11 @@
         },
         page: {
           type: String,
-          value: 'registration'
+          value: 'registration',
+          observer: '_onPageChanged'
+        },
+        routeData: {
+          type: Object
         }
       },
       observers: [
@@ -97,7 +105,14 @@
           this.page = e.detail.page;
         }
         console.log(this.page);
-      }
+      },
+      _onPageChanged: function(e) {
+        console.log('changed: ' + e);
+        this.set('route.path', '/' + e);
+      },
+      _closeDrawer: function(e) {
+        this.$.paperDrawerPanel.closeDrawer();
+      } 
     });
   </script>
 </dom-module>

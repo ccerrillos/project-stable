@@ -22,7 +22,8 @@
     "app-storage": "^0.9.8",
     "paper-radio-group": "^1.2.1",
     "paper-menu": "^1.2.2",
-    "iron-pages": "^1.0.8"
+    "iron-pages": "^1.0.8",
+    "app-route": "PolymerElements/app-route#^0.9.3"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
