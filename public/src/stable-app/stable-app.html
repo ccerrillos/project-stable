@@ -8,6 +8,8 @@
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
 
 <link rel="import" href="registration-page.html">
+<link rel="import" href="../presentations-page/presentations-page.html">
+<link rel="import" href="../viewers-page/viewers-page.html">
 
 <dom-module id="stable-app">
   <template>
@@ -34,8 +36,8 @@
         <div>
           <paper-menu attr-for-selected="name" selected="{{page}}">
             <paper-item name="registration">Registration</paper-item>
-            <paper-item name="viwers">Viewers</paper-item>
             <paper-item name="presentations">Presentations</paper-item>
+            <paper-item name="viewers">Viewers</paper-item>
           </paper-menu>
 
         </div>
@@ -49,7 +51,8 @@
           <div class="content">
             <iron-pages attr-for-selected="name" selected="{{page}}">
               <registration-page name="registration"></registration-page>
-              <viewers-page name="viewers">VVV</viewers-page>
+              <presentations-page name="presentations"></presentations-page>
+              <viewers-page name="viewers"></viewers-page>
             </iron-pages>
             
           </div>
