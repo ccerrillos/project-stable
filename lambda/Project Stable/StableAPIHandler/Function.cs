@@ -270,6 +270,16 @@ namespace StableAPIHandler {
 
 		private StableAPIResponse HandlePOST<E> (APIGatewayProxyRequest request, StableContext ctx) where E : class {
 			try {
+				string adminCode = Environment.GetEnvironmentVariable("admin_code");
+				if(adminCode == null || adminCode == "")
+					throw new InvalidOperationException("admin_code not set on server");
+
+				if(!request.Headers.ContainsKey("admin_code"))
+					throw new ArgumentException("admin_code is missing");
+
+				if(request.Headers["admin_code"] != adminCode)
+					throw new UnauthorizedAccessException("Invalid admin_code");
+
 				E obj = JsonConvert.DeserializeObject<E>(request.Body);
 
 				using(var tx = ctx.Database.BeginTransaction()) {
@@ -301,6 +311,16 @@ namespace StableAPIHandler {
 		}
 		private StableAPIResponse HandleDELETE<E>(APIGatewayProxyRequest request, StableContext ctx) where E : class {
 			try {
+				string adminCode = Environment.GetEnvironmentVariable("admin_code");
+				if(adminCode == null || adminCode == "")
+					throw new InvalidOperationException("admin_code not set on server");
+
+				if(!request.Headers.ContainsKey("admin_code"))
+					throw new ArgumentException("admin_code is missing");
+
+				if(request.Headers["admin_code"] != adminCode)
+					throw new UnauthorizedAccessException("Invalid admin_code");
+
 				E obj = JsonConvert.DeserializeObject<E>(request.Body);
 				/*
 				 * Gotta wrap DB ops in a transaction
