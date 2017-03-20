@@ -1,0 +1,270 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../signup-page/signup-page.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-drawer-panel/paper-drawer-panel.html">
+<link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
+<link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../signup-page/signup-form.html">
+<link rel="import" href="../../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
+
+<dom-module id="registration-page">
+  <template>
+    <style include="iron-flex iron-flex-alignment">
+      :host {
+        display: block;
+      }
+      .center {
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .container {
+        margin: 10px;
+      }
+      .content {
+        padding: 16px;
+        max-width: 720px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .dismiss-button {
+        text-transform: none;
+        color: #eeff41;
+      }
+      .vcenter {
+        margin-top: auto;
+        margin-bottom: auto;
+      }
+      paper-toast {
+        z-index: 10001;
+      }
+    </style>
+    <app-localstorage-document id="userDataSorage" key="stable" data="{{userData}}">
+    <iron-ajax
+      auto
+      id="datesAjax"
+      url="[[_computeAPI('/dates')]]"
+      handle-as="json"
+      on-error="_onError"
+      last-response="{{dates}}"></iron-ajax>
+    <iron-ajax
+      auto
+      id="blocksAjax"
+      url="[[_computeAPI('/blocks')]]"
+      handle-as="json"
+      on-error="_onError"
+      last-response="{{blocks}}"></iron-ajax>
+    <iron-ajax
+      id="presentationsAjax"
+      url="[[_computeAPI('/presentations')]]"
+      handle-as="json"
+      on-response="_presentationsLoaded"
+      on-error="_onError"
+      last-response="{{presentations}}"></iron-ajax>
+    <iron-ajax
+      auto
+      url="[[_computeAPI('/houses')]]"
+      handle-as="json"
+      on-error="_onError"
+      last-response="{{houses}}"></iron-ajax>
+    <iron-ajax
+      auto
+      url="[[_computeAPI('/grades')]]"
+      handle-as="json"
+      on-error="_onError"
+      last-response="{{grades}}"></iron-ajax>
+
+    <signup-form
+      id="signupForm"
+      houses="[[houses]]"
+      grades="[[grades]]"
+      on-do-signup="_doSignup"
+      ></signup-form>
+    <signup-page
+      id="signupPage"
+      dates="[[dates]]"
+      blocks="[[blocks]]"
+      presentations="[[presentations]]"
+      on-signup-done="_signupDone"
+      user-data="[[userData]]"
+      hidden
+      ></signup-page>
+
+    <paper-dialog id="postBeginDialog">
+      <div class="layout horizontal">
+        <div class="flex"></div>
+        <h2>Getting Ready!</h2>
+        <div class="flex"></div>
+      </div>
+      <div class="layout horizontal" style="margin-top: 8px; margin-bottom: 4px;">
+        <div class="flex"></div>
+        <p style="margin: 0px;">Fetching presentation data...</p>
+        <div class="flex"></div>
+      </div>
+      <div class="layout horizontal" style="margin-top: 4px; margin-bottom: 8px;">
+        <div class="flex"></div>
+        <b>Please don't reload.</b  >
+        <div class="flex"></div>
+      </div>
+      <div class="layout horizontal" style="margin-top: 8px;">
+        <div class="flex"></div>
+        <paper-spinner active></paper-spinner>
+        <div class="flex"></div>
+      </div>
+    </paper-dialog>
+    <paper-toast id="instructions" duration="0" style="padding: 8px;">
+      <div class="layout horizontal">
+        <div class="vcenter">Drag the <iron-icon icon="icons:reorder"></iron-icon> to sort your preferences.</div>
+        <div class="flex"></div>
+        <paper-icon-button icon="icons:close" on-tap="_closeToastI" class="dismiss-button"></paper-icon-button>
+      </div>
+    </paper-toast>
+    <paper-toast id="completedToast" duration="0" style="padding: 8px;">
+      <div class="layout horizontal">
+        <div class="vcenter">Your data has been saved!</div>
+        <div class="flex"></div>
+        <paper-icon-button icon="icons:close" on-tap="_closeToastC" class="dismiss-button"></paper-icon-button>
+      </div>
+    </paper-toast>
+    <paper-toast id="errorToast" duration="0" style="padding: 8px;">
+      <div class="layout horizontal">
+        <div class="vcenter">Your data was already saved!</div>
+        <div class="flex"></div>
+        <paper-icon-button icon="icons:close" on-tap="_closeToastE" class="dismiss-button"></paper-icon-button>
+      </div>
+    </paper-toast>
+    <!-- <sample-content size="10"></sample-content> -->
+    <!-- <signup-page
+      dates="[[dates]]"
+      blocks="[[blocks]]"
+      presentations="[[presentations]]"
+      ></signup-page> -->
+  </template>
+  <script>
+    Polymer({
+
+      is: 'registration-page',
+
+      properties: {
+        dates: {
+          type: Array
+        },
+        blocks: {
+          type: Object
+        },
+        presentations: {
+          type: Object
+        },
+        house: {
+          type: Object
+        },
+        grades: {
+          type: Object
+        },
+        userData: {
+          type: Object,
+          observer: '_userDataChanged'
+        },
+        titleText: {
+          type: String,
+          computed: '_computeTitleText(houses, grades, userData)',
+          observer: '_publishTitleText'
+        }
+      },
+      observers: [
+        '_dataReady(dates, blocks, presentations, userData)'
+      ],
+      _getAttrFromObj: function(key, attr, obj) {
+        if(obj && obj[key] && obj[key][attr]) {
+          return obj[key][attr];
+        }
+        return "error";
+      },
+      _computeAPI: function (path) {
+        var apiRootPath = 'https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1';
+        return apiRootPath + path;
+      },
+      handleResponse: function(e) {
+        console.log(e.detail.response);
+      },
+      tog: function(e) {
+        this.$.drawer.toggle();
+      },
+      _doSignup: function(e) {
+        console.log(e);
+        this.userData = e.detail;
+        this.$.userDataSorage.save("stable");
+        // this.$.postBeginDialog.open();
+        // this.$.presentationsAjax.generateRequest();
+        // this.$.signupPage.signup();
+      },
+      _dataReady: function(dates, blocks, presentations, userData) {
+        if(dates && blocks && presentations && userData && userData.viewer_id) {
+          this.$.postBeginDialog.close();
+          this.$.signupForm.hidden = true;
+          this.$.signupPage.hidden = false;
+          this.$.instructions.show();
+          this.$.signupPage.reset();
+        } else {
+          console.log(presentations);
+        }
+      },
+      ready: function(e) {
+        
+      },
+      _closeToastI: function(e) {
+        this.$.instructions.hide();
+      },
+      _closeToastC: function(e) {
+        this.$.completedToast.hide();
+      },
+      _closeToastE: function(e) {
+        this.$.errorToast.hide();
+      },
+      _userDataChanged: function(e) {
+        console.log(e);
+        if(e && e.viewer_id && e.viewer_key) {
+          this.$.postBeginDialog.open();
+          this.$.presentationsAjax.generateRequest();
+        } else {
+          this.$.signupForm.hidden = false;
+          this.$.signupPage.hidden = true;
+          this.titleText = '';
+        }
+      },
+      _computeTitleText: function(houses, grades, userData) {
+        if(userData && userData.viewer_id) {
+          return '- ' + userData.last_name + ', ' + userData.first_name
+            + ' (' + this._getAttrFromObj(userData.grade_id, 'grade_name', grades) + ', '
+            + this._getAttrFromObj(userData.house_id, 'house_name', houses) + ')';
+        }
+        return '';
+      },
+      _publishTitleText: function(e) {
+        this.fire('set-title', { title: e });
+      },
+      _signupDone: function(e) {
+        // this.presentation = null;
+        if(e.detail !== undefined) {
+          if(e.detail.error)
+            this.$.errorToast.show();
+          else
+            this.$.completedToast.show();
+        }
+        this.userData = {};
+        this.$.signupForm.reset();
+        this.$.userDataSorage.save("stable");
+      },
+      _onError: function(e) {
+        console.log(e);
+        var ajax = e.target;
+        // setTimeout(function() {
+        //   ajax.generateRequest();
+        // }, 500);
+      }
+    });
+  </script>
+</dom-module>
