@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
 
 <!--
 A comment describing this element
@@ -22,12 +23,60 @@ Example:
       :host {
         display: block;
       }
+      paper-material {
+        background-color: white;
+        padding: 8px;
+        margin-bottom: 16px;
+      }
     </style>
-    PRESENTATIONS
+    <iron-ajax
+      auto
+      id="datesAjax"
+      url="[[_computeAPI('/dates')]]"
+      handle-as="json"
+      on-error="_onError"
+      last-response="{{dates}}"></iron-ajax>
+    <iron-ajax
+      auto
+      id="blocksAjax"
+      url="[[_computeAPI('/blocks')]]"
+      handle-as="json"
+      on-error="_onError"
+      last-response="{{blocks}}"></iron-ajax>
+    <iron-ajax
+      id="presentationsAjax"
+      url="[[_computeAPI('/presentations')]]"
+      handle-as="json"
+      on-response="_presentationsLoaded"
+      on-error="_onError"
+      last-response="{{presentations}}"></iron-ajax>
+
+    <template is="dom-repeat" items="[[dates]]" as="date">
+      <template is="dom-repeat" items="[[_objToArray(blocks)]]" as="block">
+        <paper-material elevation="1">
+        <h3>[[date.date]] - [[block.block_name]]</h3>
+      </paper-material>
+      </template>
+      
+    </template>
+    <paper-material elevation="1">
+      
+    </paper-material>
   </template>
   <script>
     Polymer({
-      is: 'presentations-page'
+      is: 'presentations-page',
+      _computeAPI: function (path) {
+        var apiRootPath = 'https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1';
+        return apiRootPath + path;
+      },
+      _onError: function(e) {
+        console.log(e);
+      },
+      _objToArray: function(obj) {
+        if(obj)
+          return Object.keys(obj).map(function (key) { return obj[key]; });
+      }
     });
   </script>
 </dom-module>
