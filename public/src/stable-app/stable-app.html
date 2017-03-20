@@ -4,6 +4,9 @@
 <link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
 <link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+
 <link rel="import" href="registration-page.html">
 
 <dom-module id="stable-app">
@@ -29,7 +32,11 @@
           <div>Project Stable</div>
         </paper-toolbar>
         <div>
-          
+          <paper-menu attr-for-selected="name" selected="{{page}}">
+            <paper-item name="registration">Registration</paper-item>
+            <paper-item name="viwers">Viewers</paper-item>
+            <paper-item name="presentations">Presentations</paper-item>
+          </paper-menu>
 
         </div>
       </paper-header-panel>
@@ -40,7 +47,11 @@
         </paper-toolbar>
         <div class="container">
           <div class="content">
-            <registration-page></registration-page>
+            <iron-pages attr-for-selected="name" selected="{{page}}">
+              <registration-page name="registration"></registration-page>
+              <viewers-page name="viewers">VVV</viewers-page>
+            </iron-pages>
+            
           </div>
         </div>
       </paper-header-panel>
@@ -55,12 +66,17 @@
         titleText: {
           type: String,
           value: ''
+        },
+        page: {
+          type: String,
+          value: 'registration'
         }
       },
       observers: [
       ],
       listeners: {
-        'set-title': '_handleSetTitle'
+        'set-title': '_handleSetTitle',
+        'goto-page': '_handleGotoPage'
       },
       ready: function(e) {
         
@@ -71,6 +87,13 @@
         } else {
           this.titleText = '';
         }
+      },
+      _handleGotoPage: function(e) {
+        console.log(e);
+        if(e && e.detail && e.detail.page) {
+          this.page = e.detail.page;
+        }
+        console.log(this.page);
       }
     });
   </script>
