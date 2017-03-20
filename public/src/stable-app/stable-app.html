@@ -54,9 +54,9 @@
         <div class="container">
           <div class="content">
             <iron-pages attr-for-selected="name" selected="[[routeData.page]]">
-              <registration-page name="registration"></registration-page>
-              <presentations-page name="presentations"></presentations-page>
-              <viewers-page name="viewers"></viewers-page>
+              <registration-page route="[[route]]" name="registration"></registration-page>
+              <presentations-page route="[[route]]" name="presentations"></presentations-page>
+              <viewers-page route="[[route]]" name="viewers"></viewers-page>
             </iron-pages>
             
           </div>
@@ -90,7 +90,14 @@
         'goto-page': '_handleGotoPage'
       },
       ready: function(e) {
-        
+        console.log("path: " + this.routeData.page);
+        console.log(this.routeData);
+        if(this.routeData) {
+          if(this.routeData.page == undefined || this.routeData.page == '') {
+            //this.set('route.path', '/registration');
+            window.location.href = '#/registration';
+          }
+        }
       },
       _handleSetTitle: function(e) {
         if(e && e.detail && e.detail.title) {
