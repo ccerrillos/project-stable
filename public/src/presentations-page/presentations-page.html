@@ -1,6 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
 
+<link rel="import" href="../signup-page/presentation-row.html">
 <!--
 A comment describing this element
 
@@ -28,16 +30,21 @@ Example:
         padding: 8px;
         margin-bottom: 16px;
       }
+      h3 {
+        margin: 0px;
+      }
+      presentation-row:hover {
+        background-color: #e6e6e6;
+      }
     </style>
+    <app-route route="{{route}}" pattern="/presentations" active="{{active}}"></app-route>
     <iron-ajax
-      auto
       id="datesAjax"
       url="[[_computeAPI('/dates')]]"
       handle-as="json"
       on-error="_onError"
       last-response="{{dates}}"></iron-ajax>
     <iron-ajax
-      auto
       id="blocksAjax"
       url="[[_computeAPI('/blocks')]]"
       handle-as="json"
@@ -54,18 +61,33 @@ Example:
     <template is="dom-repeat" items="[[dates]]" as="date">
       <template is="dom-repeat" items="[[_objToArray(blocks)]]" as="block">
         <paper-material elevation="1">
-        <h3>[[date.date]] - [[block.block_name]]</h3>
+        <h3>[[_parseDate(date.date)]] - [[block.block_name]]</h3>
+
+        <template is="dom-repeat" items="[[_filterPresentations(date.date, block.block_id, presentations)]]" as="presentation">
+          <presentation-row
+            data="[[presentation]]"
+            data-id$="[[presentation.presentation_id]]"
+            on-show-info="_showInfo"
+            ></presentation-row>
+        </template>
+
       </paper-material>
       </template>
       
     </template>
-    <paper-material elevation="1">
-      
-    </paper-material>
   </template>
   <script>
     Polymer({
       is: 'presentations-page',
+      properties: {
+        route: {
+          type: Object
+        },
+        active: {
+          type: Boolean,
+          observer: '_activeChanged'
+        }
+      },
       _computeAPI: function (path) {
         var apiRootPath = 'https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1';
         return apiRootPath + path;
@@ -76,7 +98,41 @@ Example:
       _objToArray: function(obj) {
         if(obj)
           return Object.keys(obj).map(function (key) { return obj[key]; });
-      }
+      },
+      _activeChanged: function(e) {
+        if(e) {
+          this.$.datesAjax.generateRequest();
+          this.$.blocksAjax.generateRequest();
+          this.$.presentationsAjax.generateRequest();
+        }
+      },
+      _parseDate: function(e) {
+        var str = e.toString();
+        console.log(str);
+
+        if(!/^(\d){8}$/.test(str))
+          return "Invalid date!";
+
+        var y = str.substr(0,4),
+            m = str.substr(4,2),
+            d = str.substr(6,2);
+            console.log(y + " " + m + " " + d);
+        return new Date(y,parseInt(m) - 1,d).toDateString();
+      },
+      _filterPresentations: function(date, block, presentations) {
+        var result = [];
+
+        for(var k in presentations) {
+          if(!presentations.hasOwnProperty(k)) continue;
+          
+          var thisPresentation = presentations[k];
+
+          if(thisPresentation.date === date && thisPresentation.block_id === block)
+            result.push(thisPresentation);
+        }
+
+        return result;
+      },
     });
   </script>
 </dom-module>
