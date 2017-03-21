@@ -2,6 +2,9 @@
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <link rel="import" href="../signup-page/presentation-row.html">
 <!--
@@ -22,7 +25,7 @@ Example:
 
 <dom-module id="presentations-page">
   <template>
-    <style>
+    <style include="iron-flex iron-flex-alignment">
       :host {
         display: block;
       }
@@ -45,6 +48,36 @@ Example:
         left: 50vw;
         top: 50vh;
         z-index: 5000;
+      }
+      paper-dialog {
+        padding: 16px;
+        max-width: 400px;
+        background-color: white;
+        z-index: 10000;
+      }
+      .center {
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .close-btn {
+        position: absolute;
+        right: 4px;
+        top: 4px;
+        margin: 0;
+        padding: 0;
+        z-index: 10001;
+      }
+      .save {
+        background-color: var(--paper-blue-500);
+        color: white;
+      }
+      .cancel {
+        background-color: var(--paper-red-500);
+        color: white;
+      }
+      paper-button[disabled] {
+        background-color: var(--paper-grey-500);
+        color: white;
       }
     </style>
     <app-route route="{{route}}" pattern="/presentations" active="{{active}}"></app-route>
@@ -73,11 +106,93 @@ Example:
       handle-as="json"
       on-error="_onError"
       last-response="{{grades}}"></iron-ajax>
+    <iron-ajax
+      id="locationsAjax"
+      url="[[_computeAPI('/locations')]]"
+      handle-as="json"
+      on-error="_onError"
+      last-response="{{locations}}"></iron-ajax>
 
     <paper-spinner id="spinner" active class="page-load"></paper-spinner>
 
+    <paper-dialog id="infoDialog">
+      <div class="close-btn">
+        <paper-icon-button icon="icons:create" on-tap="_editPresentation"></paper-icon-button>
+        <paper-icon-button icon="icons:close" dialog-dismiss></paper-icon-button>
+      </div>
+      
+      <div class="layout vertical" style="margin: 0;">
+        <h2 class="center">[[infoData.topic]]</h2>
+        <div>Presenter: <b>[[infoData.first_name]] [[infoData.last_name]]</b></div>
+        <div>Location: <b>Location</b></div>
+        <div>Bio:<br>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur et augue vitae urna elementum tristique. Aliquam finibus semper ligula, molestie hendrerit leo dictum id. Duis nisi quam, eleifend in arcu at, fermentum cursus massa. Phasellus blandit ligula eu odio scelerisque aliquam. Vivamus porta at mi ornare lobortis. Nam ante eros.</div> 
+      </div>
+    </paper-dialog>
+
+    <paper-dialog id="editDialog">
+      <div class="close-btn">
+        <paper-icon-button icon="icons:close" dialog-dismiss></paper-icon-button>
+      </div>
+      <h2>Edit Presentation</h2>
+      <div class="layout vertical" style="margin: 0;">
+        <paper-input label="First Name" value="{{infoData.first_name::input}}"></paper-input>
+        <paper-input label="Last Name" value="{{infoData.last_name::input}}"></paper-input>
+        <paper-input label="Topic" value="{{infoData.topic::input}}"></paper-input>
+        <div>
+          <paper-dropdown-menu label="Date">
+            <paper-listbox class="dropdown-content" attr-for-selected="data-id" selected="{{infoData.date}}">
+              <template is="dom-repeat" items="[[dates]]">
+                <paper-item data-id$="[[item.date]]">[[_parseDate(item.date)]]</paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dropdown-menu>
+          <paper-icon-button icon="icons:add" on-tap="_addDate"></paper-icon-button>
+        </div>
+        <div>
+          <paper-dropdown-menu label="Block">
+            <paper-listbox class="dropdown-content" attr-for-selected="data-id" selected="{{infoData.block_id}}">
+              <template is="dom-repeat" items="[[blocksArray]]">
+                <paper-item data-id$="[[item.block_id]]">[[item.block_name]]</paper-item>
+              </template>
+            </paper-listbox>
+            
+          </paper-dropdown-menu>
+          <paper-icon-button icon="icons:add" on-tap="_addBlock"></paper-icon-button>
+        </div>
+        <div>
+          <paper-dropdown-menu label="Location">
+            <paper-listbox class="dropdown-content" attr-for-selected="data-id" selected="{{infoData.location_id}}">
+              <template is="dom-repeat" items="[[locationsArray]]">
+                <paper-item data-id$="[[item.location_id]]">[[item.location_name]]</paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dropdown-menu>
+          <paper-icon-button icon="icons:add" on-tap="_addLocation"></paper-icon-button>
+        </div>
+        <paper-input label="Admin Code" type="password"></paper-input>
+        <div class="layout horizontal" style="margin-top: 8px;">
+          <div class="flex"></div>
+          <paper-button raised class="save">Save</paper-button>
+          <paper-button raised class="cancel" dialog-dismiss>Cancel</paper-button>
+        </div>
+      </div>
+    </paper-dialog>
+
+    <paper-dialog id="newBasicItemDialog">
+      <h2 style="margin-top: 0px;">New [[newBasicItem.name]]</h2>
+      <div class="layout vertical" style="margin: 0px;">
+        <paper-input label="[[newBasicItem.name]]" value="{{newBasicItem.value::input}}"></paper-input>
+        <div class="layout horizontal" style="margin-top: 8px;">
+          <div class="flex"></div>
+          <paper-button raised class="save" disabled="[[!_computeEnabled(newBasicItem.value)]]" on-tap="_addBasicItem">Create</paper-button>
+          <paper-button raised class="cancel" dialog-dismiss>Cancel</paper-button>
+        </div>
+      </div>
+        
+    </paper-dialog>
+
     <template is="dom-repeat" items="[[dates]]" as="date">
-      <template is="dom-repeat" items="[[_objToArray(blocks)]]" as="block">
+      <template is="dom-repeat" items="[[blocksArray]]" as="block">
         <paper-material elevation="1">
         <h3>[[_parseDate(date.date)]] - [[block.block_name]]</h3>
 
@@ -86,6 +201,7 @@ Example:
             data="[[presentation]]"
             data-id$="[[presentation.presentation_id]]"
             on-show-info="_showInfo"
+            on-goto-presentation="_gotoPresentation"
             grades="[[gradesArray]]"
             viewer-count
             viewer-count-data="[[countData]]"
@@ -108,9 +224,17 @@ Example:
           type: Boolean,
           observer: '_activeChanged'
         },
+        blocksArray: {
+          type: Array,
+          computed: '_objToArray(blocks)'
+        },
         gradesArray: {
           type: Array,
           computed: '_objToArray(grades)'
+        },
+        locationsArray: {
+          type: Array,
+          computed: '_objToArray(locations)'
         },
         countData: {
           type: Object,
@@ -124,10 +248,17 @@ Example:
             total_count: 0,
             total_limit: 37
           }
+        },
+        infoData: {
+          type: Object
+        },
+        adminCode: {
+          type: String,
+          notify: true
         }
       },
       observers: [
-        '_dataLoaded(dates, blocks, presentations, grades)'
+        '_dataLoaded(dates, blocks, presentations, grades, locations)'
       ],
       _computeAPI: function (path) {
         var apiRootPath = 'https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1';
@@ -146,6 +277,7 @@ Example:
           this.$.blocksAjax.generateRequest();
           this.$.presentationsAjax.generateRequest();
           this.$.gradesAjax.generateRequest();
+          this.$.locationsAjax.generateRequest();
         }
       },
       _parseDate: function(e) {
@@ -175,12 +307,48 @@ Example:
 
         return result;
       },
-      _dataLoaded: function(dates, blocks, presentations, grades) {
-        if(dates && blocks && presentations, grades) {
+      _dataLoaded: function(dates, blocks, presentations, grades, locations) {
+        if(dates && blocks && presentations && grades && locations) {
           this.$.spinner.hidden = true;
           this.$.spinner.active = false;
         }
+      },
+      _showInfo: function(e) {
+        if(e && e.detail) {
+          this.infoData = JSON.parse(JSON.stringify(this.presentations[e.detail.presentation_id]));
+          this.$.infoDialog.open();
+        }
+      },
+      _editPresentation: function(e) {
+        this.$.infoDialog.close();
+        this.$.editDialog.open();
+      },
+      _addDate: function(e) {
+
+      },
+      _addBlock: function(e) {
+        this.newBasicItem = {
+          name: 'Block',
+          path: 'blocks',
+          value: ''
+        };
+        this.$.newBasicItemDialog.open();
+      },
+      _addLocation: function(e) {
+        this.newBasicItem = {
+          name: 'Location',
+          path: 'locations',
+          value: ''
+        };
+        this.$.newBasicItemDialog.open();
+      },
+      _addBasicItem: function(e) {
+
+      },
+      _computeEnabled: function(e) {
+        return e && e.length && e.length > 0;
       }
+
     });
   </script>
 </dom-module>
