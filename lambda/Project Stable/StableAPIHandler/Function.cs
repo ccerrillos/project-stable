@@ -221,6 +221,40 @@ namespace StableAPIHandler {
 						}
 						#endregion
 						break;
+					case "PUT":
+						#region PUTs
+						switch(apigProxyEvent.Path.ToLower()) {
+							case "/dates":
+							case "/dates/":
+								response = HandlePUT<Date>(apigProxyEvent, ctx);
+								break;
+							case "/blocks":
+							case "/blocks/":
+								response = HandlePUT<Block>(apigProxyEvent, ctx);
+								break;
+							case "/grades":
+							case "/grades/":
+								response = HandlePUT<Grade>(apigProxyEvent, ctx);
+								break;
+							case "/houses":
+							case "/houses/":
+								response = HandlePUT<House>(apigProxyEvent, ctx);
+								break;
+							case "/locations":
+							case "/locations/":
+								response = HandlePUT<Location>(apigProxyEvent, ctx);
+								break;
+							case "/presentations":
+							case "/presentations/":
+								response = HandlePUT<Presentation>(apigProxyEvent, ctx);
+								break;
+							case "/viewers":
+							case "/viewers/":
+								response = HandlePUT<Viewer>(apigProxyEvent, ctx);
+								break;
+						}
+						break;
+					#endregion
 					case "DELETE":
 						#region DELETEs
 						switch(apigProxyEvent.Path.ToLower()) {
@@ -285,6 +319,48 @@ namespace StableAPIHandler {
 				using(var tx = ctx.Database.BeginTransaction()) {
 					try {
 						ctx.Add(obj);
+						int status = ctx.SaveChanges();
+						tx.Commit();
+						return new StableAPIResponse() {
+							Body = JsonConvert.SerializeObject((status == 1)),
+							StatusCode = HttpStatusCode.OK
+						};
+					} catch(Exception e) {
+						tx.Rollback();
+						Logger.LogLine(e.ToString());
+						return new StableAPIResponse() {
+							Body = JsonConvert.SerializeObject(new Result(e)),
+							StatusCode = HttpStatusCode.InternalServerError
+						};
+					}
+				}
+
+			} catch(Exception e) {
+				Logger.LogLine(e.ToString());
+				return new StableAPIResponse() {
+					Body = JsonConvert.SerializeObject(new Result(e)),
+					StatusCode = HttpStatusCode.BadRequest
+				};
+			}
+		}
+		private StableAPIResponse HandlePUT<E>(APIGatewayProxyRequest request, StableContext ctx) where E : class {
+			try {
+				string adminCode = Environment.GetEnvironmentVariable("admin_code");
+				if(adminCode == null || adminCode == "")
+					throw new InvalidOperationException("admin_code not set on server");
+
+				if(!request.Headers.ContainsKey("admin_code"))
+					throw new ArgumentException("admin_code is missing");
+
+				if(request.Headers["admin_code"] != adminCode)
+					throw new UnauthorizedAccessException("Invalid admin_code");
+
+				E obj = JsonConvert.DeserializeObject<E>(request.Body);
+
+				using(var tx = ctx.Database.BeginTransaction()) {
+					try {
+						var existing = ctx.Attach<E>(obj);
+						ctx.Entry(existing).State = EntityState.Modified;
 						int status = ctx.SaveChanges();
 						tx.Commit();
 						return new StableAPIResponse() {
