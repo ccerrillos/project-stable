@@ -81,37 +81,6 @@ Example:
       }
     </style>
     <app-route route="{{route}}" pattern="/presentations" active="{{active}}"></app-route>
-    <iron-ajax
-      id="datesAjax"
-      url="[[_computeAPI('/dates')]]"
-      handle-as="json"
-      on-error="_onError"
-      last-response="{{dates}}"></iron-ajax>
-    <iron-ajax
-      id="blocksAjax"
-      url="[[_computeAPI('/blocks')]]"
-      handle-as="json"
-      on-error="_onError"
-      last-response="{{blocks}}"></iron-ajax>
-    <iron-ajax
-      id="presentationsAjax"
-      url="[[_computeAPI('/presentations')]]"
-      handle-as="json"
-      on-response="_presentationsLoaded"
-      on-error="_onError"
-      last-response="{{presentations}}"></iron-ajax>
-    <iron-ajax
-      id="gradesAjax"
-      url="[[_computeAPI('/grades')]]"
-      handle-as="json"
-      on-error="_onError"
-      last-response="{{grades}}"></iron-ajax>
-    <iron-ajax
-      id="locationsAjax"
-      url="[[_computeAPI('/locations')]]"
-      handle-as="json"
-      on-error="_onError"
-      last-response="{{locations}}"></iron-ajax>
 
     <paper-spinner id="spinner" active class="page-load"></paper-spinner>
 
@@ -191,7 +160,7 @@ Example:
         
     </paper-dialog>
 
-    <template is="dom-repeat" items="[[dates]]" as="date">
+    <template is="dom-repeat" items="[[dates]]" as="date" id="content" hidden>
       <template is="dom-repeat" items="[[blocksArray]]" as="block">
         <paper-material elevation="1">
         <h3>[[_parseDate(date.date)]] - [[block.block_name]]</h3>
@@ -273,11 +242,8 @@ Example:
       },
       _activeChanged: function(e) {
         if(e) {
-          this.$.datesAjax.generateRequest();
-          this.$.blocksAjax.generateRequest();
-          this.$.presentationsAjax.generateRequest();
-          this.$.gradesAjax.generateRequest();
-          this.$.locationsAjax.generateRequest();
+          this.fire('reload-presentations');
+          this.fire('reload-locations');
         }
       },
       _parseDate: function(e) {
@@ -311,6 +277,7 @@ Example:
         if(dates && blocks && presentations && grades && locations) {
           this.$.spinner.hidden = true;
           this.$.spinner.active = false;
+          this.$.content.hidden = false;
         }
       },
       _showInfo: function(e) {
