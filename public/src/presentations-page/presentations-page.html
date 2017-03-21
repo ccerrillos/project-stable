@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 
 <link rel="import" href="../signup-page/presentation-row.html">
 <!--
@@ -36,6 +37,15 @@ Example:
       presentation-row:hover {
         background-color: #e6e6e6;
       }
+      div.page-load {
+
+      }
+      .page-load {
+        position: fixed;
+        left: 50vw;
+        top: 50vh;
+        z-index: 5000;
+      }
     </style>
     <app-route route="{{route}}" pattern="/presentations" active="{{active}}"></app-route>
     <iron-ajax
@@ -57,6 +67,14 @@ Example:
       on-response="_presentationsLoaded"
       on-error="_onError"
       last-response="{{presentations}}"></iron-ajax>
+    <iron-ajax
+      id="gradesAjax"
+      url="[[_computeAPI('/grades')]]"
+      handle-as="json"
+      on-error="_onError"
+      last-response="{{grades}}"></iron-ajax>
+
+    <paper-spinner id="spinner" active class="page-load"></paper-spinner>
 
     <template is="dom-repeat" items="[[dates]]" as="date">
       <template is="dom-repeat" items="[[_objToArray(blocks)]]" as="block">
@@ -68,6 +86,9 @@ Example:
             data="[[presentation]]"
             data-id$="[[presentation.presentation_id]]"
             on-show-info="_showInfo"
+            grades="[[gradesArray]]"
+            viewer-count
+            viewer-count-data="[[countData]]"
             ></presentation-row>
         </template>
 
@@ -86,8 +107,28 @@ Example:
         active: {
           type: Boolean,
           observer: '_activeChanged'
+        },
+        gradesArray: {
+          type: Array,
+          computed: '_objToArray(grades)'
+        },
+        countData: {
+          type: Object,
+          value: {
+            grades: [
+              { grade_name: '9th', count: 0 },
+              { grade_name: '10th', count: 0 },
+              { grade_name: '11th', count: 0 },
+              { grade_name: '12th', count: 0 }
+            ],
+            total_count: 0,
+            total_limit: 37
+          }
         }
       },
+      observers: [
+        '_dataLoaded(dates, blocks, presentations, grades)'
+      ],
       _computeAPI: function (path) {
         var apiRootPath = 'https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1';
         return apiRootPath + path;
@@ -104,6 +145,7 @@ Example:
           this.$.datesAjax.generateRequest();
           this.$.blocksAjax.generateRequest();
           this.$.presentationsAjax.generateRequest();
+          this.$.gradesAjax.generateRequest();
         }
       },
       _parseDate: function(e) {
@@ -133,6 +175,12 @@ Example:
 
         return result;
       },
+      _dataLoaded: function(dates, blocks, presentations, grades) {
+        if(dates && blocks && presentations, grades) {
+          this.$.spinner.hidden = true;
+          this.$.spinner.active = false;
+        }
+      }
     });
   </script>
 </dom-module>

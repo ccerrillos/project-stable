@@ -62,6 +62,13 @@ Example:
       </div>
       <div class="vcenter noselect">[[data.topic]]</div>
       <div class="flex"></div>
+      <template is="dom-if" if="[[viewerCount]]">
+        <template is="dom-repeat" items="[[viewerCountData.grades]]">
+          <div class="vcenter" ><b>[[item.count]]</b> [[item.grade_name]]</div>
+        </template>
+        <div class="vcenter"><b>[[viewerCountData.total_count]]</b>/<b>[[viewerCountData.total_limit]]</b> Total</div>
+        <paper-icon-button icon="icons:event-seat" on-tap="_gotoPresentation"></paper-icon-button>
+      </template>
       <div>
         <paper-icon-button icon="icons:info" on-tap="_showInfo"></paper-icon-button>
       </div>
@@ -96,6 +103,15 @@ Example:
           type: Boolean,
           value: false,
           reflectToAttribute: true
+        },
+        viewerCount: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        },
+        viewerCountData: {
+          type: Object,
+          value: {}
         }
       },
       observers: [
