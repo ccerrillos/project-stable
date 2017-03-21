@@ -8,6 +8,7 @@
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../bower_components/app-route/app-location.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 
 <link rel="import" href="../signup-page/registration-page.html">
 <link rel="import" href="../presentations-page/presentations-page.html">
@@ -29,7 +30,6 @@
         margin-right: auto;
       }
       .side-bar-content {
-        height: 100%;
         margin-bottom: 16px;
       }
       .center {
@@ -39,6 +39,59 @@
     </style>
     <app-location route="{{route}}" use-hash-as-path></app-location>
     <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{tail}}"></app-route>
+
+    <iron-ajax
+      auto
+      id="blocksAjax"
+      url="[[_computeAPI('/blocks')]]"
+      handle-as="json"
+      content-type="application/json"
+      on-error="_onError"
+      on-response="ajaxResponse"
+      last-response="{{blocks}}"></iron-ajax>
+    <iron-ajax
+      auto
+      id="datesAjax"
+      url="[[_computeAPI('/dates')]]"
+      handle-as="json"
+      content-type="application/json"
+      on-error="_onError"
+      on-response="ajaxResponse"
+      last-response="{{dates}}"></iron-ajax>
+    <iron-ajax
+      auto
+      id="housesAjax"
+      url="[[_computeAPI('/houses')]]"
+      handle-as="json"
+      content-type="application/json"
+      on-error="_onError"
+      on-response="ajaxResponse"
+      last-response="{{houses}}"></iron-ajax>
+    <iron-ajax
+      auto
+      id="gradesAjax"
+      url="[[_computeAPI('/grades')]]"
+      handle-as="json"
+      content-type="application/json"
+      on-error="_onError"
+      on-response="ajaxResponse"
+      last-response="{{grades}}"></iron-ajax>
+    <iron-ajax
+      id="locationsAjax"
+      url="[[_computeAPI('/locations')]]"
+      handle-as="json"
+      content-type="application/json"
+      on-error="_onError"
+      on-response="ajaxResponse"
+      last-response="{{locations}}"></iron-ajax>
+    <iron-ajax
+      id="presentationsAjax"
+      url="[[_computeAPI('/presentations')]]"
+      handle-as="json"
+      content-type="application/json"
+      on-error="_onError"
+      on-response="ajaxResponse"
+      last-response="{{presentations}}"></iron-ajax>
 
     <paper-drawer-panel force-narrow id="paperDrawerPanel">
       <paper-header-panel drawer>
@@ -65,8 +118,16 @@
         <div class="container">
           <div class="content">
             <iron-pages attr-for-selected="name" selected="[[routeData.page]]">
-              <registration-page route="[[route]]" name="registration"></registration-page>
-              <presentations-page route="[[route]]" name="presentations"></presentations-page>
+              <registration-page
+                route="[[route]]"
+                name="registration"
+                dates="[[dates]]"
+                grades="[[grades]]"
+                houses="[[houses]]"
+                blocks="[[blocks]]"
+                presentations="[[presentations]]"
+                ></registration-page>
+              <presentations-page route="[[route]]" name="presentations" admin-code="{{adminCode}}"></presentations-page>
               <viewers-page route="[[route]]" name="viewers"></viewers-page>
             </iron-pages>
             
@@ -74,6 +135,7 @@
         </div>
       </paper-header-panel>
     </paper-drawer-panel>
+    <paper-toast id="globalToast"></paper-toast>
   </template>
   <script>
     Polymer({
@@ -92,13 +154,25 @@
         },
         routeData: {
           type: Object
+        },
+        adminCode: {
+          type: String,
+          value: ''
         }
       },
       observers: [
       ],
+      behaviors: [ StableBehavior ],
       listeners: {
         'set-title': '_handleSetTitle',
-        'goto-page': '_handleGotoPage'
+        'goto-page': '_handleGotoPage',
+        'firetoast': '_handleToast',
+        'reload-blocks': '_reloadBlocks',
+        'reload-dates': '_reloadDates',
+        'reload-houses': '_reloadHouses',
+        'reload-grades': '_reloadGrades',
+        'reload-locations': '_reloadLocations',
+        'reload-presentations': '_reloadPresentations'
       },
       ready: function(e) {
         console.log("path: " + this.routeData.page);
@@ -130,7 +204,31 @@
       },
       _closeDrawer: function(e) {
         this.$.paperDrawerPanel.closeDrawer();
-      } 
+      },
+      _handleToast: function(e) {
+        if(e && e.detail) {
+          this.$.globalToast.text = e.detail.message;
+          this.$.globalToast.show();
+        }
+      },
+      _reloadBlocks: function(e) {
+        this.$.blocksAjax.generateRequest();
+      },
+      _reloadGrades: function(e) {
+        this.$.gradesAjax.generateRequest();
+      },
+      _reloadHouses: function(e) {
+        this.$.housesAjax.generateRequest();
+      },
+      _reloadDates: function(e) {
+        this.$.datesAjax.generateRequest();
+      },
+      _reloadLocations: function(e) {
+        this.$.locationsAjax.generateRequest();
+      },
+      _reloadPresentations: function(e) {
+        this.$.presentationsAjax.generateRequest();
+      }
     });
   </script>
 </dom-module>
