@@ -79,7 +79,24 @@ Example:
         background-color: var(--paper-grey-500);
         color: white;
       }
+      paper-fab {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 10000;
+        background-color: var(--paper-green-500);
+      }
     </style>
+    <iron-ajax
+      id="ajax"
+      url="https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1/presentations"
+      method="POST"
+      content-type="application/json"
+      handle-as="json"
+      on-request="_request"
+      on-response="_response"
+      on-error="_error"></iron-ajax>
+
     <app-route route="{{route}}" pattern="/presentations" active="{{active}}"></app-route>
 
     <paper-spinner id="spinner" active class="page-load"></paper-spinner>
@@ -102,7 +119,7 @@ Example:
       <div class="close-btn">
         <paper-icon-button icon="icons:close" dialog-dismiss></paper-icon-button>
       </div>
-      <h2>Edit Presentation</h2>
+      <h2>Add Presentation</h2>
       <div class="layout vertical" style="margin: 0;">
         <paper-input label="First Name" value="{{infoData.first_name::input}}"></paper-input>
         <paper-input label="Last Name" value="{{infoData.last_name::input}}"></paper-input>
@@ -115,7 +132,7 @@ Example:
               </template>
             </paper-listbox>
           </paper-dropdown-menu>
-          <paper-icon-button icon="icons:create" on-tap="_addDate"></paper-icon-button>
+          <paper-icon-button icon="icons:create" on-tap=""></paper-icon-button>
         </div>
         <div>
           <paper-dropdown-menu label="Block">
@@ -126,7 +143,7 @@ Example:
             </paper-listbox>
             
           </paper-dropdown-menu>
-          <paper-icon-button icon="icons:create" on-tap="_addBlock"></paper-icon-button>
+          <paper-icon-button icon="icons:create" on-tap=""></paper-icon-button>
         </div>
         <div>
           <paper-dropdown-menu label="Location">
@@ -141,7 +158,7 @@ Example:
         <paper-input label="Admin Code" type="password" value="{{adminCode::input}}"></paper-input>
         <div class="layout horizontal" style="margin-top: 8px;">
           <div class="flex"></div>
-          <paper-button raised class="save">Save</paper-button>
+          <paper-button raised id="confirmButton" class="save" on-tap="_doAddPresentation">Save</paper-button>
           <paper-button raised class="cancel" dialog-dismiss>Cancel</paper-button>
         </div>
       </div>
@@ -181,6 +198,7 @@ Example:
       </template>
       
     </template>
+    <paper-fab icon="icons:add" on-tap="_addPresentation"></paper-fab>
   </template>
   <script>
     Polymer({
@@ -287,9 +305,28 @@ Example:
           this.$.infoDialog.open();
         }
       },
-      _editPresentation: function(e) {
+      _addPresentation: function(e) {
+        this.infoData = {
+          'first_name': '',
+          'last_name': '',
+          'topic': '',
+          'date': '',
+          'block_id': '',
+          'location_id': ''
+        };
         this.$.infoDialog.close();
         this.$.editDialog.open();
+      },
+      _disableConfirm: function() {
+        this.$.confirmButton.disabled = true;
+        //this.$.confirmText.hidden = true;
+        //this.$.confirmSpinner.hidden = false;
+      },
+      _enableConfirm: function() {
+        this.$.confirmButton.disabled = false;
+        //this.$.confirmText.hidden = false;
+        //this.$.confirmSpinner.hidden = true;
+        this._ajaxRequest = null;
       },
       _addDate: function(e) {
         //this.set('route.path', '/dates');
@@ -305,6 +342,22 @@ Example:
       },
       _computeEnabled: function(e) {
         return e && e.length && e.length > 0;
+      },
+      _doAddPresentation: function(e) {
+        console.log(this.infoData);
+        this.$.ajax.method = "POST";
+        this.$.ajax.body = JSON.stringify(this.infoData);
+        this.$.ajax.headers = {
+          'admin_code': this.adminCode
+        };
+        this.$.ajax.generateRequest();
+      },
+      _error: function(e) {
+        this._enableConfirm();
+      },
+      _response: function(e) {
+        this._enableConfirm();
+        this.$.editDialog.close();
       }
 
     });
