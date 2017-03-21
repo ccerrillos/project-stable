@@ -61,6 +61,7 @@ Example:
         <paper-icon-button icon="icons:arrow-downward" disabled="[[last]]" on-tap="_moveDown"></paper-icon-button>
       </div>
       <div class="vcenter noselect">[[data.topic]]</div>
+      <div class="vcenter noselect" hidden="[[viewerCount]]"><b>|</b> [[data.first_name]] [[data.last_name]]</div>
       <div class="flex"></div>
       <template is="dom-if" if="[[viewerCount]]">
         <template is="dom-repeat" items="[[viewerCountData.grades]]">
