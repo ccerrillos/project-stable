@@ -132,7 +132,7 @@
           <div class="content">
             <iron-pages attr-for-selected="name" selected="[[routeData.page]]">
               <registration-page
-                route="[[route]]"
+                route="{{route}}"
                 name="registration"
                 dates="[[dates]]"
                 grades="[[grades]]"
@@ -141,7 +141,7 @@
                 presentations="[[presentations]]"
                 ></registration-page>
               <presentations-page
-                route="[[route]]"
+                route="{{route}}"
                 name="presentations"
                 dates="[[dates]]"
                 grades="[[grades]]"
