@@ -13,6 +13,7 @@
 <link rel="import" href="../signup-page/registration-page.html">
 <link rel="import" href="../presentations-page/presentations-page.html">
 <link rel="import" href="../viewers-page/viewers-page.html">
+<link rel="import" href="../edit-item-pages/edit-locations-page.html">
 
 <dom-module id="stable-app">
   <template>
@@ -35,6 +36,11 @@
       .center {
         margin-left: auto;
         margin-right: auto;
+      }
+      .shameless {
+        position: absolute;
+        bottom: 8px;
+        width: 100%;
       }
     </style>
     <app-location route="{{route}}" use-hash-as-path></app-location>
@@ -103,11 +109,15 @@
             <paper-item name="registration">Registration</paper-item>
             <paper-item name="presentations">Presentations</paper-item>
             <paper-item name="viewers">Viewers</paper-item>
-          </paper-menu>
-          <div class="flex"></div>
-          <a href="https://github.com/cacerrillos/project-stable" target="_blank" class="center">
+            <paper-item name="locations">Locations</paper-item>
+          </paper-menu>          
+        </div>
+        <div class="shameless layout horizontal">
+        <div class="flex"></div>
+          <a href="https://github.com/cacerrillos/project-stable" target="_blank">
             <paper-icon-button src="github.png"></paper-icon-button>
           </a>
+          <div class="flex"></div>
         </div>
       </paper-header-panel>
       <paper-header-panel main>
@@ -129,6 +139,7 @@
                 ></registration-page>
               <presentations-page route="[[route]]" name="presentations" admin-code="{{adminCode}}"></presentations-page>
               <viewers-page route="[[route]]" name="viewers"></viewers-page>
+              <edit-locations-page route="{{route}}" name="locations" locations="[[locations]]" admin-code="{{adminCode}}"></edit-locations-page>
             </iron-pages>
             
           </div>
