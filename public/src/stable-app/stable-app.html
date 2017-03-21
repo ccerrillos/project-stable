@@ -101,6 +101,14 @@
       on-error="_onError"
       on-response="ajaxResponse"
       last-response="{{presentations}}"></iron-ajax>
+    <iron-ajax
+      id="viewersAjax"
+      url="[[_computeAPI('/viewers')]]"
+      handle-as="json"
+      content-type="application/json"
+      on-error="_onError"
+      on-response="ajaxResponse"
+      last-response="{{viewers}}"></iron-ajax>
 
     <paper-drawer-panel force-narrow id="paperDrawerPanel">
       <paper-header-panel drawer>
@@ -151,7 +159,13 @@
                 locations="[[locations]]"
                 admin-code="{{adminCode}}"
                 ></presentations-page>
-              <viewers-page route="[[route]]" name="viewers"></viewers-page>
+              <viewers-page
+                route="{{route}}"
+                houses="[[houses]]"
+                grades="[[grades]]"
+                viewers="[[viewers]]"
+                name="viewers"
+                ></viewers-page>
               <edit-locations-page route="{{route}}" name="locations" locations="[[locations]]" admin-code="{{adminCode}}"></edit-locations-page>
             </iron-pages>
             
@@ -196,7 +210,8 @@
         'reload-houses': '_reloadHouses',
         'reload-grades': '_reloadGrades',
         'reload-locations': '_reloadLocations',
-        'reload-presentations': '_reloadPresentations'
+        'reload-presentations': '_reloadPresentations',
+        'reload-viewers': '_reloadViewers'
       },
       ready: function(e) {
         console.log("path: " + this.routeData.page);
@@ -252,6 +267,9 @@
       },
       _reloadPresentations: function(e) {
         this.$.presentationsAjax.generateRequest();
+      },
+      _reloadViewers: function(e) {
+        this.$.viewersAjax.generateRequest();
       }
     });
   </script>

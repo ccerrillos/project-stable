@@ -1,4 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <!--
 A comment describing this element
@@ -18,16 +21,96 @@ Example:
 
 <dom-module id="viewers-page">
   <template>
-    <style>
+    <style include="iron-flex iron-flex-alignment">
       :host {
         display: block;
       }
+      paper-material {
+        background-color: white;
+        padding: 8px;
+        margin-bottom: 16px;
+      }
+      h3 {
+        margin: 0;
+      }
+      .vcenter {
+        margin-top: auto;
+        margin-bottom: auto;
+        margin-right: 8px;
+      }
     </style>
-    VIEWERS
+    <app-route route="{{route}}" pattern="/viewers" active="{{active}}"></app-route>
+    <app-route route="{{route}}" pattern="/viewers/:viewer_id" active="{{viewerActive}}"></app-route>
+    <b>[[active]]</b> <b>[[viewerActive]]</b>
+    <template is="dom-if" if="[[mainActive]]">
+      <template is="dom-repeat" items="[[gradesArray]]" as="grade">
+        <template is="dom-repeat" items="[[housesArray]]" as="house">
+          <paper-material elevation="1">
+            <h3>[[grade.grade_name]] [[house.house_id]]</h3>
+            <template is="dom-repeat" items="[[_filterViewers(grade.grade_id, house.house_id, viewers)]]" as="viewer">
+              <div class="layout horizontal">
+                <div class="vcenter">[[viewer.first_name]]</div>
+                <div class="vcenter">[[viewer.last_name]]</div>
+                <div class="flex"></div>
+                <paper-icon-button icon="icons:info"></paper-icon-button>
+              </div>
+            </template>
+          </paper-material>
+        </template>
+      </template>
+    </template>
   </template>
   <script>
     Polymer({
-      is: 'viewers-page'
+      is: 'viewers-page',
+      properties: {
+        route: {
+          type: Object,
+          notify: true
+        },
+        viewers: {
+          type: Object
+        },
+        viewersArray: {
+          type: Array,
+          computed: '_objToArray(viewers)'
+        },
+        grades: {
+          type: Object
+        },
+        gradesArray: {
+          type: Array,
+          computed: '_objToArray(grades)'
+        },
+        houses: {
+          type: Object
+        },
+        housesArray: {
+          type: Array,
+          computed: '_objToArray(houses)'
+        },
+        mainActive: {
+          type: Boolean,
+          computed: '_computeMainActive(active, viewerActive)'
+        }
+      },
+      behaviors: [ StableBehavior ],
+      _computeMainActive: function(active, viewerActive) {
+        var result = active && !viewerActive;
+        if(result)
+          this.fire('reload-viewers');
+        return result;
+      },
+      _filterViewers: function(grade_id, house_id, viewers) {
+        var arr = [];
+        for(var k in viewers) {
+          if(!viewers.hasOwnProperty(k)) continue;
+
+          if(viewers[k].grade_id == grade_id && viewers[k].house_id == house_id)
+            arr.push(viewers[k]);
+        }
+        return arr;
+      }
     });
   </script>
 </dom-module>
