@@ -14,6 +14,16 @@
     <script>
       StableBehavior = {
         _computeAPI: function (path) {
+          switch(path) {
+            case '/houses':
+              return '/houses.json';
+            case '/grades':
+              return '/grades.json';
+            case '/dates':
+              return '/dates.json';
+            case '/blocks':
+              return '/blocks.json';
+          }
           var apiRootPath = 'https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1';
           return apiRootPath + path;
         },
