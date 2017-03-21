@@ -155,6 +155,9 @@ Example:
       },
       _showInfo: function(e) {
         this.fire('show-info', { presentation_id: this.data.presentation_id });
+      },
+      _gotoPresentation: function(e) {
+        this.fire('goto-presentation', { presentation_id: this.data.presentation_id });
       }
       
     });
