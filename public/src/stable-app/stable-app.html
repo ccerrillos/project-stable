@@ -28,6 +28,14 @@
         margin-left: auto;
         margin-right: auto;
       }
+      .side-bar-content {
+        height: 100%;
+        margin-bottom: 16px;
+      }
+      .center {
+        margin-left: auto;
+        margin-right: auto;
+      }
     </style>
     <app-location route="{{route}}" use-hash-as-path></app-location>
     <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{tail}}"></app-route>
@@ -37,13 +45,16 @@
         <paper-toolbar>
           <div>Project Stable</div>
         </paper-toolbar>
-        <div>
+        <div class="layout vertical side-bar-content">
           <paper-menu attr-for-selected="name" selected="{{routeData.page}}" on-tap="_closeDrawer">
             <paper-item name="registration">Registration</paper-item>
             <paper-item name="presentations">Presentations</paper-item>
             <paper-item name="viewers">Viewers</paper-item>
           </paper-menu>
-
+          <div class="flex"></div>
+          <a href="https://github.com/cacerrillos/project-stable" target="_blank" class="center">
+            <paper-icon-button src="github.png"></paper-icon-button>
+          </a>
         </div>
       </paper-header-panel>
       <paper-header-panel main>
