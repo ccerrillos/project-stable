@@ -115,7 +115,7 @@ Example:
               </template>
             </paper-listbox>
           </paper-dropdown-menu>
-          <paper-icon-button icon="icons:add" on-tap="_addDate"></paper-icon-button>
+          <paper-icon-button icon="icons:create" on-tap="_addDate"></paper-icon-button>
         </div>
         <div>
           <paper-dropdown-menu label="Block">
@@ -126,7 +126,7 @@ Example:
             </paper-listbox>
             
           </paper-dropdown-menu>
-          <paper-icon-button icon="icons:add" on-tap="_addBlock"></paper-icon-button>
+          <paper-icon-button icon="icons:create" on-tap="_addBlock"></paper-icon-button>
         </div>
         <div>
           <paper-dropdown-menu label="Location">
@@ -136,7 +136,7 @@ Example:
               </template>
             </paper-listbox>
           </paper-dropdown-menu>
-          <paper-icon-button icon="icons:add" on-tap="_addLocation"></paper-icon-button>
+          <paper-icon-button icon="icons:create" on-tap="_addLocation"></paper-icon-button>
         </div>
         <paper-input label="Admin Code" type="password"></paper-input>
         <div class="layout horizontal" style="margin-top: 8px;">
@@ -187,7 +187,8 @@ Example:
       is: 'presentations-page',
       properties: {
         route: {
-          type: Object
+          type: Object,
+          notify: true
         },
         active: {
           type: Boolean,
@@ -291,23 +292,13 @@ Example:
         this.$.editDialog.open();
       },
       _addDate: function(e) {
-
+        //this.set('route.path', '/dates');
       },
       _addBlock: function(e) {
-        this.newBasicItem = {
-          name: 'Block',
-          path: 'blocks',
-          value: ''
-        };
-        this.$.newBasicItemDialog.open();
+        this.set('route.path', '/blocks');
       },
       _addLocation: function(e) {
-        this.newBasicItem = {
-          name: 'Location',
-          path: 'locations',
-          value: ''
-        };
-        this.$.newBasicItemDialog.open();
+        this.set('route.path', '/locations');
       },
       _addBasicItem: function(e) {
 
