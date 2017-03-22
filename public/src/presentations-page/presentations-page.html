@@ -8,6 +8,7 @@
 
 <link rel="import" href="../signup-page/presentation-row.html">
 <link rel="import" href="../stable-app/stable-behavior.html">
+<link rel="import" href="../viewers-page/viewer-row.html">
 <!--
 A comment describing this element
 
@@ -87,6 +88,16 @@ Example:
         z-index: 10000;
         background-color: var(--paper-green-500);
       }
+      p {
+        margin-top: 0;
+        margin-bottom: 0.5em;
+      }
+      .viewers {
+        min-height: 64px;
+      }
+      viewer-row:hover {
+        background-color: #e6e6e6;
+      }
     </style>
     <iron-ajax
       id="ajax"
@@ -94,9 +105,19 @@ Example:
       method="POST"
       content-type="application/json"
       handle-as="json"
-      on-request="_request"
       on-response="_response"
       on-error="_error"></iron-ajax>
+
+    <iron-ajax
+      auto
+      id="viewersAjax"
+      url="[[_computeAPI('/viewers')]]"
+      method="GET"
+      content-type="application/json"
+      handle-as="json"
+      params="[[detailsData]]"
+      last-response="{{presentationViewers}}"
+      ></iron-ajax>
 
     <app-route
       route="{{route}}"
@@ -216,10 +237,21 @@ Example:
     </template>
     <template is="dom-if" if="[[detailsActiveAndLoaded]]">
       <paper-material elevation="1">
-        <div>[[presentation.first_name]] [[presentation.last_name]]</div>
-        <div>[[presentation.topic]]</div>
-        <div>[[_parseDate(detailsData.date)]], [[_getAttrFromObj(detailsData.block_id, 'block_name', blocks)]]</div>
-        <div>[[_getAttrFromObj(presentation.location_id, 'location_name', locations)]]</div>
+        <p>[[presentation.first_name]] [[presentation.last_name]]</p>
+        <p>[[presentation.topic]]</p>
+        <p>Date: <b>[[_parseDate(detailsData.date)]], [[_getAttrFromObj(detailsData.block_id, 'block_name', blocks)]]</b></p>
+        <p>Location: <b>[[_getAttrFromObj(presentation.location_id, 'location_name', locations)]]</b></p>
+
+        <div class="viewers">
+          <div class="layout horizontal" hidden="[[viewersLoader]]">
+            <div class="flex"></div>
+            <paper-spinner active></paper-spinner>
+            <div class="flex"></div>
+          </div>
+          <template is="dom-repeat" items="[[presentationViewers]]" as="viewer">
+            <viewer-row viewer="[[viewer]]" on-viewer-details="_viewerDetails"></viewer-row>
+          </template>
+        </div>
       </paper-material>
     </template>
   </template>
@@ -294,6 +326,15 @@ Example:
         presentation: {
           type: Object,
           computed: '_getObjByKey(presentations, detailsData.presentation_id)'
+        },
+        presentationViewers: {
+          type: Array,
+          value: null
+        },
+        viewersLoader: {
+          type: Boolean,
+          value: false,
+          computed: '_onPresentationViewersChanged(presentationViewers)'
         }
       },
       behaviors: [ StableBehavior ],
@@ -429,12 +470,24 @@ Example:
       _onDetailsActiveChanged: function(e) {
         if(e) {
           this.fire('show-back-button', true);
+        } else {
+          this.presentationViewers = null;
         }
       },
       _onMainActiveChanged: function(e) {
         if(e) {
           this.fire('show-back-button', false);
         }
+      },
+      _onPresentationViewersChanged: function(e) {
+        if(e === undefined || e === null)
+          return false;
+        return true;
+      },
+      _viewerDetails: function(e) {
+        var viewer_id = e.detail.viewer_id;
+
+        this.set('route.path', '/viewers/' + viewer_id);
       }
 
     });
