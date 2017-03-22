@@ -115,7 +115,7 @@ Example:
       behaviors: [ StableBehavior ],
       _computeMainActive: function(active, viewerActive) {
         var result = active && !viewerActive;
-        if(result || (viewerActive) && this.viewers === undefined)
+        if(result || (viewerActive && this.viewers === undefined))
           this.fire('reload-viewers');
         return result;
       },
