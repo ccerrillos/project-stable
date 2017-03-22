@@ -2,10 +2,6 @@
   "entrypoint": "index.html",
   "shell": "src/stable-app/stable-app.html",
   "fragments": [
-    "src/signup-page/registration-page.html",
-    "src/viewers-page/viewers-page.html",
-    "src/presentations-page/presentations-page.html",
-    "src/edit-item-pages/edit-locations-page.html"
   ],
   "sources": [
     "src/**/*",
