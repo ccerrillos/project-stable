@@ -14,7 +14,7 @@
 <link rel="import" href="../signup-page/registration-page.html">
 <link rel="import" href="../presentations-page/presentations-page.html">
 <link rel="import" href="../viewers-page/viewers-page.html">
-<link rel="import" href="../edit-item-pages/edit-locations-page.html">
+<!-- <link rel="import" href="../edit-item-pages/edit-locations-page.html"> -->
 <link rel="import" href="stable-behavior.html">
 
 <dom-module id="stable-app">
@@ -131,7 +131,7 @@
             <paper-item name="registration">Registration</paper-item>
             <paper-item name="schedule">Schedule</paper-item>
             <paper-item name="viewers">Viewers</paper-item>
-            <paper-item name="locations">Locations</paper-item>
+            <!-- <paper-item name="locations">Locations</paper-item> -->
           </paper-menu>          
         </div>
         <div class="shameless layout horizontal">
@@ -183,7 +183,12 @@
                 locations="[[locations]]"
                 name="viewers"
                 ></viewers-page>
-              <edit-locations-page route="{{route}}" name="locations" locations="[[locations]]" admin-code="{{adminCode}}"></edit-locations-page>
+              <!-- <edit-locations-page
+                route="{{route}}"
+                name="locations"
+                locations="[[locations]]"
+                admin-code="{{adminCode}}"
+                ></edit-locations-page> -->
             </iron-pages>
             
           </div>
