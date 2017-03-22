@@ -68,8 +68,8 @@ Example:
           <div class="vcenter" ><b>[[item.count]]</b> [[item.grade_name]]</div>
         </template>
         <div class="vcenter"><b>[[viewerCountData.total_count]]</b>/<b>[[viewerCountData.total_limit]]</b> Total</div>
-        <paper-icon-button icon="icons:event-seat" on-tap="_gotoPresentation"></paper-icon-button>
       </template>
+        <paper-icon-button icon="icons:event-seat" on-tap="_gotoPresentation" hidden="[[!goToViewers]]"></paper-icon-button>
       <div>
         <paper-icon-button icon="icons:info" on-tap="_showInfo"></paper-icon-button>
       </div>
@@ -113,6 +113,11 @@ Example:
         viewerCountData: {
           type: Object,
           value: {}
+        },
+        goToViewers: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
         }
       },
       observers: [
@@ -158,7 +163,7 @@ Example:
         this.fire('show-info', { presentation_id: this.data.presentation_id });
       },
       _gotoPresentation: function(e) {
-        this.fire('goto-presentation', { presentation_id: this.data.presentation_id });
+        this.fire('goto-presentation', { presentation_id: this.data.presentation_id, date: this.date, block_id: this.blockId });
       }
       
     });
