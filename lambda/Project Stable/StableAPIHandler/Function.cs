@@ -56,6 +56,8 @@ namespace StableAPIHandler {
 				case "/presentations/":
 				case "/viewers":
 				case "/viewers/":
+				case "/schedule":
+				case "/schedule/":
 					break;
 
 				case "/signup":
@@ -170,7 +172,14 @@ namespace StableAPIHandler {
 									};
 								}
 								break;
-
+							
+							case "/schedule":
+							case "/schedule/":
+								response = new StableAPIResponse() {
+									Body = JsonConvert.SerializeObject(ctx.Schedule),
+									StatusCode = HttpStatusCode.OK
+								};
+								break;
 
 							default:
 								break;

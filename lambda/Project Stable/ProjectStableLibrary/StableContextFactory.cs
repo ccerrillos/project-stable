@@ -25,6 +25,12 @@ namespace ProjectStableLibrary {
 					c.viewer_id,
 					c.order
 				});
+			modelBuilder.Entity<Schedule>()
+				.HasKey(c => new {
+					c.date,
+					c.block_id,
+					c.presentation_id
+				});
 		}
 
 		public DbSet<Date> dates {
@@ -146,6 +152,18 @@ namespace ProjectStableLibrary {
 						 select thus.presentation_id;
 
 			return subset.ToList();
+		}
+		public DbSet<Schedule> schedule {
+			get;
+			set;
+		}
+		public List<Schedule> Schedule {
+			get {
+				var set  = from thus in schedule
+							orderby thus.date, thus.block_id select thus;
+				
+				return set.ToList();
+			}
 		}
 
 	}
