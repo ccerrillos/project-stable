@@ -2,8 +2,10 @@
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../stable-app/stable-behavior.html">
 <link rel="import" href="viewer-row.html">
+<link rel="import" href="../signup-page/presentation-row.html">
 
 <!--
 A comment describing this element
@@ -43,10 +45,25 @@ Example:
       viewer-row:hover {
         background-color: #e6e6e6;
       }
+      .session {
+        margin-top: 8px;
+        margin-bottom: 16px;
+      }
     </style>
     <app-route route="{{route}}" pattern="/viewers" active="{{active}}"></app-route>
     <app-route route="{{route}}" pattern="/viewers/:viewer_id" active="{{viewerActive}}" data="{{viewerDetailsData}}"></app-route>
-    <b>[[active]]</b> <b>[[viewerActive]]</b>
+
+    <iron-ajax
+      auto
+      id="scheduleAjax"
+      url="[[_computeAPI('/schedule')]]"
+      method="GET"
+      content-type="application/json"
+      handle-as="json"
+      params="[[_computeParams(viewer)]]"
+      last-response="{{schedule}}"
+      ></iron-ajax>
+
     <template is="dom-if" if="[[mainActive]]">
       <template is="dom-repeat" items="[[gradesArray]]" as="grade">
         <template is="dom-repeat" items="[[housesArray]]" as="house">
@@ -67,6 +84,27 @@ Example:
     <template is="dom-if" if="[[viewerActive]]">
       <paper-material elevation="1">
         <h3>[[viewer.first_name]] [[viewer.last_name]] | [[_getAttrFromObj(viewer.house_id, 'house_name', houses)]] [[_getAttrFromObj(viewer.grade_id, 'grade_name', grades)]]</h3>
+
+        <b>Schedule:</b>
+        <template is="dom-repeat" items="[[dates]]" as="date">
+          <template is="dom-repeat" items="[[blocksArray]]" as="block">
+            <div class="layout vertical session">
+              <div class="layout horizontal">
+                <!-- <div class="flex"></div> -->
+                <b>[[_parseDate(date.date)]] | [[_getAttrFromObj(block.block_id, 'block_name', blocks)]]</b>
+                <div class="flex"></div>
+              </div>
+              <div class="layout horizontal">
+                <presentation-row
+                  class="flex"
+                  data="[[_filterReg(date.date, block.block_id, schedule, presentations)]]"
+                  locations="[[locations]]"
+                  show-details
+                  ></presentation-row>
+              </div>
+            </div>
+          </template>
+        </template>
       </paper-material>
     </template>
   </template>
@@ -99,6 +137,10 @@ Example:
           type: Array,
           computed: '_objToArray(houses)'
         },
+        blocksArray: {
+          type: Array,
+          computed: '_objToArray(blocks)'
+        },
         mainActive: {
           type: Boolean,
           computed: '_computeMainActive(active, viewerActive)',
@@ -113,6 +155,9 @@ Example:
           computed: '_getObjByKey(viewers, viewerDetailsData.viewer_id)'
         },
         viewerDetailsData: {
+          type: Object
+        },
+        presentations: {
           type: Object
         }
       },
@@ -141,12 +186,29 @@ Example:
       _onViewerActiveChanged: function(e) {
         if(e) {
           this.fire('show-back-button', true);
+          if(this.presentations === undefined)
+            this.fire('reload-presentations');
+          if(this.locations === undefined)
+            this.fire('reload-locations');
         }
       },
       _onMainActiveChanged: function(e) {
         if(e) {
           this.fire('show-back-button', false);
         }
+      },
+      _filterReg: function(date, block_id, schedule, presentations) {
+        var presentation_id = -1;
+        for(var x = 0; x < schedule.length; x++) {
+          if(schedule[x].date == date && schedule[x].block_id == block_id)
+            return this._getObjByKey(presentations, schedule[x].presentation_id);
+        }
+        return {};
+      },
+      _computeParams: function(e) {
+        return {
+          viewer_id: e.viewer_id
+        };
       }
     });
   </script>
