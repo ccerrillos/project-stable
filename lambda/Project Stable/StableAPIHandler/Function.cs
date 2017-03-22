@@ -492,18 +492,12 @@ namespace StableAPIHandler {
 				req.status = true;
 				try {
 					List<Preference> toAdd = new List<Preference>();
-					foreach(var kv_1 in req.data) {
-						foreach(var kv_2 in kv_1.Value) {
-							for(int x = 0; x < kv_2.Value.Count; x++) {
-								toAdd.Add(new Preference() {
-									viewer_id = req.viewer_id,
-									date = kv_1.Key,
-									block_id = kv_2.Key,
-									order = (uint)(x + 1),
-									presentation_id = kv_2.Value[x]
-								});
-							}
-						}
+					for(int x = 0; x < req.data.Count; x++) {
+						toAdd.Add(new Preference() {
+							viewer_id = req.viewer_id,
+							order = (uint)(x + 1),
+							presentation_id = req.data[x]
+						});
 					}
 					using(var tx = ctx.Database.BeginTransaction()) {
 						try {

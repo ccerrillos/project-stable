@@ -13,16 +13,6 @@ namespace ProjectStableLibrary {
 			set;
 		}
 		[Key, Column(Order = 2)]
-		public uint date {
-			get;
-			set;
-		}
-		[Key, Column(Order = 3)]
-		public uint block_id {
-			get;
-			set;
-		}
-		[Key, Column(Order = 4)]
 		public uint order {
 			get;
 			set;

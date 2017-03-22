@@ -23,8 +23,6 @@ namespace ProjectStableLibrary {
 			modelBuilder.Entity<Preference>()
 				.HasKey(c => new {
 					c.viewer_id,
-					c.date,
-					c.block_id,
 					c.order
 				});
 		}
@@ -144,8 +142,6 @@ namespace ProjectStableLibrary {
 		public List<uint> GetPreferences(uint viewer_id, uint date, uint block_id) {
 			var subset = from thus in preferences
 						 where thus.viewer_id == viewer_id
-							 && thus.date == date
-							 && thus.block_id == block_id
 						 orderby thus.order
 						 select thus.presentation_id;
 

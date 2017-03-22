@@ -8,6 +8,7 @@
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
 
 <link rel="import" href="presentation-row.html">
+<link rel="import" href="../stable-app/stable-behavior.html">
 <!--
 A comment describing this element
 
@@ -121,21 +122,24 @@ Example:
     </paper-dialog>
 
     <div id="content">
-      <template is="dom-repeat" items="[[dates]]" as="date">
-        <template is="dom-repeat" items="[[blocksArr]]" as="block">
+      <!-- <template is="dom-repeat" items="[[dates]]" as="date"> -->
+        <!-- <template is="dom-repeat" items="[[blocksArr]]" as="block"> -->
           <paper-material elevation="1">
-            <h3>[[_parseDate(date.date)]] - [[block.block_name]] Block</h3>
+            <!-- <h3>[[_parseDate(date.date)]] - [[block.block_name]] Block</h3> -->
+            <h3>All Presentations</h3>
+            <!-- class$="[[_computeSorter(date.date, block.block_id)]]" -->
             <sortable-js
-            class$="[[_computeSorter(date.date, block.block_id)]]"
             draggable="presentation-row"
             handle=".handle"
             filter=".no-drag"
             data-id-attr="data-id"
             on-update="_sortableUpdate">
-              <template is="dom-repeat" items="[[_filterPresentations(date.date, block.block_id, presentations)]]" as="presentation">
+              <!-- <template is="dom-repeat" items="[[_filterPresentations(date.date, block.block_id, presentations)]]" as="presentation"> -->
+              <template is="dom-repeat" items="[[presentationsArray]]" as="presentation">
+
                 <presentation-row
                   data="[[presentation]]"
-                  order="[[block.order]]"
+                  order="[[order]]"
                   data-id$="[[presentation.presentation_id]]"
                   on-move-up="_doMoveUp"
                   on-move-down="_doMoveDown"
@@ -146,8 +150,8 @@ Example:
             </sortable-js>
             
           </paper-material>
-        </template>
-      </template>
+        <!-- </template> -->
+      <!-- </template> -->
     </div>
 
     <paper-toast id="errorToast" text="An error occurred."></paper-toast>
@@ -170,6 +174,10 @@ Example:
         presentations: {
           type: Object
         },
+        presentationsArray: {
+          type: Array,
+          computed: '_objToArray(presentations)'
+        },
         infoData: {
           type: Object,
           value: {}
@@ -180,8 +188,12 @@ Example:
         },
         userData: {
           type: Object
+        },
+        order: {
+          type: Array
         }
       },
+      behaviors: [ StableBehavior ],
       reset: function() {
         this.toSave = {};
         this.blocksArr = this._computeBlocksArr(this.blocks);
@@ -226,7 +238,11 @@ Example:
       _sortableUpdate: function(e) {
         var order = e.target.sortable.toArray();
         //TODO: save the order
-        e.model.set('block.order', order);
+        //e.model.set('block.order', order);
+        this.order = order;
+
+        this.toSave = order;
+        return;
         //
 
         var date = e.model.get('date.date');

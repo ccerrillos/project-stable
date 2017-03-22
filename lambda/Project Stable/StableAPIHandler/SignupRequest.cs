@@ -57,7 +57,7 @@ namespace StableAPIHandler {
 			get;
 			set;
 		}
-		public Dictionary<uint, Dictionary<uint, List<uint>>> data {
+		public List<uint> data {
 			get;
 			set;
 		}
