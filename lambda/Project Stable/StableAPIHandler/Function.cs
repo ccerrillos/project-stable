@@ -158,8 +158,7 @@ namespace StableAPIHandler {
 										uint block_id = uint.Parse(apigProxyEvent.QueryStringParameters["block_id"]);
 										uint presentation_id = uint.Parse(apigProxyEvent.QueryStringParameters["presentation_id"]);
 
-										var regs = ctx.registrations.ToList();
-										regs = regs.Where(thus => thus.date == date && thus.block_id == block_id && thus.presentation_id == presentation_id).ToList();
+										var regs = ctx.registrations.Where(thus => thus.date == date && thus.block_id == block_id && thus.presentation_id == presentation_id).ToList();
 										var viewers = ctx.viewers.ToList();
 										var result = new List<SanitizedViewer>();
 										foreach(var r in regs) {
@@ -203,6 +202,26 @@ namespace StableAPIHandler {
 							
 							case "/schedule":
 							case "/schedule/":
+								if(apigProxyEvent.QueryStringParameters != null)
+									if(apigProxyEvent.QueryStringParameters.ContainsKey("viewer_id")) {
+										try {
+											uint viewer_id = uint.Parse(apigProxyEvent.QueryStringParameters["viewer_id"]);
+
+											var regs = ctx.registrations.Where(thus => thus.viewer_id == viewer_id).ToList();
+											response = new StableAPIResponse() {
+												Body = JsonConvert.SerializeObject(regs),
+												StatusCode = HttpStatusCode.OK
+											};
+											break;
+										} catch (Exception e) {
+											Logger.LogLine(e.ToString());
+											response = new StableAPIResponse() {
+												Body = JsonConvert.SerializeObject(new Result(e)),
+												StatusCode = HttpStatusCode.BadRequest
+											};
+										}
+										break;
+									}
 								response = new StableAPIResponse() {
 									Body = JsonConvert.SerializeObject(ctx.Schedule),
 									StatusCode = HttpStatusCode.OK
