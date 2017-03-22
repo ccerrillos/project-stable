@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../stable-app/stable-behavior.html">
 
 <!--
 A comment describing this element
@@ -69,6 +70,7 @@ Example:
         </template>
         <div class="vcenter"><b>[[viewerCountData.total_count]]</b>/<b>[[viewerCountData.total_limit]]</b> Total</div>
       </template>
+      <div class="vcenter" hidden="[[!showDetails]]">[[_getAttrFromObj(data.location_id, 'location_name', locations)]]</div>
         <paper-icon-button icon="icons:event-seat" on-tap="_gotoPresentation" hidden="[[!goToViewers]]"></paper-icon-button>
       <div>
         <paper-icon-button icon="icons:info" on-tap="_showInfo"></paper-icon-button>
@@ -118,8 +120,14 @@ Example:
           type: Boolean,
           value: false,
           reflectToAttribute: true
+        },
+        showDetails: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
         }
       },
+      behaviors: [ StableBehavior ],
       observers: [
         '_computeFirstLast(order, data)'
       ],
