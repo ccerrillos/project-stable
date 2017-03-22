@@ -31,6 +31,12 @@ namespace ProjectStableLibrary {
 					c.block_id,
 					c.presentation_id
 				});
+			modelBuilder.Entity<Registration>()
+				.HasKey(c => new {
+					c.date,
+					c.block_id,
+					c.viewer_id
+				});
 		}
 
 		public DbSet<Date> dates {
@@ -164,6 +170,11 @@ namespace ProjectStableLibrary {
 				
 				return set.ToList();
 			}
+		}
+
+		public DbSet<Registration> registrations {
+			get;
+			set;
 		}
 
 	}

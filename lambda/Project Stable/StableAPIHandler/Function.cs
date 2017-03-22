@@ -151,6 +151,34 @@ namespace StableAPIHandler {
 
 							case "/viewers":
 							case "/viewers/":
+								if(apigProxyEvent.QueryStringParameters != null)
+								if(apigProxyEvent.QueryStringParameters.Count( thus => thus.Key == "date" || thus.Key == "block_id" || thus.Key == "presentation_id") == 3){
+									try {
+										uint date = uint.Parse(apigProxyEvent.QueryStringParameters["date"]);
+										uint block_id = uint.Parse(apigProxyEvent.QueryStringParameters["block_id"]);
+										uint presentation_id = uint.Parse(apigProxyEvent.QueryStringParameters["presentation_id"]);
+
+										var regs = ctx.registrations.ToList();
+										regs = regs.Where(thus => thus.date == date && thus.block_id == block_id && thus.presentation_id == presentation_id).ToList();
+										var viewers = ctx.viewers.ToList();
+										var result = new List<SanitizedViewer>();
+										foreach(var r in regs) {
+											result.Add(viewers.Find(thus => thus.viewer_id == r.viewer_id).Sanitize());
+										}
+										response = new StableAPIResponse() {
+											Body = JsonConvert.SerializeObject(result),
+											StatusCode = HttpStatusCode.OK
+										};
+										break;
+									} catch (Exception e) {
+										Logger.LogLine(e.ToString());
+										response = new StableAPIResponse() {
+											Body = JsonConvert.SerializeObject(new Result(e)),
+											StatusCode = HttpStatusCode.BadRequest
+										};
+									}
+									break;
+								}
 								response = new StableAPIResponse() {
 									Body = JsonConvert.SerializeObject(ctx.Viewers),
 									StatusCode = HttpStatusCode.OK
