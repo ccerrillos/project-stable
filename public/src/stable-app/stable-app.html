@@ -110,6 +110,14 @@
       on-error="_onError"
       on-response="ajaxResponse"
       last-response="{{viewers}}"></iron-ajax>
+    <iron-ajax
+      id="scheduleAjax"
+      url="[[_computeAPI('/schedule')]]"
+      handle-as="json"
+      content-type="application/json"
+      on-error="_onError"
+      on-response="ajaxResponse"
+      last-response="{{schedule}}"></iron-ajax>
 
     <paper-drawer-panel force-narrow id="paperDrawerPanel">
       <paper-header-panel drawer>
@@ -119,7 +127,7 @@
         <div class="layout vertical side-bar-content">
           <paper-menu attr-for-selected="name" selected="{{routeData.page}}" on-tap="_closeDrawer">
             <paper-item name="registration">Registration</paper-item>
-            <paper-item name="presentations">Presentations</paper-item>
+            <paper-item name="schedule">Schedule</paper-item>
             <paper-item name="viewers">Viewers</paper-item>
             <paper-item name="locations">Locations</paper-item>
           </paper-menu>          
@@ -152,13 +160,14 @@
                 ></registration-page>
               <presentations-page
                 route="{{route}}"
-                name="presentations"
+                name="schedule"
                 dates="[[dates]]"
                 grades="[[grades]]"
                 houses="[[houses]]"
                 blocks="[[blocks]]"
                 presentations="[[presentations]]"
                 locations="[[locations]]"
+                schedule="[[schedule]]"
                 admin-code="{{adminCode}}"
                 ></presentations-page>
               <viewers-page
@@ -214,6 +223,7 @@
         'reload-locations': '_reloadLocations',
         'reload-presentations': '_reloadPresentations',
         'reload-viewers': '_reloadViewers',
+        'reload-schedule': '_reloadSchedule',
         'show-back-button': '_handleShowBackButton'
       },
       ready: function(e) {
@@ -274,6 +284,9 @@
       _reloadViewers: function(e) {
         this.$.viewersAjax.generateRequest();
       },
+      _reloadSchedule: function(e) {
+        this.$.scheduleAjax.generateRequest();
+      },
       _handleShowBackButton: function(e) {
         var temp = true;
         if(e.detail !== undefined)
@@ -286,6 +299,11 @@
         this.$.backButton.hidden = true;
         this.$.menuButton.hidden = false;
         window.history.back();
+      },
+      _onError: function(e) {
+        this._handleToast({ detail: {
+          message: 'Failed to fetch data! Please reload!'
+        }});
       }
     });
   </script>
