@@ -248,7 +248,7 @@ Example:
             <paper-spinner active></paper-spinner>
             <div class="flex"></div>
           </div>
-          <template is="dom-repeat" items="[[presentationViewers]]" as="viewer">
+          <template is="dom-repeat" items="[[_sortViewers(presentationViewers)]]" as="viewer">
             <viewer-row
               viewer="[[viewer]]"
               on-viewer-details="_viewerDetails"
@@ -493,6 +493,10 @@ Example:
         var viewer_id = e.detail.viewer_id;
 
         this.set('route.path', '/viewers/' + viewer_id);
+      },
+      _sortViewers: function(arr) {
+        arr.sort(this._dynamicSortMultiple("last_name", "first_name"));
+        return arr;
       }
 
     });

@@ -176,6 +176,9 @@ Example:
           if(viewers[k].grade_id == grade_id && viewers[k].house_id == house_id)
             arr.push(viewers[k]);
         }
+
+        arr.sort(this._dynamicSortMultiple("last_name", "first_name"));
+
         return arr;
       },
       _viewerDetails: function(e) {
