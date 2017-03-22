@@ -1,0 +1,51 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<!--
+A comment describing this element
+
+Example:
+
+    <my-elem></my-elem>
+
+Example:
+
+    <my-elem>
+      <h2>Hello my-elem</h2>
+    </my-elem>
+
+@demo demo/index.html
+-->
+
+<dom-module id="viewer-row">
+  <template>
+    <style include="iron-flex iron-flex-alignment">
+      :host {
+        display: block;
+      }
+      .vcenter {
+        margin-top: auto;
+        margin-bottom: auto;
+        margin-right: 8px;
+      }
+    </style>
+    <div class="layout horizontal">
+      <div class="vcenter">[[viewer.last_name]], [[viewer.first_name]]</div>
+      <div class="flex"></div>
+      <paper-icon-button icon="icons:info" on-tap="_viewerDetails"></paper-icon-button>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is: 'viewer-row',
+      properties: {
+        viewer: {
+          type: Object
+        }
+      },
+      _viewerDetails: function(e) {
+        this.fire('viewer-details', { viewer_id: this.viewer.viewer_id });
+      }
+    });
+  </script>
+</dom-module>
