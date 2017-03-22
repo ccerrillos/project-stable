@@ -495,7 +495,8 @@ Example:
         this.set('route.path', '/viewers/' + viewer_id);
       },
       _sortViewers: function(arr) {
-        arr.sort(this._dynamicSortMultiple("last_name", "first_name"));
+        if(arr)
+          arr.sort(this._dynamicSortMultiple("last_name", "first_name"));
         return arr;
       }
 
