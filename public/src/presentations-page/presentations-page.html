@@ -98,7 +98,17 @@ Example:
       on-response="_response"
       on-error="_error"></iron-ajax>
 
-    <app-route route="{{route}}" pattern="/schedule" active="{{active}}"></app-route>
+    <app-route
+      route="{{route}}"
+      pattern="/schedule"
+      active="{{active}}"
+      ></app-route>
+    <app-route
+      route="{{route}}"
+      pattern="/schedule/:date/:block_id/:presentation_id"
+      data="{{detailsData}}"
+      active="{{detailsActive}}"
+      ></app-route>
 
     <paper-spinner id="spinner" active class="page-load"></paper-spinner>
 
@@ -177,30 +187,41 @@ Example:
       </div>
         
     </paper-dialog>
+    <template is="dom-if" if="[[mainPageActive]]">
+      <template is="dom-repeat" items="[[dates]]" as="date" id="content" hidden>
+        <template is="dom-repeat" items="[[blocksArray]]" as="block">
+          <paper-material elevation="1">
+          <h3>[[_parseDate(date.date)]] - [[block.block_name]]</h3>
 
-    <template is="dom-repeat" items="[[dates]]" as="date" id="content" hidden>
-      <template is="dom-repeat" items="[[blocksArray]]" as="block">
-        <paper-material elevation="1">
-        <h3>[[_parseDate(date.date)]] - [[block.block_name]]</h3>
+          <template is="dom-repeat" items="[[_filterPresentations(date.date, block.block_id, presentations, schedule)]]" as="presentation">
+            <presentation-row
+              data="[[presentation]]"
+              data-id$="[[presentation.presentation_id]]"
+              on-show-info="_showInfo"
+              on-goto-presentation="_gotoPresentation"
+              grades="[[gradesArray]]"
+              date="[[date.date]]"
+              block-id="[[block.block_id]]"
+              locations="[[locations]]"
+              go-to-viewers
+              viewer-count-data="[[countData]]"
+              ></presentation-row>
+          </template>
 
-        <template is="dom-repeat" items="[[_filterPresentations(date.date, block.block_id, presentations, schedule)]]" as="presentation">
-          <presentation-row
-            data="[[presentation]]"
-            data-id$="[[presentation.presentation_id]]"
-            on-show-info="_showInfo"
-            on-goto-presentation="_gotoPresentation"
-            grades="[[gradesArray]]"
-            locations="[[locations]]"
-            viewer-count
-            viewer-count-data="[[countData]]"
-            ></presentation-row>
+        </paper-material>
         </template>
-
-      </paper-material>
+        
       </template>
-      
+      <paper-fab icon="icons:add" on-tap="_addPresentation"></paper-fab>
     </template>
-    <paper-fab icon="icons:add" on-tap="_addPresentation"></paper-fab>
+    <template is="dom-if" if="[[detailsActiveAndLoaded]]">
+      <paper-material elevation="1">
+        <div>[[presentation.first_name]] [[presentation.last_name]]</div>
+        <div>[[presentation.topic]]</div>
+        <div>[[_parseDate(detailsData.date)]], [[_getAttrFromObj(detailsData.block_id, 'block_name', blocks)]]</div>
+        <div>[[_getAttrFromObj(presentation.location_id, 'location_name', locations)]]</div>
+      </paper-material>
+    </template>
   </template>
   <script>
     Polymer({
@@ -245,15 +266,48 @@ Example:
         adminCode: {
           type: String,
           notify: true
+        },
+        detailsData: {
+          type: Object,
+          value: {}
+        },
+        mainPageActive: {
+          type: Boolean,
+          value: false,
+          computed: '_computeMainPageActive(active, detailsActive, dataLoaded)'
+        },
+        dataLoaded: {
+          type: Boolean,
+          value: false,
+          computed: '_dataLoaded(dates, blocks, presentations, grades, locations, schedule)'
+        },
+        detailsActiveAndLoaded: {
+          type: Boolean,
+          value: false,
+          computed: '_computeDetailsActiveAndLoaded(detailsActive, dataLoaded)'
+        },
+        presentation: {
+          type: Object,
+          computed: '_getObjByKey(presentations, detailsData.presentation_id)'
         }
       },
       behaviors: [ StableBehavior ],
       observers: [
-        '_dataLoaded(dates, blocks, presentations, grades, locations, schedule)'
       ],
-      _computeAPI: function (path) {
-        var apiRootPath = 'https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1';
-        return apiRootPath + path;
+      _computeMainPageActive: function(active, detailsActive, dataLoaded) {
+        var status = active && !detailsActive;
+        if(status || detailsActive) {
+          if(this.presentations === undefined)
+            this.fire('reload-presentations');
+          if(this.locations === undefined)
+            this.fire('reload-locations');
+          if(this.schedule === undefined)
+            this.fire('reload-schedule');
+        }
+        return status && dataLoaded;
+      },
+      _computeDetailsActiveAndLoaded: function(detailsActive, dataLoaded) {
+        return detailsActive && dataLoaded;
       },
       _onError: function(e) {
         console.log(e);
@@ -297,8 +351,9 @@ Example:
         if(dates && blocks && presentations && grades && locations && schedule) {
           this.$.spinner.hidden = true;
           this.$.spinner.active = false;
-          this.$.content.hidden = false;
+          return true;
         }
+        return false;
       },
       _showInfo: function(e) {
         if(e && e.detail) {
@@ -359,6 +414,12 @@ Example:
       _response: function(e) {
         this._enableConfirm();
         this.$.editDialog.close();
+      },
+      _gotoPresentation: function(e) {
+        var date = e.detail.date;
+        var block_id = e.detail.block_id;
+        var presentation_id = e.detail.presentation_id;
+        this.set('route.path', '/schedule/' + date + '/' + block_id + '/' + presentation_id);
       }
 
     });
