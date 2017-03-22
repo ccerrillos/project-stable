@@ -53,7 +53,12 @@ Example:
           <paper-material elevation="1">
             <h3>[[grade.grade_name]] [[house.house_name]]</h3>
             <template is="dom-repeat" items="[[_filterViewers(grade.grade_id, house.house_id, viewers)]]" as="viewer">
-              <viewer-row viewer="[[viewer]]" on-viewer-details="_viewerDetails"></viewer-row>
+              <viewer-row
+                viewer="[[viewer]]"
+                on-viewer-details="_viewerDetails"
+                grades="[[grades]]"
+                houses="[[houses]]"
+                ></viewer-row>
             </template>
           </paper-material>
         </template>

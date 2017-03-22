@@ -249,7 +249,13 @@ Example:
             <div class="flex"></div>
           </div>
           <template is="dom-repeat" items="[[presentationViewers]]" as="viewer">
-            <viewer-row viewer="[[viewer]]" on-viewer-details="_viewerDetails"></viewer-row>
+            <viewer-row
+              viewer="[[viewer]]"
+              on-viewer-details="_viewerDetails"
+              grades="[[grades]]"
+              houses="[[houses]]"
+              show-details
+              ></viewer-row>
           </template>
         </div>
       </paper-material>
@@ -338,8 +344,7 @@ Example:
         }
       },
       behaviors: [ StableBehavior ],
-      observers: [
-      ],
+      observers: [ ],
       _computeMainPageActive: function(active, detailsActive, dataLoaded) {
         var status = active && !detailsActive;
         if(status || detailsActive) {

@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../stable-app/stable-behavior.html">
 <!--
 A comment describing this element
 
@@ -32,6 +33,9 @@ Example:
     <div class="layout horizontal">
       <div class="vcenter">[[viewer.last_name]], [[viewer.first_name]]</div>
       <div class="flex"></div>
+      <div class="vcenter" hidden="[[!showDetails]]">
+        [[_getAttrFromObj(viewer.grade_id, 'grade_name', grades)]] [[_getAttrFromObj(viewer.house_id, 'house_name', houses)]]
+      </div>
       <paper-icon-button icon="icons:info" on-tap="_viewerDetails"></paper-icon-button>
     </div>
   </template>
@@ -41,8 +45,14 @@ Example:
       properties: {
         viewer: {
           type: Object
+        },
+        showDetails: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
         }
       },
+      behaviors: [ StableBehavior ],
       _viewerDetails: function(e) {
         this.fire('viewer-details', { viewer_id: this.viewer.viewer_id });
       }
