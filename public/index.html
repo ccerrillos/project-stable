@@ -4,55 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
 
-    <title>Project Stable</title>
-    <meta name="description" content="Project Stable description">
+    <title>iPoly Career Day</title>
+    <meta name="description" content="iPoly Career Day">
 
     <!-- See https://goo.gl/OOhYW5 -->
     <link rel="manifest" href="/manifest.json">
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
     <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
-    <script>
-      StableBehavior = {
-        _computeAPI: function (path) {
-          switch(path) {
-            case '/houses':
-              return '/houses.json';
-            case '/grades':
-              return '/grades.json';
-            case '/dates':
-              return '/dates.json';
-            case '/blocks':
-              return '/blocks.json';
-          }
-          var apiRootPath = 'https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1';
-          return apiRootPath + path;
-        },
-        _objToArray: function(obj) {
-          if(obj)
-            return Object.keys(obj).map(function (key) { return obj[key]; });
-          return [];
-        },
-        _parseDate: function(e) {
-          var str = e.toString();
-          console.log(str);
-
-          if(!/^(\d){8}$/.test(str))
-            return "Invalid date!";
-
-          var y = str.substr(0,4),
-              m = str.substr(4,2),
-              d = str.substr(6,2);
-              console.log(y + " " + m + " " + d);
-          return new Date(y,parseInt(m) - 1,d).toDateString();
-        },
-        _getAttrFromObj: function(key, attr, obj) {
-          if(obj && obj[key] && obj[key][attr]) {
-            return obj[key][attr];
-          }
-          return "error";
-        }
-      };
-    </script>
 
     <link rel="import" href="src/stable-app/stable-app.html">
     <style type="text/css">

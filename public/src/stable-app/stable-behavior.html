@@ -1,0 +1,48 @@
+
+<script>
+  /**
+   * Behavior that highlights stuff.
+   *
+   * @polymerBehavior
+   */
+  StableBehavior = {
+    _computeAPI: function (path) {
+      switch(path) {
+        case '/houses':
+          return '/houses.json';
+        case '/grades':
+          return '/grades.json';
+        case '/dates':
+          return '/dates.json';
+        case '/blocks':
+          return '/blocks.json';
+      }
+      var apiRootPath = 'https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1';
+      return apiRootPath + path;
+    },
+    _objToArray: function(obj) {
+      if(obj)
+        return Object.keys(obj).map(function (key) { return obj[key]; });
+      return [];
+    },
+    _parseDate: function(e) {
+      var str = e.toString();
+      console.log(str);
+
+      if(!/^(\d){8}$/.test(str))
+        return "Invalid date!";
+
+      var y = str.substr(0,4),
+          m = str.substr(4,2),
+          d = str.substr(6,2);
+          console.log(y + " " + m + " " + d);
+      return new Date(y,parseInt(m) - 1,d).toDateString();
+    },
+    _getAttrFromObj: function(key, attr, obj) {
+      if(obj && obj[key] && obj[key][attr]) {
+        return obj[key][attr];
+      }
+      return "error";
+    }
+  };
+</script>
