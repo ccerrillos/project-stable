@@ -7,6 +7,7 @@
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <link rel="import" href="../signup-page/presentation-row.html">
+<link rel="import" href="../stable-app/stable-behavior.html">
 <!--
 A comment describing this element
 
@@ -97,7 +98,7 @@ Example:
       on-response="_response"
       on-error="_error"></iron-ajax>
 
-    <app-route route="{{route}}" pattern="/presentations" active="{{active}}"></app-route>
+    <app-route route="{{route}}" pattern="/schedule" active="{{active}}"></app-route>
 
     <paper-spinner id="spinner" active class="page-load"></paper-spinner>
 
@@ -110,8 +111,8 @@ Example:
       <div class="layout vertical" style="margin: 0;">
         <h2 class="center">[[infoData.topic]]</h2>
         <div>Presenter: <b>[[infoData.first_name]] [[infoData.last_name]]</b></div>
-        <div>Location: <b>Location</b></div>
-        <div>Bio:<br>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur et augue vitae urna elementum tristique. Aliquam finibus semper ligula, molestie hendrerit leo dictum id. Duis nisi quam, eleifend in arcu at, fermentum cursus massa. Phasellus blandit ligula eu odio scelerisque aliquam. Vivamus porta at mi ornare lobortis. Nam ante eros.</div> 
+        <div>Location: <b>[[_getAttrFromObj(infoData.location_id, 'location_name', locations)]]</b></div>
+        <div>Bio:<br>[[infoData.bio]]</div> 
       </div>
     </paper-dialog>
 
@@ -182,13 +183,14 @@ Example:
         <paper-material elevation="1">
         <h3>[[_parseDate(date.date)]] - [[block.block_name]]</h3>
 
-        <template is="dom-repeat" items="[[_filterPresentations(date.date, block.block_id, presentations)]]" as="presentation">
+        <template is="dom-repeat" items="[[_filterPresentations(date.date, block.block_id, presentations, schedule)]]" as="presentation">
           <presentation-row
             data="[[presentation]]"
             data-id$="[[presentation.presentation_id]]"
             on-show-info="_showInfo"
             on-goto-presentation="_gotoPresentation"
             grades="[[gradesArray]]"
+            locations="[[locations]]"
             viewer-count
             viewer-count-data="[[countData]]"
             ></presentation-row>
@@ -245,8 +247,9 @@ Example:
           notify: true
         }
       },
+      behaviors: [ StableBehavior ],
       observers: [
-        '_dataLoaded(dates, blocks, presentations, grades, locations)'
+        '_dataLoaded(dates, blocks, presentations, grades, locations, schedule)'
       ],
       _computeAPI: function (path) {
         var apiRootPath = 'https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1';
@@ -263,6 +266,7 @@ Example:
         if(e) {
           this.fire('reload-presentations');
           this.fire('reload-locations');
+          this.fire('reload-schedule');
         }
       },
       _parseDate: function(e) {
@@ -278,22 +282,19 @@ Example:
             console.log(y + " " + m + " " + d);
         return new Date(y,parseInt(m) - 1,d).toDateString();
       },
-      _filterPresentations: function(date, block, presentations) {
+      _filterPresentations: function(date, block, presentations, schedule) {
         var result = [];
 
-        for(var k in presentations) {
-          if(!presentations.hasOwnProperty(k)) continue;
-          
-          var thisPresentation = presentations[k];
-
-          if(thisPresentation.date === date && thisPresentation.block_id === block)
-            result.push(thisPresentation);
+        for(var x = 0; x < schedule.length; x++) {
+          if(date == schedule[x].date && block == schedule[x].block_id) {
+            result.push(presentations[schedule[x].presentation_id]);
+          }
         }
 
         return result;
       },
-      _dataLoaded: function(dates, blocks, presentations, grades, locations) {
-        if(dates && blocks && presentations && grades && locations) {
+      _dataLoaded: function(dates, blocks, presentations, grades, locations, schedule) {
+        if(dates && blocks && presentations && grades && locations && schedule) {
           this.$.spinner.hidden = true;
           this.$.spinner.active = false;
           this.$.content.hidden = false;
