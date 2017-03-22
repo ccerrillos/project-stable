@@ -39,5 +39,9 @@ namespace ProjectStableLibrary {
 			get;
 			set;
 		}
+		public string bio {
+			get;
+			set;
+		}
 	}
 }
