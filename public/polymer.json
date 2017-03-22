@@ -1,7 +1,22 @@
 {
-  "lint": {
-    "rules": [
-      "polymer-2-hybrid"
-    ]
-  }
+  "entrypoint": "index.html",
+  "shell": "src/stable-app/stable-app.html",
+  "fragments": [
+    "src/signup-page/registration-page.html",
+    "src/viewers-page/viewers-page.html",
+    "src/presentations-page/presentations-page.html",
+    "src/edit-item-pages/edit-locations-page.html"
+  ],
+  "sources": [
+    "src/**/*",
+    "images/**/*",
+    "bower.json"
+  ],
+  "includeDependencies": [
+    "bower_components/webcomponentsjs/webcomponents-lite.min.js",
+    "blocks.json",
+    "dates.json",
+    "grades.json",
+    "houses.json"
+  ]
 }
