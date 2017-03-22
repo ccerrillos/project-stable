@@ -10,6 +10,7 @@
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../signup-page/signup-form.html">
 <link rel="import" href="../../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
 
 <dom-module id="registration-page">
   <template>
@@ -43,7 +44,7 @@
       }
     </style>
     <app-localstorage-document id="userDataSorage" key="stable" data="{{userData}}">
-
+    <app-route route="{{route}}" pattern="/registration" active="{{active}}"></app-route>
     <signup-form
       id="signupForm"
       houses="[[houses]]"
@@ -139,6 +140,14 @@
           type: String,
           computed: '_computeTitleText(houses, grades, userData)',
           observer: '_publishTitleText'
+        },
+        route: {
+          type: Object,
+          notify: true
+        },
+        active: {
+          type: Boolean,
+          observer: '_onActiveChanged'
         }
       },
       observers: [
@@ -232,6 +241,10 @@
         // setTimeout(function() {
         //   ajax.generateRequest();
         // }, 500);
+      },
+      _onActiveChanged: function(e) {
+        if(e)
+          this.fire('show-back-button', false);
       }
     });
   </script>

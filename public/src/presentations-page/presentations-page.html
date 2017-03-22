@@ -274,12 +274,17 @@ Example:
         mainPageActive: {
           type: Boolean,
           value: false,
-          computed: '_computeMainPageActive(active, detailsActive, dataLoaded)'
+          computed: '_computeMainPageActive(active, detailsActive, dataLoaded)',
+          observer: '_onMainActiveChanged'
         },
         dataLoaded: {
           type: Boolean,
           value: false,
           computed: '_dataLoaded(dates, blocks, presentations, grades, locations, schedule)'
+        },
+        detailsActive: {
+          type: Boolean,
+          observer: '_onDetailsActiveChanged'
         },
         detailsActiveAndLoaded: {
           type: Boolean,
@@ -420,6 +425,16 @@ Example:
         var block_id = e.detail.block_id;
         var presentation_id = e.detail.presentation_id;
         this.set('route.path', '/schedule/' + date + '/' + block_id + '/' + presentation_id);
+      },
+      _onDetailsActiveChanged: function(e) {
+        if(e) {
+          this.fire('show-back-button', true);
+        }
+      },
+      _onMainActiveChanged: function(e) {
+        if(e) {
+          this.fire('show-back-button', false);
+        }
       }
 
     });
