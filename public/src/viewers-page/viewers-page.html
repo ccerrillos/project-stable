@@ -41,7 +41,7 @@ Example:
       }
     </style>
     <app-route route="{{route}}" pattern="/viewers" active="{{active}}"></app-route>
-    <app-route route="{{route}}" pattern="/viewers/:viewer_id" active="{{viewerActive}}"></app-route>
+    <app-route route="{{route}}" pattern="/viewers/:viewer_id" active="{{viewerActive}}" data="{{viewerDetailsData}}"></app-route>
     <b>[[active]]</b> <b>[[viewerActive]]</b>
     <template is="dom-if" if="[[mainActive]]">
       <template is="dom-repeat" items="[[gradesArray]]" as="grade">
@@ -53,12 +53,17 @@ Example:
                 <div class="vcenter">[[viewer.first_name]]</div>
                 <div class="vcenter">[[viewer.last_name]]</div>
                 <div class="flex"></div>
-                <paper-icon-button icon="icons:info"></paper-icon-button>
+                <paper-icon-button icon="icons:info" on-tap="_viewerDetails"></paper-icon-button>
               </div>
             </template>
           </paper-material>
         </template>
       </template>
+    </template>
+    <template is="dom-if" if="[[viewerActive]]">
+      <paper-material elevation="1">
+        <h3>[[viewer.first_name]] [[viewer.last_name]] | [[_getAttrFromObj(viewer.house_id, 'house_name', houses)]] [[_getAttrFromObj(viewer.grade_id, 'grade_name', grades)]]</h3>
+      </paper-material>
     </template>
   </template>
   <script>
@@ -92,13 +97,25 @@ Example:
         },
         mainActive: {
           type: Boolean,
-          computed: '_computeMainActive(active, viewerActive)'
+          computed: '_computeMainActive(active, viewerActive)',
+          observer: '_onMainActiveChanged'
+        },
+        viewerActive: {
+          type: Boolean,
+          observer: '_onViewerActiveChanged'
+        },
+        viewer: {
+          type: Object,
+          computed: '_getObjByKey(viewers, viewerDetailsData.viewer_id)'
+        },
+        viewerDetailsData: {
+          type: Object
         }
       },
       behaviors: [ StableBehavior ],
       _computeMainActive: function(active, viewerActive) {
         var result = active && !viewerActive;
-        if(result)
+        if(result || (viewerActive) && this.viewers === undefined)
           this.fire('reload-viewers');
         return result;
       },
@@ -111,6 +128,23 @@ Example:
             arr.push(viewers[k]);
         }
         return arr;
+      },
+      _viewerDetails: function(e) {
+        console.log(e);
+        console.log(e.model.get('viewer.viewer_id'));
+        var viewer_id = e.model.get('viewer.viewer_id');
+
+        this.set('route.path', '/viewers/' + viewer_id);
+      },
+      _onViewerActiveChanged: function(e) {
+        if(e) {
+          this.fire('show-back-button', true);
+        }
+      },
+      _onMainActiveChanged: function(e) {
+        if(e) {
+          this.fire('show-back-button', false);
+        }
       }
     });
   </script>

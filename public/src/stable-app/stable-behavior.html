@@ -43,6 +43,11 @@
         return obj[key][attr];
       }
       return "error";
-    }
+    },
+    _getObjByKey: function(obj, id) {
+      if(obj && obj[id])
+        return obj[id];
+      return {};
+    },
   };
 </script>
