@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../stable-app/stable-behavior.html">
 
 <!--
 A comment describing this element
@@ -46,7 +47,7 @@ Example:
       <template is="dom-repeat" items="[[gradesArray]]" as="grade">
         <template is="dom-repeat" items="[[housesArray]]" as="house">
           <paper-material elevation="1">
-            <h3>[[grade.grade_name]] [[house.house_id]]</h3>
+            <h3>[[grade.grade_name]] [[house.house_name]]</h3>
             <template is="dom-repeat" items="[[_filterViewers(grade.grade_id, house.house_id, viewers)]]" as="viewer">
               <div class="layout horizontal">
                 <div class="vcenter">[[viewer.first_name]]</div>
