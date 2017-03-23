@@ -85,9 +85,12 @@
     </paper-dialog>
     <paper-toast id="instructions" duration="0" style="padding: 8px;">
       <div class="layout horizontal">
-        <div class="vcenter">Drag the <iron-icon icon="icons:reorder"></iron-icon> to sort your preferences.</div>
+        <div class="layout vertical vcenter">
+          <div>Drag the <iron-icon icon="icons:reorder"></iron-icon> to sort your preferences.</div>
+          <div>Be sure to save using <iron-icon icon="icons:save"></iron-icon> afterwards!</div>
+        </div>
         <div class="flex"></div>
-        <paper-icon-button icon="icons:close" on-tap="_closeToastI" class="dismiss-button"></paper-icon-button>
+        <paper-icon-button icon="icons:close" on-tap="_closeToastI" class="vcenter dismiss-button"></paper-icon-button>
       </div>
     </paper-toast>
     <paper-toast id="completedToast" duration="0" style="padding: 8px;">
