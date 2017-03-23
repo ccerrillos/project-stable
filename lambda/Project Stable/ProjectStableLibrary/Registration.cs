@@ -26,5 +26,14 @@ namespace ProjectStableLibrary {
 			get;
 			set;
 		}
+		public Schedule Schedule {
+			get {
+				return new Schedule() {
+					date = date,
+					block_id = block_id,
+					presentation_id = presentation_id
+				};
+			}
+		}
 	}
 }

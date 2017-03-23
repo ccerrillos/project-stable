@@ -630,12 +630,26 @@ namespace StableAPIHandler {
 				}
 				var presentation = ctx.presentations.First(thus => thus.presentation_id == pres_id);
 				var location = ctx.locations.First(thus => thus.location_id == presentation.location_id);
-				var blocks = ctx.blocks.ToList();
+				var blocks = ctx.Blocks;
+				var grades = ctx.Grades;
+				var houses = ctx.Houses;
 
 				var schedules = ctx.schedule.Where(thus => thus.presentation_id == pres_id).ToList();
-				var viewers = new Dictionary<Schedule, SanitizedViewer>();
+				var viewers = new Dictionary<Schedule, List<Viewer>>();
+
+				foreach(Schedule s in schedules) {
+					viewers.Add(s, new List<Viewer>());
+				}
 
 				var temp = ctx.registrations.Where(thus => thus.presentation_id == pres_id).ToList();
+
+				var viewers_in_pres = from thus in temp select thus.viewer_id;
+				
+				var viewers_with_data = ctx.viewers.Where(thus => viewers_in_pres.Contains(thus.viewer_id)).ToList();
+
+				foreach(Registration r in temp) {
+					viewers[r.Schedule].Add(viewers_with_data.First(thus => thus.viewer_id == r.viewer_id));
+				}
 
 
 				PrintOutput print = new PrintOutput() {
@@ -643,6 +657,9 @@ namespace StableAPIHandler {
 					locationData = location,
 					blocks = blocks,
 					schedule = schedules,
+					grades = grades,
+					houses = houses,
+					viewers = viewers
 
 				};
 				var res = new StableAPIResponse() {

@@ -12,7 +12,7 @@ namespace StableAPIHandler {
 			get;
 			set;
 		}
-		public List<Block> blocks {
+		public Dictionary<uint, Block> blocks {
 			get;
 			set;
 		}
@@ -20,7 +20,15 @@ namespace StableAPIHandler {
 			get;
 			set;
 		}
-		public Dictionary<Schedule, Viewer> viewers {
+		public Dictionary<uint, Grade> grades {
+			get;
+			set;
+		}
+		public Dictionary<uint, House> houses {
+			get;
+			set;
+		}
+		public Dictionary<Schedule, List<Viewer>> viewers {
 			get;
 			set;
 		}
@@ -32,8 +40,13 @@ namespace StableAPIHandler {
 				// if(!viewers.ContainsKey(s))
 				// 	continue;
 
-				response += "<h3>" + presentationData.ToString() + " | " + locationData.location_name + "</h3>";
-
+				response += "<h3>" + presentationData.ToString() + " | " + locationData.location_name + " | " + blocks[s.block_id].block_name + "</h3>";
+				response += "<table>";
+				foreach(Viewer v in viewers[s].OrderBy(thus => thus.last_name).ThenBy(thus => thus.first_name)) {
+					response += $"<tr><td>{v.last_name}</td><td>{v.first_name}</td>";
+					response += $"<td>{grades[v.grade_id].grade_name}</td><td>{houses[v.house_id].house_name}</td></tr>";
+				}
+				response += "</table>";
 				response += "<div class=\"break\"></div>";
 			}
 			

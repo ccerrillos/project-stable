@@ -22,5 +22,19 @@ namespace ProjectStableLibrary {
 			get;
 			set;
 		}
+		public override bool Equals(object o) {
+			if(o == null)
+				return false;
+			
+			var s = o as Schedule;
+			if(s == null)
+				return false;
+			
+			return date == s.date && block_id == s.block_id && presentation_id == s.presentation_id;
+		}
+
+		public override int GetHashCode() {
+			return (date + "_" + block_id + "_" + presentation_id).GetHashCode();
+		}
 	}
 }
