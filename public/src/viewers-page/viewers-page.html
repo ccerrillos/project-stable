@@ -83,40 +83,47 @@ Example:
     </template>
     <template is="dom-if" if="[[viewerActive]]">
       <paper-material elevation="1">
-        <h3>[[viewer.first_name]] [[viewer.last_name]] | [[_getAttrFromObj(viewer.house_id, 'house_name', houses)]] [[_getAttrFromObj(viewer.grade_id, 'grade_name', grades)]]</h3>
-
-        <b>Schedule:</b>
-        <div class="layout horizontal" hidden="[[showSchedule]]">
+        <div class="layout horizontal" hidden="[[detailsDataReady]]">
           <div class="flex"></div>
-          <b>No schedule.</b>
+          <paper-spinner active></paper-spinner>
           <div class="flex"></div>
         </div>
-        <template is="dom-if" if="[[showSchedule]]">
-          <template is="dom-repeat" items="[[dates]]" as="date">
-            <template is="dom-repeat" items="[[blocksArray]]" as="block">
-              <div class="layout vertical session">
-                <div class="layout horizontal">
-                  <!-- <div class="flex"></div> -->
-                  <b>[[_parseDate(date.date)]] | [[_getAttrFromObj(block.block_id, 'block_name', blocks)]]</b>
-                  <div class="flex"></div>
+        <div hidden="[[!detailsDataReady]]">
+          <h3>[[viewer.first_name]] [[viewer.last_name]] | [[_getAttrFromObj(viewer.house_id, 'house_name', houses)]] [[_getAttrFromObj(viewer.grade_id, 'grade_name', grades)]]</h3>
+
+          <b>Schedule:</b>
+          <div class="layout horizontal" hidden="[[showSchedule]]">
+            <div class="flex"></div>
+            <b>No schedule.</b>
+            <div class="flex"></div>
+          </div>
+          <template is="dom-if" if="[[showSchedule]]">
+            <template is="dom-repeat" items="[[dates]]" as="date">
+              <template is="dom-repeat" items="[[blocksArray]]" as="block">
+                <div class="layout vertical session">
+                  <div class="layout horizontal">
+                    <!-- <div class="flex"></div> -->
+                    <b>[[_parseDate(date.date)]] | [[_getAttrFromObj(block.block_id, 'block_name', blocks)]]</b>
+                    <div class="flex"></div>
+                  </div>
+                  <div class="layout horizontal" hidden="[[!_hasData(date.date, block.block_id, schedule)]]">
+                    <presentation-row
+                      class="flex"
+                      data="[[_filterReg(date.date, block.block_id, schedule, presentations)]]"
+                      date="[[date.date]]"
+                      block-id="[[block.block_id]]"
+                      locations="[[locations]]"
+                      show-details
+                      hide-info
+                      go-to-viewers
+                      on-goto-presentation="_gotoPresentation"
+                      ></presentation-row>
+                  </div>
                 </div>
-                <div class="layout horizontal" hidden="[[!_hasData(date.date, block.block_id, schedule)]]">
-                  <presentation-row
-                    class="flex"
-                    data="[[_filterReg(date.date, block.block_id, schedule, presentations)]]"
-                    date="[[date.date]]"
-                    block-id="[[block.block_id]]"
-                    locations="[[locations]]"
-                    show-details
-                    hide-info
-                    go-to-viewers
-                    on-goto-presentation="_gotoPresentation"
-                    ></presentation-row>
-                </div>
-              </div>
+              </template>
             </template>
           </template>
-        </template>
+        </div>
       </paper-material>
     </template>
   </template>
@@ -175,6 +182,11 @@ Example:
         showSchedule: {
           type: Boolean,
           computed: '_notEmpty(schedule)',
+          value: false
+        },
+        detailsDataReady: {
+          type: Boolean,
+          computed: '_computeDetailsDataReady(viewer, grades, houses, dates, schedule, presentations, locations)',
           value: false
         }
       },
@@ -241,6 +253,11 @@ Example:
         return {
           viewer_id: e.viewer_id
         };
+      },
+      _computeDetailsDataReady: function(viewer, grades, houses, dates, schedule, presentations, locations) {
+        if(viewer && grades && houses && dates && schedule && presentations && locations)
+          return true;
+        return false;
       },
       _gotoPresentation: function(e) {
         var date = e.detail.date;
