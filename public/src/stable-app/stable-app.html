@@ -12,7 +12,7 @@
 <link rel="import" href="../../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
 
 <link rel="import" href="../signup-page/registration-page.html">
-<link rel="import" href="../presentations-page/presentations-page.html">
+<link rel="import" href="../schedule-page/schedule-page.html">
 <link rel="import" href="../viewers-page/viewers-page.html">
 <!-- <link rel="import" href="../edit-item-pages/edit-locations-page.html"> -->
 <link rel="import" href="stable-behavior.html">
@@ -160,7 +160,7 @@
                 blocks="[[blocks]]"
                 presentations="[[presentations]]"
                 ></registration-page>
-              <presentations-page
+              <schedule-page
                 route="{{route}}"
                 name="schedule"
                 dates="[[dates]]"
@@ -171,7 +171,7 @@
                 locations="[[locations]]"
                 schedule="[[schedule]]"
                 admin-code="{{adminCode}}"
-                ></presentations-page>
+                ></schedule-page>
               <viewers-page
                 route="{{route}}"
                 houses="[[houses]]"

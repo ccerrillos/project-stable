@@ -25,11 +25,12 @@ Example:
 @demo demo/index.html
 -->
 
-<dom-module id="presentations-page">
+<dom-module id="schedule-page">
   <template>
     <style include="iron-flex iron-flex-alignment">
       :host {
         display: block;
+        padding-bottom: 48px;
       }
       paper-material {
         background-color: white;
@@ -263,7 +264,7 @@ Example:
   </template>
   <script>
     Polymer({
-      is: 'presentations-page',
+      is: 'schedule-page',
       properties: {
         route: {
           type: Object,
