@@ -11,6 +11,7 @@
 <link rel="import" href="../signup-page/signup-form.html">
 <link rel="import" href="../../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
 <link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="../stable-app/stable-behavior.html">
 
 <dom-module id="registration-page">
   <template>
@@ -153,6 +154,7 @@
           observer: '_onActiveChanged'
         }
       },
+      behaviors: [ StableBehavior ],
       observers: [
         '_dataReady(dates, blocks, presentations, userData)'
       ],

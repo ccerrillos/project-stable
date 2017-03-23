@@ -374,19 +374,6 @@ Example:
           this.fire('reload-schedule');
         }
       },
-      _parseDate: function(e) {
-        var str = e.toString();
-        console.log(str);
-
-        if(!/^(\d){8}$/.test(str))
-          return "Invalid date!";
-
-        var y = str.substr(0,4),
-            m = str.substr(4,2),
-            d = str.substr(6,2);
-            console.log(y + " " + m + " " + d);
-        return new Date(y,parseInt(m) - 1,d).toDateString();
-      },
       _filterPresentations: function(date, block, presentations, schedule) {
         var result = [];
 
