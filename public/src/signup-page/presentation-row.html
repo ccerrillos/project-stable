@@ -74,10 +74,9 @@ Example:
         <div class="vcenter"><b>[[viewerCountData.total_count]]</b>/<b>[[viewerCountData.total_limit]]</b> Total</div>
       </template>
       <div class="vcenter" hidden="[[!showDetails]]">[[_getAttrFromObj(data.location_id, 'location_name', locations)]]</div>
-        <paper-icon-button icon="icons:event-seat" on-tap="_gotoPresentation" hidden="[[!goToViewers]]"></paper-icon-button>
-      <div>
-        <paper-icon-button icon="icons:info" on-tap="_showInfo" hidden="[[hideInfo]]"></paper-icon-button>
-      </div>
+      <paper-icon-button icon="icons:event-seat" on-tap="_gotoPresentation" hidden="[[!goToViewers]]"></paper-icon-button>
+      <paper-icon-button icon="icons:print" on-tap="_gotoPrint" hidden="[[!goToPrint]]"></paper-icon-button>
+      <paper-icon-button icon="icons:info" on-tap="_showInfo" hidden="[[hideInfo]]"></paper-icon-button>
     </div>
   </template>
   <script>
@@ -132,6 +131,11 @@ Example:
           type: Boolean,
           value: false,
           reflectToAttribute: true
+        },
+        goToPrint: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
         }
       },
       behaviors: [ StableBehavior ],
@@ -180,6 +184,9 @@ Example:
       },
       _gotoPresentation: function(e) {
         this.fire('goto-presentation', { presentation_id: this.data.presentation_id, date: this.date, block_id: this.blockId });
+      },
+      _gotoPrint: function(e) {
+        window.open(this._computeAPI('/print?presentation_id=' + this.data.presentation_id), '_blank');
       }
       
     });

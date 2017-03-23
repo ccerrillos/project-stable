@@ -1,0 +1,341 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="../signup-page/presentation-row.html">
+<link rel="import" href="../stable-app/stable-behavior.html">
+<link rel="import" href="../viewers-page/viewer-row.html">
+<!--
+A comment describing this element
+
+Example:
+
+    <my-elem></my-elem>
+
+Example:
+
+    <my-elem>
+      <h2>Hello my-elem</h2>
+    </my-elem>
+
+@demo demo/index.html
+-->
+
+<dom-module id="presentations-page">
+  <template>
+    <style include="iron-flex iron-flex-alignment">
+      :host {
+        display: block;
+        padding-bottom: 48px;
+      }
+      paper-material {
+        background-color: white;
+        padding: 8px;
+        margin-bottom: 16px;
+      }
+      h3 {
+        margin: 0px;
+      }
+      presentation-row:hover {
+        background-color: #e6e6e6;
+      }
+      div.page-load {
+
+      }
+      .page-load {
+        position: fixed;
+        left: 50vw;
+        top: 50vh;
+        z-index: 5000;
+      }
+      paper-dialog {
+        padding: 16px;
+        max-width: 400px;
+        background-color: white;
+        z-index: 10000;
+      }
+      .center {
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .close-btn {
+        position: absolute;
+        right: 4px;
+        top: 4px;
+        margin: 0;
+        padding: 0;
+        z-index: 10001;
+      }
+      .save {
+        background-color: var(--paper-blue-500);
+        color: white;
+      }
+      .cancel {
+        background-color: var(--paper-red-500);
+        color: white;
+      }
+      paper-button[disabled] {
+        background-color: var(--paper-grey-500);
+        color: white;
+      }
+      paper-fab {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 10000;
+        background-color: var(--paper-green-500);
+      }
+      p {
+        margin-top: 0;
+        margin-bottom: 0.5em;
+      }
+      .viewers {
+        min-height: 64px;
+      }
+      viewer-row:hover {
+        background-color: #e6e6e6;
+      }
+    </style>
+
+    <app-route
+      route="{{route}}"
+      pattern="/presentations"
+      active="{{active}}"
+      ></app-route>
+
+    <paper-spinner id="spinner" active class="page-load"></paper-spinner>
+
+    <paper-dialog id="infoDialog">
+      <div class="close-btn">
+        <paper-icon-button icon="icons:create" on-tap="_editPresentation"></paper-icon-button>
+        <paper-icon-button icon="icons:close" dialog-dismiss></paper-icon-button>
+      </div>
+      
+      <div class="layout vertical" style="margin: 0;">
+        <h2 class="center">[[infoData.topic]]</h2>
+        <div>Presenter: <b>[[infoData.first_name]] [[infoData.last_name]]</b></div>
+        <div>Location: <b>[[_getAttrFromObj(infoData.location_id, 'location_name', locations)]]</b></div>
+        <div>Bio:<br>[[infoData.bio]]</div> 
+      </div>
+    </paper-dialog>
+    <paper-material elevation="1" id="content" hidden>
+      <template is="dom-repeat" items="[[presentationsArray]]" as="presentation">
+        <presentation-row
+          data="[[presentation]]"
+          data-id$="[[presentation.presentation_id]]"
+          go-to-print
+          hide-info
+          ></presentation-row>
+      </template>
+    </paper-material>
+  </template>
+  <script>
+    Polymer({
+      is: 'presentations-page',
+      properties: {
+        route: {
+          type: Object,
+          notify: true
+        },
+        active: {
+          type: Boolean,
+          observer: '_activeChanged'
+        },
+        blocksArray: {
+          type: Array,
+          computed: '_objToArray(blocks)'
+        },
+        gradesArray: {
+          type: Array,
+          computed: '_objToArray(grades)'
+        },
+        locationsArray: {
+          type: Array,
+          computed: '_objToArray(locations)'
+        },
+        presentationsArray: {
+          type: Array,
+          computed: '_objToArray(presentations)'
+        },
+        countData: {
+          type: Object,
+          value: {
+            grades: [
+              { grade_name: '9th', count: 0 },
+              { grade_name: '10th', count: 0 },
+              { grade_name: '11th', count: 0 },
+              { grade_name: '12th', count: 0 }
+            ],
+            total_count: 0,
+            total_limit: 37
+          }
+        },
+        infoData: {
+          type: Object
+        },
+        adminCode: {
+          type: String,
+          notify: true
+        },
+        detailsData: {
+          type: Object,
+          value: {}
+        },
+        mainPageActive: {
+          type: Boolean,
+          value: false,
+          computed: '_computeMainPageActive(active, detailsActive, dataLoaded)',
+          observer: '_onMainActiveChanged'
+        },
+        dataLoaded: {
+          type: Boolean,
+          value: false,
+          computed: '_dataLoaded(presentations)'
+        }
+      },
+      behaviors: [ StableBehavior ],
+      observers: [ ],
+      _computeMainPageActive: function(active, detailsActive, dataLoaded) {
+        var status = active && !detailsActive;
+        if(status || detailsActive) {
+          if(this.presentations === undefined)
+            this.fire('reload-presentations');
+        }
+        return status && dataLoaded;
+      },
+      _computeDetailsActiveAndLoaded: function(detailsActive, dataLoaded) {
+        return detailsActive && dataLoaded;
+      },
+      _onError: function(e) {
+        console.log(e);
+      },
+      _objToArray: function(obj) {
+        if(obj)
+          return Object.keys(obj).map(function (key) { return obj[key]; });
+      },
+      _activeChanged: function(e) {
+        if(e) {
+          this.fire('reload-presentations');
+        }
+      },
+      _filterPresentations: function(date, block, presentations, schedule) {
+        var result = [];
+
+        for(var x = 0; x < schedule.length; x++) {
+          if(date == schedule[x].date && block == schedule[x].block_id) {
+            result.push(presentations[schedule[x].presentation_id]);
+          }
+        }
+
+        return result;
+      },
+      _dataLoaded: function(presentations) {
+        if(presentations) {
+          this.$.spinner.hidden = true;
+          this.$.spinner.active = false;
+          this.$.content.hidden = false;
+          return true;
+        }
+        return false;
+      },
+      _showInfo: function(e) {
+        if(e && e.detail) {
+          this.infoData = JSON.parse(JSON.stringify(this.presentations[e.detail.presentation_id]));
+          this.$.infoDialog.open();
+        }
+      },
+      _addPresentation: function(e) {
+        this.infoData = {
+          'first_name': '',
+          'last_name': '',
+          'topic': '',
+          'date': '',
+          'block_id': '',
+          'location_id': ''
+        };
+        this.$.infoDialog.close();
+        this.$.editDialog.open();
+      },
+      _disableConfirm: function() {
+        this.$.confirmButton.disabled = true;
+        //this.$.confirmText.hidden = true;
+        //this.$.confirmSpinner.hidden = false;
+      },
+      _enableConfirm: function() {
+        this.$.confirmButton.disabled = false;
+        //this.$.confirmText.hidden = false;
+        //this.$.confirmSpinner.hidden = true;
+        this._ajaxRequest = null;
+      },
+      _addDate: function(e) {
+        //this.set('route.path', '/dates');
+      },
+      _addBlock: function(e) {
+        this.set('route.path', '/blocks');
+      },
+      _addLocation: function(e) {
+        this.set('route.path', '/locations');
+      },
+      _addBasicItem: function(e) {
+
+      },
+      _computeEnabled: function(e) {
+        return e && e.length && e.length > 0;
+      },
+      _doAddPresentation: function(e) {
+        console.log(this.infoData);
+        this.$.ajax.method = "POST";
+        this.$.ajax.body = JSON.stringify(this.infoData);
+        this.$.ajax.headers = {
+          'admin_code': this.adminCode
+        };
+        this.$.ajax.generateRequest();
+      },
+      _error: function(e) {
+        this._enableConfirm();
+      },
+      _response: function(e) {
+        this._enableConfirm();
+        this.$.editDialog.close();
+      },
+      _gotoPresentation: function(e) {
+        var date = e.detail.date;
+        var block_id = e.detail.block_id;
+        var presentation_id = e.detail.presentation_id;
+        this.set('route.path', '/schedule/' + date + '/' + block_id + '/' + presentation_id);
+      },
+      _onDetailsActiveChanged: function(e) {
+        if(e) {
+          this.fire('show-back-button', true);
+        } else {
+          this.presentationViewers = null;
+        }
+      },
+      _onMainActiveChanged: function(e) {
+        if(e) {
+          this.fire('show-back-button', false);
+        }
+      },
+      _onPresentationViewersChanged: function(e) {
+        if(e === undefined || e === null)
+          return false;
+        return true;
+      },
+      _viewerDetails: function(e) {
+        var viewer_id = e.detail.viewer_id;
+
+        this.set('route.path', '/viewers/' + viewer_id);
+      },
+      _sortViewers: function(arr) {
+        if(arr)
+          arr.sort(this._dynamicSortMultiple("last_name", "first_name"));
+        return arr;
+      }
+
+    });
+  </script>
+</dom-module>
