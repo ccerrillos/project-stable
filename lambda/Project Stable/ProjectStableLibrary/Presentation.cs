@@ -43,5 +43,8 @@ namespace ProjectStableLibrary {
 			get;
 			set;
 		}
+		public override string ToString() {
+			return first_name + " " + last_name + " | " + topic;
+		}
 	}
 }

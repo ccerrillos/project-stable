@@ -58,6 +58,8 @@ namespace StableAPIHandler {
 				case "/viewers/":
 				case "/schedule":
 				case "/schedule/":
+				case "/print":
+				case "/print/":
 					break;
 
 				case "/signup":
@@ -226,6 +228,10 @@ namespace StableAPIHandler {
 									Body = JsonConvert.SerializeObject(ctx.Schedule),
 									StatusCode = HttpStatusCode.OK
 								};
+								break;
+							case "/print":
+							case "/print/":
+								response = HandlePrint(apigProxyEvent, ctx);
 								break;
 
 							default:
@@ -610,6 +616,53 @@ namespace StableAPIHandler {
 				};
 			}
 		}
+		private StableAPIResponse HandlePrint(APIGatewayProxyRequest request, StableContext ctx) {
+
+			uint pres_id;
+			try {
+				try {
+				pres_id = uint.Parse(request.QueryStringParameters["presentation_id"]);
+				} catch(Exception e) {
+					return new StableAPIResponse() {
+						Body = JsonConvert.SerializeObject(new Result(e)),
+						StatusCode = HttpStatusCode.BadRequest
+					};
+				}
+				var presentation = ctx.presentations.First(thus => thus.presentation_id == pres_id);
+				var location = ctx.locations.First(thus => thus.location_id == presentation.location_id);
+				var blocks = ctx.blocks.ToList();
+
+				var schedules = ctx.schedule.Where(thus => thus.presentation_id == pres_id).ToList();
+				var viewers = new Dictionary<Schedule, SanitizedViewer>();
+
+				var temp = ctx.registrations.Where(thus => thus.presentation_id == pres_id).ToList();
+
+
+				PrintOutput print = new PrintOutput() {
+					presentationData = presentation,
+					locationData = location,
+					blocks = blocks,
+					schedule = schedules,
+
+				};
+				var res = new StableAPIResponse() {
+					Body = print.ToString(),
+					StatusCode = HttpStatusCode.OK,
+					
+				};
+				res.Headers.Add("Content-Type", "text/html; charset=utf-8");
+				return res;
+			} catch(Exception e) {
+				throw;
+			}
+
+
+			return new StableAPIResponse() {
+				Body = "",
+				StatusCode = HttpStatusCode.NotImplemented
+			};
+		}
+
 	}
 	public class StableAPIResponse : APIGatewayProxyResponse {
 		public StableAPIResponse() {
