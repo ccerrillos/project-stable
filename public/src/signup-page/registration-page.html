@@ -156,16 +156,6 @@
       observers: [
         '_dataReady(dates, blocks, presentations, userData)'
       ],
-      _getAttrFromObj: function(key, attr, obj) {
-        if(obj && obj[key] && obj[key][attr]) {
-          return obj[key][attr];
-        }
-        return "error";
-      },
-      _computeAPI: function (path) {
-        var apiRootPath = 'https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1';
-        return apiRootPath + path;
-      },
       handleResponse: function(e) {
         console.log(e.detail.response);
       },

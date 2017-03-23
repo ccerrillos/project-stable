@@ -13,6 +13,7 @@
     "blocks.json",
     "dates.json",
     "grades.json",
-    "houses.json"
+    "houses.json",
+    "locations.json"
   ]
 }
