@@ -76,7 +76,7 @@ Example:
       <div class="vcenter" hidden="[[!showDetails]]">[[_getAttrFromObj(data.location_id, 'location_name', locations)]]</div>
         <paper-icon-button icon="icons:event-seat" on-tap="_gotoPresentation" hidden="[[!goToViewers]]"></paper-icon-button>
       <div>
-        <paper-icon-button icon="icons:info" on-tap="_showInfo"></paper-icon-button>
+        <paper-icon-button icon="icons:info" on-tap="_showInfo" hidden="[[hideInfo]]"></paper-icon-button>
       </div>
     </div>
   </template>
@@ -85,8 +85,7 @@ Example:
       is: 'presentation-row',
       properties: {
         data: {
-          type: Object,
-          observer: '_onDataChanged'
+          type: Object
         },
         first: {
           type: Boolean,
@@ -128,6 +127,11 @@ Example:
           type: Boolean,
           value: false,
           reflectToAttribute: true
+        },
+        hideInfo: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
         }
       },
       behaviors: [ StableBehavior ],
@@ -147,6 +151,7 @@ Example:
 
         if(number == -1) {
           this.$.number.style.color = "rgb(0,0,0)";
+          return '*';
         } else {
           var number_z = number - 1;
           var size = order.length - 1;
