@@ -86,23 +86,35 @@ Example:
         <h3>[[viewer.first_name]] [[viewer.last_name]] | [[_getAttrFromObj(viewer.house_id, 'house_name', houses)]] [[_getAttrFromObj(viewer.grade_id, 'grade_name', grades)]]</h3>
 
         <b>Schedule:</b>
-        <template is="dom-repeat" items="[[dates]]" as="date">
-          <template is="dom-repeat" items="[[blocksArray]]" as="block">
-            <div class="layout vertical session">
-              <div class="layout horizontal">
-                <!-- <div class="flex"></div> -->
-                <b>[[_parseDate(date.date)]] | [[_getAttrFromObj(block.block_id, 'block_name', blocks)]]</b>
-                <div class="flex"></div>
+        <div class="layout horizontal" hidden="[[showSchedule]]">
+          <div class="flex"></div>
+          <b>No schedule.</b>
+          <div class="flex"></div>
+        </div>
+        <template is="dom-if" if="[[showSchedule]]">
+          <template is="dom-repeat" items="[[dates]]" as="date">
+            <template is="dom-repeat" items="[[blocksArray]]" as="block">
+              <div class="layout vertical session">
+                <div class="layout horizontal">
+                  <!-- <div class="flex"></div> -->
+                  <b>[[_parseDate(date.date)]] | [[_getAttrFromObj(block.block_id, 'block_name', blocks)]]</b>
+                  <div class="flex"></div>
+                </div>
+                <div class="layout horizontal" hidden="[[!_hasData(date.date, block.block_id, schedule)]]">
+                  <presentation-row
+                    class="flex"
+                    data="[[_filterReg(date.date, block.block_id, schedule, presentations)]]"
+                    date="[[date.date]]"
+                    block-id="[[block.block_id]]"
+                    locations="[[locations]]"
+                    show-details
+                    hide-info
+                    go-to-viewers
+                    on-goto-presentation="_gotoPresentation"
+                    ></presentation-row>
+                </div>
               </div>
-              <div class="layout horizontal">
-                <presentation-row
-                  class="flex"
-                  data="[[_filterReg(date.date, block.block_id, schedule, presentations)]]"
-                  locations="[[locations]]"
-                  show-details
-                  ></presentation-row>
-              </div>
-            </div>
+            </template>
           </template>
         </template>
       </paper-material>
@@ -159,9 +171,19 @@ Example:
         },
         presentations: {
           type: Object
+        },
+        showSchedule: {
+          type: Boolean,
+          computed: '_notEmpty(schedule)',
+          value: false
         }
       },
       behaviors: [ StableBehavior ],
+      _notEmpty: function(schedule) {
+        if(schedule && schedule.length > 0)
+          return true;
+        return false;
+      },
       _computeMainActive: function(active, viewerActive) {
         var result = active && !viewerActive;
         if(result || (viewerActive && this.viewers === undefined))
@@ -208,10 +230,23 @@ Example:
         }
         return {};
       },
+      _hasData: function(date, block_id, schedule) {
+        for(var x = 0; x < schedule.length; x++) {
+          if(schedule[x].date == date && schedule[x].block_id == block_id)
+            return true;
+        }
+        return false;
+      },
       _computeParams: function(e) {
         return {
           viewer_id: e.viewer_id
         };
+      },
+      _gotoPresentation: function(e) {
+        var date = e.detail.date;
+        var block_id = e.detail.block_id;
+        var presentation_id = e.detail.presentation_id;
+        this.set('route.path', '/schedule/' + date + '/' + block_id + '/' + presentation_id);
       }
     });
   </script>
