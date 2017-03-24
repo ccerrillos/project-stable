@@ -6,6 +6,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.IO;
+using Microsoft.EntityFrameworkCore;
 
 namespace ConsoleTools {
 	public class Program {
@@ -21,8 +22,6 @@ namespace ConsoleTools {
 					conStr.Database = (string)conf["database"];
 				}
 			}
-
-			Console.WriteLine(conStr.ToString());
 
 			bool clean = true;
 
@@ -48,11 +47,15 @@ namespace ConsoleTools {
 				var presentations = ctx.Presentations;
 
 				int expected_count = blocks.Count;
-				const int retry_count = 3;
+				const int retry_count = 5;
+
+				var toAddToDB = new List<Registration>();
 
 				uint[] grade_pri = new uint[] {3, 2, 4, 1};
 				uint high_max = 27;
 				uint low_max = 27;
+
+				DateTime start = DateTime.Now;
 				foreach(uint g in grade_pri) {
 					// if(g != 3)
 					// 	continue;
@@ -119,7 +122,7 @@ namespace ConsoleTools {
 
 							}
 							if(bleh_v.Count != expected_count) {
-								Console.WriteLine("ERROR " + string.Join(", ", bleh_v));
+								//Console.WriteLine("ERROR " + string.Join(", ", bleh_v));
 
 								//undo
 								foreach(var toRemove in bleh) {
@@ -134,21 +137,63 @@ namespace ConsoleTools {
 									clean = false;
 									break;
 								}
-									
+
+							} else {
+								foreach(var toAdd in bleh) {
+									toAddToDB.Add(new Registration() {
+										date = temp_s.date,
+										block_id = toAdd.Item1,
+										presentation_id = toAdd.Item2,
+										viewer_id = v
+									});
+								}
 							}
 						} while(bleh_v.Count != expected_count);
 						
-						var rng = randomize ? "RNG" : "";
-						Console.WriteLine($"Student: {v} {rng} {string.Join(", ", bleh)}");
+						//var rng = randomize ? "RNG" : "";
+						//Console.WriteLine($"Student: {v} {rng} {string.Join(", ", bleh)}");
 					}
 
 					
 				}
+				DateTime end = DateTime.Now;
+				Console.WriteLine($"Took {(end - start).TotalMilliseconds} ms to sort");
+
+				start = DateTime.Now;
+
+				if(clean) {
+					using(var tx = ctx.Database.BeginTransaction()) {
+						try {
+							ctx.Database.ExecuteSqlCommand("DELETE FROM `registrations`;");
+							tx.Commit();
+						} catch(Exception e) {
+							tx.Rollback();
+							Console.WriteLine(e);
+						}
+					}
+					using(var tx = ctx.Database.BeginTransaction()) {
+						try {
+							ctx.registrations.AddRange(toAddToDB);
+							ctx.SaveChanges();
+							tx.Commit();
+						} catch(Exception e) {
+							tx.Rollback();
+							Console.WriteLine(e);
+						}
+					}
+				}
+
+				end = DateTime.Now;
+				Console.WriteLine($"Took {(end - start).TotalMilliseconds} ms to add to db!");
+
 				foreach(var e in capacityCheck) {
 					Console.WriteLine(e.Key.block_id + " " + e.Key.presentation_id + " " + e.Value);
 				}
+				Console.WriteLine($"{toAddToDB.Count} entries to add to DB!");
 			}
 			Console.WriteLine("Clean: " + clean.ToString());
+			Console.WriteLine("Press enter to quit");
+			Console.ReadLine();
 		}
 		
 	}
