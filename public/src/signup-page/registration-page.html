@@ -108,6 +108,13 @@
         <paper-icon-button icon="icons:close" on-tap="_closeToastE" class="dismiss-button"></paper-icon-button>
       </div>
     </paper-toast>
+    <paper-toast id="closedToast" duration="0" style="padding: 8px;">
+      <div class="layout horizontal">
+        <div class="vcenter">Signups are closed!</div>
+        <div class="flex"></div>
+        <paper-icon-button icon="icons:close" on-tap="_closeToastSC" class="dismiss-button"></paper-icon-button>
+      </div>
+    </paper-toast>
     <!-- <sample-content size="10"></sample-content> -->
     <!-- <signup-page
       dates="[[dates]]"
@@ -195,6 +202,9 @@
       _closeToastE: function(e) {
         this.$.errorToast.hide();
       },
+      _closeToastSC: function(e) {
+        this.$.closedToast.hide();
+      },
       _userDataChanged: function(e) {
         console.log(e);
         if(e && e.viewer_id && e.viewer_key) {
@@ -221,7 +231,9 @@
       _signupDone: function(e) {
         // this.presentation = null;
         if(e.detail !== undefined) {
-          if(e.detail.error)
+          if(e.detail.closed)
+            this.$.closedToast.show();
+          else if(e.detail.error)
             this.$.errorToast.show();
           else
             this.$.completedToast.show();
