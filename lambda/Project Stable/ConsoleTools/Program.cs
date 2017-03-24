@@ -11,6 +11,21 @@ using Microsoft.EntityFrameworkCore;
 namespace ConsoleTools {
 	public class Program {
 		static void Main(string[] args) {
+			string s;
+			char c;
+			do {
+				Console.Write("Save to db? (y/n/q): ");
+				s = Console.ReadLine().ToUpper();
+				if(s.Length > 0) {
+					c = s[0];
+					if(c == 'Y' || c == 'N')
+						PlaceViewers(c == 'Y');
+				} else {
+					c = ' ';
+				}
+			} while(c != 'Q');
+		}
+		static void PlaceViewers(bool saveToDB) {
 			var conStr = new MySqlConnectionStringBuilder();
 			using(StreamReader file = File.OpenText("config.json")) {
 				using(JsonTextReader r = new JsonTextReader(file)) {
@@ -161,7 +176,7 @@ namespace ConsoleTools {
 
 				start = DateTime.Now;
 
-				if(clean) {
+				if(clean && saveToDB) {
 					using(var tx = ctx.Database.BeginTransaction()) {
 						try {
 							ctx.Database.ExecuteSqlCommand("DELETE FROM `registrations`;");
@@ -192,8 +207,6 @@ namespace ConsoleTools {
 				Console.WriteLine($"{toAddToDB.Count} entries to add to DB!");
 			}
 			Console.WriteLine("Clean: " + clean.ToString());
-			Console.WriteLine("Press enter to quit");
-			Console.ReadLine();
 		}
 		
 	}
