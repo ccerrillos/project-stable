@@ -60,17 +60,20 @@ namespace ConsoleTools {
 					foreach(uint v in viewers_to_proc) {
 						var bleh = new List<Tuple<uint, uint>>();
 						var bleh_v = new List<uint>();
-						var v_pref = preferences.Where(thus => thus.viewer_id == v).OrderBy(thus => thus.order).ToList();
-
+						//var v_pref = preferences.Where(thus => thus.viewer_id == v).OrderBy(thus => thus.order).ToList();
+						var v_pref = (from thus in preferences where thus.viewer_id == v orderby thus.order select thus.presentation_id).ToList();
+						
 						bool randomize = v_pref.Count < presentations.Count;
 						
 						var temp_s = new Schedule(){ date = 20170324 };
-						foreach(Block b in blocks.Values) {
+						var blocks_r = blocks.Values.ToList();
+						blocks_r.Randomize();
+						foreach(Block b in blocks_r) {
 							temp_s.block_id = b.block_id;
 							
 							if(randomize) {
-								var r_p = presentations.Keys.ToList();
-								r_p.Randomize();
+								var r_p = from thus in capacityCheck orderby thus.Value select thus.Key.presentation_id;
+								//r_p.Randomize();
 
 								// int index = r_p.IndexOf(47);
 								// r_p[index] = r_p[0];
@@ -92,17 +95,17 @@ namespace ConsoleTools {
 								continue;
 							}
 
-							foreach(Preference p in v_pref) {
-								if(bleh_v.Contains(p.presentation_id))
+							foreach(uint p in v_pref) {
+								if(bleh_v.Contains(p))
 									continue;
-								temp_s.presentation_id = p.presentation_id;
+								temp_s.presentation_id = p;
 								if(!capacityCheck.ContainsKey(temp_s))
 									continue;
-								if(capacityCheck[temp_s] >= (p.presentation_id != 47 ? high_max : low_max))
+								if(capacityCheck[temp_s] >= (p != 47 ? high_max : low_max))
 									continue;
 								capacityCheck[temp_s]++;
-								bleh.Add(new Tuple<uint, uint>(b.block_id, p.presentation_id));
-								bleh_v.Add(p.presentation_id);
+								bleh.Add(new Tuple<uint, uint>(b.block_id, p));
+								bleh_v.Add(p);
 								break;
 							}
 							
