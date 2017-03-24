@@ -32,6 +32,14 @@ namespace StableAPIHandler {
 			object resultObject = new object();
 			int resultCode = 405;
 
+			var noSignups = new APIGatewayProxyResponse() {
+									Body = "{}",
+									Headers = new Dictionary<string, string>() {{"access-control-allow-origin", Environment.GetEnvironmentVariable("SITE_DOMAIN")}},
+									StatusCode = 418
+								};
+			bool enabled = bool.Parse(Environment.GetEnvironmentVariable("enabled"));
+
+
 
 			//Pre check the request path to save time
 
@@ -273,11 +281,15 @@ namespace StableAPIHandler {
 
 							case "/signup":
 							case "/signup/":
+								if(!enabled)
+									return noSignups;
 								response = startSignup(apigProxyEvent, ctx);
 								break;
 
 							case "/signup/finish":
 							case "/signup/finish/":
+								if(!enabled)
+									return noSignups;
 								response = finishSignup(apigProxyEvent, ctx, context);
 								break;
 						}
