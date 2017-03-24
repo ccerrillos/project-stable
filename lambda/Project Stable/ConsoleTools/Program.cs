@@ -64,6 +64,11 @@ namespace ConsoleTools {
 						var v_pref = (from thus in preferences where thus.viewer_id == v orderby thus.order select thus.presentation_id).ToList();
 						
 						bool randomize = v_pref.Count < presentations.Count;
+						if(!randomize && (g == 1 || g == 4)) {
+							v_pref[v_pref.IndexOf(47)] = v_pref[0];
+							v_pref[0] = 47;
+						}
+						
 						
 						var temp_s = new Schedule(){ date = 20170324 };
 						var blocks_r = blocks.Values.ToList();
