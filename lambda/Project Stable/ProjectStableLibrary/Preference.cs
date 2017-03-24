@@ -21,9 +21,9 @@ namespace ProjectStableLibrary {
 			get;
 			set;
 		}
-		public DateTime timestamp {
-			get;
-			set;
-		}
+		// public DateTime timestamp {
+		// 	get;
+		// 	set;
+		// }
 	}
 }
