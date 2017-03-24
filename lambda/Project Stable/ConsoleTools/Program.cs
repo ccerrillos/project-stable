@@ -22,6 +22,8 @@ namespace ConsoleTools {
 				}
 			}
 
+			Console.WriteLine(conStr.ToString());
+
 			bool clean = true;
 
 			using(StableContext ctx = StableContextFactory.Build(conStr.ToString())) {
@@ -45,9 +47,12 @@ namespace ConsoleTools {
 
 				var presentations = ctx.Presentations;
 
+				int expected_count = blocks.Count;
+				const int retry_count = 3;
+
 				uint[] grade_pri = new uint[] {3, 2, 4, 1};
-				uint high_max = 26;
-				uint low_max = 20;
+				uint high_max = 27;
+				uint low_max = 27;
 				foreach(uint g in grade_pri) {
 					// if(g != 3)
 					// 	continue;
@@ -60,7 +65,6 @@ namespace ConsoleTools {
 					foreach(uint v in viewers_to_proc) {
 						var bleh = new List<Tuple<uint, uint>>();
 						var bleh_v = new List<uint>();
-						//var v_pref = preferences.Where(thus => thus.viewer_id == v).OrderBy(thus => thus.order).ToList();
 						var v_pref = (from thus in preferences where thus.viewer_id == v orderby thus.order select thus.presentation_id).ToList();
 						
 						bool randomize = v_pref.Count < presentations.Count;
@@ -72,19 +76,34 @@ namespace ConsoleTools {
 						
 						var temp_s = new Schedule(){ date = 20170324 };
 						var blocks_r = blocks.Values.ToList();
-						blocks_r.Randomize();
-						foreach(Block b in blocks_r) {
-							temp_s.block_id = b.block_id;
-							
-							if(randomize) {
-								var r_p = from thus in capacityCheck orderby thus.Value select thus.Key.presentation_id;
-								//r_p.Randomize();
 
-								// int index = r_p.IndexOf(47);
-								// r_p[index] = r_p[0];
-								// r_p[0] = 47;
+						int error_count = 0;
+						do {
 
-								foreach(uint p in r_p) {
+							blocks_r.Randomize();
+							foreach(Block b in blocks_r) {
+								temp_s.block_id = b.block_id;
+
+								if(randomize) {
+									var r_p = from thus in capacityCheck orderby thus.Value select thus.Key.presentation_id;
+
+									foreach(uint p in r_p) {
+										if(bleh_v.Contains(p))
+											continue;
+										temp_s.presentation_id = p;
+										if(!capacityCheck.ContainsKey(temp_s))
+											continue;
+										if(capacityCheck[temp_s] >= (p != 47 ? high_max : low_max))
+											continue;
+										capacityCheck[temp_s]++;
+										bleh.Add(new Tuple<uint, uint>(b.block_id, p));
+										bleh_v.Add(p);
+										break;
+									}
+									continue;
+								}
+
+								foreach(uint p in v_pref) {
 									if(bleh_v.Contains(p))
 										continue;
 									temp_s.presentation_id = p;
@@ -97,28 +116,28 @@ namespace ConsoleTools {
 									bleh_v.Add(p);
 									break;
 								}
-								continue;
-							}
 
-							foreach(uint p in v_pref) {
-								if(bleh_v.Contains(p))
-									continue;
-								temp_s.presentation_id = p;
-								if(!capacityCheck.ContainsKey(temp_s))
-									continue;
-								if(capacityCheck[temp_s] >= (p != 47 ? high_max : low_max))
-									continue;
-								capacityCheck[temp_s]++;
-								bleh.Add(new Tuple<uint, uint>(b.block_id, p));
-								bleh_v.Add(p);
-								break;
 							}
-							
-						}
-						if(bleh_v.Count != 5) {
-							Console.WriteLine("ERROR " + string.Join(", ", bleh_v));
-							clean = false;
-						}
+							if(bleh_v.Count != expected_count) {
+								Console.WriteLine("ERROR " + string.Join(", ", bleh_v));
+
+								//undo
+								foreach(var toRemove in bleh) {
+									temp_s.block_id = toRemove.Item1;
+									temp_s.presentation_id = toRemove.Item2;
+									capacityCheck[temp_s]--;
+								}
+								bleh.Clear();
+								bleh_v.Clear();
+								error_count++;
+								if(error_count > retry_count) {
+									clean = false;
+									break;
+								}
+									
+							}
+						} while(bleh_v.Count != expected_count);
+						
 						var rng = randomize ? "RNG" : "";
 						Console.WriteLine($"Student: {v} {rng} {string.Join(", ", bleh)}");
 					}
