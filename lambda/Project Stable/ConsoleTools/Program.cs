@@ -67,9 +67,38 @@ namespace ConsoleTools {
 				var toAddToDB = new List<Registration>();
 
 				uint[] grade_pri = new uint[] {3, 2, 4, 1};
+				
 				uint high_max = 27;
 				uint low_max = 27;
 
+				do {
+					try {
+						Console.Write($"high_max [{high_max}]: ");
+						string s = Console.ReadLine();
+						if(s.Length == 0)
+							break;
+						
+						high_max = uint.Parse(s);
+						break;
+					} catch {
+						Console.WriteLine("Invalid input!");
+					}
+				} while(true);
+
+				do {
+					try {
+						Console.Write($"low_max [{low_max}]: ");
+						string s = Console.ReadLine();
+						if(s.Length == 0)
+							break;
+						
+						low_max = uint.Parse(s);
+						break;
+					} catch {
+						Console.WriteLine("Invalid input!");
+					}
+				} while(true);
+				
 				DateTime start = DateTime.Now;
 				foreach(uint g in grade_pri) {
 					// if(g != 3)
@@ -173,37 +202,41 @@ namespace ConsoleTools {
 				}
 				DateTime end = DateTime.Now;
 				Console.WriteLine($"Took {(end - start).TotalMilliseconds} ms to sort");
+				if(saveToDB) {
+					start = DateTime.Now;
 
-				start = DateTime.Now;
-
-				if(clean && saveToDB) {
-					using(var tx = ctx.Database.BeginTransaction()) {
-						try {
-							ctx.Database.ExecuteSqlCommand("DELETE FROM `registrations`;");
-							tx.Commit();
-						} catch(Exception e) {
-							tx.Rollback();
-							Console.WriteLine(e);
+					if(clean) {
+						using(var tx = ctx.Database.BeginTransaction()) {
+							try {
+								ctx.Database.ExecuteSqlCommand("DELETE FROM `registrations`;");
+								tx.Commit();
+							} catch(Exception e) {
+								tx.Rollback();
+								Console.WriteLine(e);
+							}
+						}
+						using(var tx = ctx.Database.BeginTransaction()) {
+							try {
+								ctx.registrations.AddRange(toAddToDB);
+								ctx.SaveChanges();
+								tx.Commit();
+							} catch(Exception e) {
+								tx.Rollback();
+								Console.WriteLine(e);
+							}
 						}
 					}
-					using(var tx = ctx.Database.BeginTransaction()) {
-						try {
-							ctx.registrations.AddRange(toAddToDB);
-							ctx.SaveChanges();
-							tx.Commit();
-						} catch(Exception e) {
-							tx.Rollback();
-							Console.WriteLine(e);
-						}
-					}
+
+					end = DateTime.Now;
+					Console.WriteLine($"Took {(end - start).TotalMilliseconds} ms to add to db!");
 				}
-
-				end = DateTime.Now;
-				Console.WriteLine($"Took {(end - start).TotalMilliseconds} ms to add to db!");
 
 				foreach(var e in capacityCheck) {
 					Console.WriteLine(e.Key.block_id + " " + e.Key.presentation_id + " " + e.Value);
 				}
+				if(!saveToDB)
+					Console.WriteLine("Did not save to DB!");
+				
 				Console.WriteLine($"{toAddToDB.Count} entries to add to DB!");
 			}
 			Console.WriteLine("Clean: " + clean.ToString());
