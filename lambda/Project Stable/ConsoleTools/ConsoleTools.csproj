@@ -5,4 +5,14 @@
     <TargetFramework>netcoreapp1.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MySql.Data" Version="7.0.6-IR31" />
+    <PackageReference Include="MySql.Data.EntityFrameworkCore" Version="7.0.6-IR31" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ProjectStableLibrary\ProjectStableLibrary.csproj" />
+  </ItemGroup>
+
+
 </Project>
