@@ -72,9 +72,9 @@ namespace ConsoleTools {
 								var r_p = presentations.Keys.ToList();
 								r_p.Randomize();
 
-								int index = r_p.IndexOf(47);
-								r_p[index] = r_p[0];
-								r_p[0] = 47;
+								// int index = r_p.IndexOf(47);
+								// r_p[index] = r_p[0];
+								// r_p[0] = 47;
 
 								foreach(uint p in r_p) {
 									if(bleh_v.Contains(p))
