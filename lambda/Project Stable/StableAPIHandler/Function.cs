@@ -99,7 +99,8 @@ namespace StableAPIHandler {
 				Port = uint.Parse(Environment.GetEnvironmentVariable("DB_PORT")),
 				UserID = Environment.GetEnvironmentVariable("DB_USER"),
 				Password = Environment.GetEnvironmentVariable("DB_PASSWORD"),
-				Database = Environment.GetEnvironmentVariable("DB_NAME")
+				Database = Environment.GetEnvironmentVariable("DB_NAME"),
+				SslMode = MySqlSslMode.Required
 			}.ToString();
 			using(StableContext ctx = StableContextFactory.Build(conStr)) {
 				switch(apigProxyEvent.HttpMethod) {

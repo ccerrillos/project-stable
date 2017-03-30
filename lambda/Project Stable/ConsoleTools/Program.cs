@@ -35,6 +35,7 @@ namespace ConsoleTools {
 					conStr.UserID = (string)conf["user"];
 					conStr.Password = (string)conf["password"];
 					conStr.Database = (string)conf["database"];
+					conStr.SslMode = MySqlSslMode.Required;
 				}
 			}
 
