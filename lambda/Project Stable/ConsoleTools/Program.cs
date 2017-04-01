@@ -69,31 +69,16 @@ namespace ConsoleTools {
 
 				uint[] grade_pri = new uint[] {3, 2, 4, 1};
 				
-				uint high_max = 27;
-				uint low_max = 27;
+				uint max_viewers = 27;
 
 				do {
 					try {
-						Console.Write($"high_max [{high_max}]: ");
+						Console.Write($"max_viewers [{max_viewers}]: ");
 						string s = Console.ReadLine();
 						if(s.Length == 0)
 							break;
 						
-						high_max = uint.Parse(s);
-						break;
-					} catch {
-						Console.WriteLine("Invalid input!");
-					}
-				} while(true);
-
-				do {
-					try {
-						Console.Write($"low_max [{low_max}]: ");
-						string s = Console.ReadLine();
-						if(s.Length == 0)
-							break;
-						
-						low_max = uint.Parse(s);
+						max_viewers = uint.Parse(s);
 						break;
 					} catch {
 						Console.WriteLine("Invalid input!");
@@ -116,10 +101,6 @@ namespace ConsoleTools {
 						var v_pref = (from thus in preferences where thus.viewer_id == v orderby thus.order select thus.presentation_id).ToList();
 						
 						bool randomize = v_pref.Count < presentations.Count;
-						if(!randomize && (g == 1 || g == 4)) {
-							v_pref[v_pref.IndexOf(47)] = v_pref[0];
-							v_pref[0] = 47;
-						}
 						
 						
 						var temp_s = new Schedule(){ date = 20170324 };
@@ -141,7 +122,7 @@ namespace ConsoleTools {
 										temp_s.presentation_id = p;
 										if(!capacityCheck.ContainsKey(temp_s))
 											continue;
-										if(capacityCheck[temp_s] >= (p != 47 ? high_max : low_max))
+										if(capacityCheck[temp_s] >= max_viewers)
 											continue;
 										capacityCheck[temp_s]++;
 										bleh.Add(new Tuple<uint, uint>(b.block_id, p));
@@ -157,7 +138,7 @@ namespace ConsoleTools {
 									temp_s.presentation_id = p;
 									if(!capacityCheck.ContainsKey(temp_s))
 										continue;
-									if(capacityCheck[temp_s] >= (p != 47 ? high_max : low_max))
+									if(capacityCheck[temp_s] >= max_viewers)
 										continue;
 									capacityCheck[temp_s]++;
 									bleh.Add(new Tuple<uint, uint>(b.block_id, p));
