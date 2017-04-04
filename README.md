@@ -1,4 +1,4 @@
-# project-stable
+# project-stable [![Build Status](https://travis-ci.org/cacerrillos/project-stable.svg?branch=master)](https://travis-ci.org/cacerrillos/project-stable)
 Temporary home for the new PolySPS.
 
 ## Goals
