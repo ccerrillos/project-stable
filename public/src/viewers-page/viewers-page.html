@@ -83,16 +83,16 @@ Example:
     </template>
     <template is="dom-if" if="[[viewerActive]]">
       <paper-material elevation="1">
-        <div class="layout horizontal" hidden="[[detailsDataReady]]">
+        <div class="layout horizontal" hidden$="[[detailsDataReady]]">
           <div class="flex"></div>
           <paper-spinner active></paper-spinner>
           <div class="flex"></div>
         </div>
-        <div hidden="[[!detailsDataReady]]">
+        <div hidden$="[[!detailsDataReady]]">
           <h3>[[viewer.first_name]] [[viewer.last_name]] | [[_getAttrFromObj(viewer.house_id, 'house_name', houses)]] [[_getAttrFromObj(viewer.grade_id, 'grade_name', grades)]]</h3>
 
           <b>Schedule:</b>
-          <div class="layout horizontal" hidden="[[showSchedule]]">
+          <div class="layout horizontal" hidden$="[[showSchedule]]">
             <div class="flex"></div>
             <b>No schedule.</b>
             <div class="flex"></div>
@@ -106,7 +106,7 @@ Example:
                     <b>[[_parseDate(date.date)]] | [[_getAttrFromObj(block.block_id, 'block_name', blocks)]]</b>
                     <div class="flex"></div>
                   </div>
-                  <div class="layout horizontal" hidden="[[!_hasData(date.date, block.block_id, schedule)]]">
+                  <div class="layout horizontal" hidden$="[[!_hasData(date.date, block.block_id, schedule)]]">
                     <presentation-row
                       class="flex"
                       data="[[_filterReg(date.date, block.block_id, schedule, presentations)]]"
@@ -188,6 +188,12 @@ Example:
           type: Boolean,
           computed: '_computeDetailsDataReady(viewer, grades, houses, dates, schedule, presentations, locations)',
           value: false
+        },
+        active: {
+          type: Boolean
+        },
+        schedule: {
+          type: Array
         }
       },
       behaviors: [ StableBehavior ],

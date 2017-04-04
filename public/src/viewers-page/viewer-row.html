@@ -36,8 +36,8 @@ Example:
     <div class="layout horizontal">
       <div class="vcenter">[[viewer.last_name]], [[viewer.first_name]]</div>
       <div class="flex"></div>
-      <div class="vcenter" hidden="[[!showDetails]]">
-        [[_getAttrFromObj(viewer.grade_id, 'grade_name', grades)]] [[_getAttrFromObj(viewer.house_id, 'house_name', houses)]]
+      <div class="vcenter" hidden$="[[!showDetails]]">
+        <div>[[_getAttrFromObj(viewer.grade_id, 'grade_name', grades)]]</div> <div>[[_getAttrFromObj(viewer.house_id, 'house_name', houses)]]</div>
       </div>
       <paper-icon-button icon="icons:info" on-tap="_viewerDetails"></paper-icon-button>
     </div>
@@ -53,6 +53,12 @@ Example:
           type: Boolean,
           value: false,
           reflectToAttribute: true
+        },
+        grades: {
+          type: Object
+        },
+        houses: {
+          type: Object
         }
       },
       behaviors: [ StableBehavior ],

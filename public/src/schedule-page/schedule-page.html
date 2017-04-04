@@ -244,7 +244,7 @@ Example:
         <p>Location: <b>[[_getAttrFromObj(presentation.location_id, 'location_name', locations)]]</b></p>
         <b>Viewers:</b>
         <div class="viewers">
-          <div class="layout horizontal" hidden="[[viewersLoader]]">
+          <div class="layout horizontal" hidden$="[[viewersLoader]]">
             <div class="flex"></div>
             <paper-spinner active></paper-spinner>
             <div class="flex"></div>
@@ -342,6 +342,12 @@ Example:
           type: Boolean,
           value: false,
           computed: '_onPresentationViewersChanged(presentationViewers)'
+        },
+        dates: {
+          type: Array
+        },
+        locations: {
+          type: Object
         }
       },
       behaviors: [ StableBehavior ],

@@ -58,14 +58,14 @@ Example:
       }
     </style>
     <div class="layout horizontal">
-      <h3 id="number" class="vcenter number noselect" hidden="[[!sortable]]">[[number]]</h3>
-      <iron-icon icon="icons:reorder" class="handle vcenter handle-icon noselect" hidden="[[!sortable]]"></iron-icon>
+      <h3 id="number" class="vcenter number noselect" hidden$="[[!sortable]]">[[number]]</h3>
+      <iron-icon icon="icons:reorder" class="handle vcenter handle-icon noselect" hidden$="[[!sortable]]"></iron-icon>
       <div hidden>
         <paper-icon-button icon="icons:arrow-upward" disabled="[[first]]" on-tap="_moveUp"></paper-icon-button>
         <paper-icon-button icon="icons:arrow-downward" disabled="[[last]]" on-tap="_moveDown"></paper-icon-button>
       </div>
       <div class="vcenter noselect">[[data.topic]]</div>
-      <!-- <div class="vcenter noselect" hidden="[[viewerCount]]"><b>|</b> [[data.first_name]] [[data.last_name]]</div> -->
+      <!-- <div class="vcenter noselect" hidden$="[[viewerCount]]"><b>|</b> [[data.first_name]] [[data.last_name]]</div> -->
       <div class="flex"></div>
       <template is="dom-if" if="[[viewerCount]]">
         <template is="dom-repeat" items="[[viewerCountData.grades]]">
@@ -73,10 +73,10 @@ Example:
         </template>
         <div class="vcenter"><b>[[viewerCountData.total_count]]</b>/<b>[[viewerCountData.total_limit]]</b> Total</div>
       </template>
-      <div class="vcenter" hidden="[[!showDetails]]">[[_getAttrFromObj(data.location_id, 'location_name', locations)]]</div>
-      <paper-icon-button icon="icons:event-seat" on-tap="_gotoPresentation" hidden="[[!goToViewers]]"></paper-icon-button>
-      <paper-icon-button icon="icons:print" on-tap="_gotoPrint" hidden="[[!goToPrint]]"></paper-icon-button>
-      <paper-icon-button icon="icons:info" on-tap="_showInfo" hidden="[[hideInfo]]"></paper-icon-button>
+      <div class="vcenter" hidden$="[[!showDetails]]">[[_getAttrFromObj(data.location_id, 'location_name', locations)]]</div>
+      <paper-icon-button icon="icons:event-seat" on-tap="_gotoPresentation" hidden$="[[!goToViewers]]"></paper-icon-button>
+      <paper-icon-button icon="icons:print" on-tap="_gotoPrint" hidden$="[[!goToPrint]]"></paper-icon-button>
+      <paper-icon-button icon="icons:info" on-tap="_showInfo" hidden$="[[hideInfo]]"></paper-icon-button>
     </div>
   </template>
   <script>
@@ -136,6 +136,9 @@ Example:
           type: Boolean,
           value: false,
           reflectToAttribute: true
+        },
+        locations: {
+          type: Object
         }
       },
       behaviors: [ StableBehavior ],
