@@ -1,6 +1,8 @@
 # project-stable [![Build Status](https://travis-ci.org/cacerrillos/project-stable.svg?branch=master)](https://travis-ci.org/cacerrillos/project-stable)
 Temporary home for the new PolySPS.
 
+#### Server-side build status: [![Build Status](https://travis-ci.org/cacerrillos/project-stable-serverside.svg?branch=master)](https://travis-ci.org/cacerrillos/project-stable-serverside)
+
 ## Goals
 Three modes, selective, lotto and preferential lotto.
 
