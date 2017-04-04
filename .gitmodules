@@ -1,0 +1,3 @@
+[submodule "project-stable-serverside"]
+	path = project-stable-serverside
+	url = https://github.com/cacerrillos/project-stable-serverside.git
