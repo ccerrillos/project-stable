@@ -17,8 +17,7 @@ before_script:
 - polymer lint
 script:
 - xvfb-run polymer test --skip-plugin sauce
-- if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then polymer test -s 'default' --skip-plugin local;
-  fi
+- if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then polymer test -s 'default' --skip-plugin local; fi
 env:
   global:
   - secure: DSE8ihiZ12RW2HEG1voOoe/xLiw974LLQ+BLjVcHlSwS3Us/He2CnY/YnTXc1VnHH83yNsA06unvZfFcHxGvJLHEVpE8G8iBrPRuzmewEfoDEW13SZt6L8exKFuJq8UYEyCRNiFLHMpH9WOc+bE6tloVLGvBgYXTcFk/ZFmwy+ckiHOdNMbI4jzMM9+XhBrBAJeGC8vLwo4KorKivZW5Gb2B2vJS5jQPCPNU+vKJyC0vO4VTCBJpjPmnHuozVplZK1+PD+5SoDsZlj4d9/GulFgK/0t3Jv1KMM+4aiym5WZbeoqPZ9taUyDq32Wi+1BBXxoXVNA9YOOsncQMFJHnSRXQJwlCwwWe03DvjfXkAXQFsW8II1rWt0ik/LgX90xJXG3Tp8EqoqwESHk1+8JY8FX8i7eT5KweyNB/wHvNj8qdE8q4rm2IlKTyRtK0ODL5eN7LWaaSFhc6SkbHhhdmOWwSZXyg3AY/PsWAP+zXpLkt/c4BwYc7DT4Yve4emaghbf6UYcPnxMdfctOusjtrF1hKYAbkS4Ft7FVh3IQsi+4eIWcFb3OB3XZ96xamsCNN/qw3xoSARnftgGTUN0OhlXi1594/DdWQ/qhaSkM9QZuTbxlhquAUPggeeif/zJIaG/iU3sC/KiLHm8Cb0Y++9D5xm5ieQz5SvcAPFapUNvg=
