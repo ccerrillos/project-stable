@@ -10,9 +10,8 @@
     <!-- See https://goo.gl/OOhYW5 -->
     <link rel="manifest" href="/manifest.json">
     <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-    <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
 
-    <link rel="import" href="src/stable-app/stable-app.html">
+    <link rel="import" href="src/stable-app/stable-app.html" async>
     <style type="text/css">
       body {
         font-family: 'Roboto', sans-serif;
@@ -20,6 +19,19 @@
         margin: 0;
       }
     </style>
+    <script type="text/javascript">
+      (function() {
+        if('registerElement' in document
+            && 'import' in document.createElement('link')
+            && 'content' in document.createElement('template')) {
+
+        } else {
+          var s = document.createElement('script');
+          s.src = 'bower_components/webcomponentsjs/webcomponents-lite.min.js';
+          document.body.appendChild(s);
+        }
+      })();
+    </script>
 <!--      <script src="/bower_components/skel/dist/skel.min.js"></script>
     <script src="/bower_components/skel/dist/skel-layout.min.js"></script>
     <script type="text/javascript">
