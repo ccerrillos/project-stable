@@ -3,6 +3,7 @@
 <link rel="import" href="stable-behavior.html">
 <link rel="import" href="../../bower_components/ctech-dialogs/ctech-confirm-dialog.html">
 <link rel="import" href="../../bower_components/ctech-dialogs/ctech-ajax.html">
+
 <!--
 A comment describing this element
 
@@ -26,23 +27,24 @@ Example:
         display: block;
       }
     </style>
-    <ctech-confirm-dialog id="confirmDialog">
+    <ctech-confirm-dialog id="confirmDialog" modal>
+      <c-data data="[[confirmData]]"></c-data>
       <ctech-ajax
         id="signupAjax"
         url="[[_computeAPI('/signup')]]"
         method="POST"
         content-type="application/json"
         handle-as="json"
-        on-iron-ajax-request=""
-        on-iron-ajax-response="signupConfirmCallbackResponse"
-        on-iron-ajax-error="signupConfirmCallbackError"></ctech-ajax>
+        callbacks="[[confirmData.callbacks]]"
+        body="[[_toJson(confirmData.data)]]"
+        ></ctech-ajax>
       <div class="layout vertical">
         <h2>Confirm</h2>
         <p>Are you sure this information is correct?</p>
-        <div>First Name: <b>[[confirmData.firstname]]</b></div>
-        <div>Last Name: <b>[[confirmData.lastname]]</b></div>
-        <div>Grade: <b>[[_getAttrFromObj(confirmData.grade, 'grade_name', grades)]]</b></div>
-        <div>House: <b>[[_getAttrFromObj(confirmData.house, 'house_name', houses)]]</b></div>
+        <div>First Name: <b>[[confirmData.data.firstname]]</b></div>
+        <div>Last Name: <b>[[confirmData.data.lastname]]</b></div>
+        <div>Grade: <b>[[_getAttrFromObj(confirmData.data.grade, 'grade_name', grades)]]</b></div>
+        <div>House: <b>[[_getAttrFromObj(confirmData.data.house, 'house_name', houses)]]</b></div>
         <!-- <div class="layout horizontal" style="margin-top: 16px;">
           <div class="flex"></div>
           <paper-button id="confirmButton" raised class="start" on-tap="_submit">
@@ -69,34 +71,29 @@ Example:
           type: Object
         }
       },
+      listeners: {
+        'iron-ajax-request': '_onIronAjaxRequest',
+        'iron-ajax-response': '_onIronAjaxResponse',
+        'iron-ajax-error': '_onIronAjaxError'
+      },
       behaviors: [ StableBehavior ],
-
-      signupConfirmCallbackResponse: function(e) {
-        console.log(e);
-        console.log('yo response');
+      _onIronAjaxRequest: function(e) {
+        e.target.callbacks.requestCallback(e);
       },
-      signupConfirmCallbackError: function(e) {
-        console.log(e);
-        console.log('yo error');
+      _onIronAjaxResponse: function(e) {;
+        e.target.callbacks.responseCallback(e);
       },
-
+      _onIronAjaxError: function(e) {
+        e.target.callbacks.errorCallback(e);
+      },
       signupConfirmOpen: function(e) {
-        console.log(e);
-        console.log(this);
         this.confirmData = e.detail;
         this.$.confirmDialog.open();
       },
       signupConfirmClose: function(e) {
-        console.log(e);
-        console.log(this);
+        this.$.confirmDialog.close();
       },
       _submit: function() {
-      },  
-      attached: function() {
-        
-      },
-      detached: function() {
-
       },
       ready: function() {
         document.addEventListener('dialog-signup-confirm-open', this.signupConfirmOpen.bind(this));
