@@ -1,0 +1,107 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="stable-behavior.html">
+<link rel="import" href="../../bower_components/ctech-dialogs/ctech-confirm-dialog.html">
+<link rel="import" href="../../bower_components/ctech-dialogs/ctech-ajax.html">
+<!--
+A comment describing this element
+
+Example:
+
+    <my-elem></my-elem>
+
+Example:
+
+    <my-elem>
+      <h2>Hello my-elem</h2>
+    </my-elem>
+
+@demo demo/index.html
+-->
+
+<dom-module id="stable-dialogs">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <ctech-confirm-dialog id="confirmDialog">
+      <ctech-ajax
+        id="signupAjax"
+        url="[[_computeAPI('/signup')]]"
+        method="POST"
+        content-type="application/json"
+        handle-as="json"
+        on-iron-ajax-request=""
+        on-iron-ajax-response="signupConfirmCallbackResponse"
+        on-iron-ajax-error="signupConfirmCallbackError"></ctech-ajax>
+      <div class="layout vertical">
+        <h2>Confirm</h2>
+        <p>Are you sure this information is correct?</p>
+        <div>First Name: <b>[[confirmData.firstname]]</b></div>
+        <div>Last Name: <b>[[confirmData.lastname]]</b></div>
+        <div>Grade: <b>[[_getAttrFromObj(confirmData.grade, 'grade_name', grades)]]</b></div>
+        <div>House: <b>[[_getAttrFromObj(confirmData.house, 'house_name', houses)]]</b></div>
+        <!-- <div class="layout horizontal" style="margin-top: 16px;">
+          <div class="flex"></div>
+          <paper-button id="confirmButton" raised class="start" on-tap="_submit">
+            <paper-spinner id="spinner" active hidden></paper-spinner>
+            <div id="confirmText">Confirm</div>
+          </paper-button>
+          <paper-button id="cancelButton" raised on-tap="" class="reset">Cancel</paper-button>
+        </div> -->
+      </div>
+      
+    </ctech-confirm-dialog>
+  </template>
+  <script>
+    Polymer({
+      is: 'stable-dialogs',
+      properties: {
+        confirmData: {
+          type: Object
+        },
+        grades: {
+          type: Object
+        },
+        houses: {
+          type: Object
+        }
+      },
+      behaviors: [ StableBehavior ],
+
+      signupConfirmCallbackResponse: function(e) {
+        console.log(e);
+        console.log('yo response');
+      },
+      signupConfirmCallbackError: function(e) {
+        console.log(e);
+        console.log('yo error');
+      },
+
+      signupConfirmOpen: function(e) {
+        console.log(e);
+        console.log(this);
+        this.confirmData = e.detail;
+        this.$.confirmDialog.open();
+      },
+      signupConfirmClose: function(e) {
+        console.log(e);
+        console.log(this);
+      },
+      _submit: function() {
+      },  
+      attached: function() {
+        
+      },
+      detached: function() {
+
+      },
+      ready: function() {
+        document.addEventListener('dialog-signup-confirm-open', this.signupConfirmOpen.bind(this));
+        document.addEventListener('dialog-signup-confirm-close', this.signupConfirmClose.bind(this));
+      }
+    });
+  </script>
+</dom-module>

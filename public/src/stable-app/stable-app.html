@@ -17,6 +17,7 @@
 <link rel="import" href="../presentations-page/presentations-page.html">
 <!-- <link rel="import" href="../edit-item-pages/edit-locations-page.html"> -->
 <link rel="import" href="stable-behavior.html">
+<link rel="import" href="stable-dialogs.html">
 
 <dom-module id="stable-app">
   <template>
@@ -48,7 +49,7 @@
         width: 100%;
       }
     </style>
-    <app-localstorage-document id="adminCodeStorage" key="admincode" data="{{adminCode}}">
+    <app-localstorage-document id="adminCodeStorage" key="admincode" data="{{adminCode}}"></app-localstorage-document>
 
     <app-location route="{{route}}" use-hash-as-path></app-location>
     <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{tail}}"></app-route>
@@ -121,7 +122,7 @@
       on-error="_onError"
       on-response="ajaxResponse"
       last-response="{{schedule}}"></iron-ajax>
-
+    <stable-dialogs houses="[[houses]]" grades="[[grades]]"></stable-dialogs>
     <paper-drawer-panel force-narrow id="paperDrawerPanel">
       <paper-header-panel drawer>
         <paper-toolbar>

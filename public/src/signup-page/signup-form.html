@@ -230,13 +230,21 @@ Example:
         return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
       },
       _confirm: function() {
-        this.$.confirmDialog.open();
+        this.fire('dialog-signup-confirm-open',
+          {
+            firstname: this.firstname,
+            lastname: this.lastname,
+            grade: this.grade,
+            house: this.house
+          });
+        //this.$.confirmDialog.open();
       },
       _cancel: function() {
         if(this._ajaxRequest != null)
           this._ajaxRequest.abort();
         else
-          this.$.confirmDialog.close();
+          this.fire('dialog-signup-confirm-close');
+          //this.$.confirmDialog.close();
       },
       _submit: function() {
         this._disableConfirm();
@@ -270,6 +278,7 @@ Example:
         if(e.detail.response) {
           if(e.detail.response.status) {
             this.$.confirmDialog.close();
+            this.fire('dialog-signup-confirm-close');
             //load presentation data & go to preferences page
             this.fire('do-signup', e.detail.response);
           } else {
