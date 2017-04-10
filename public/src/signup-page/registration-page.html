@@ -62,28 +62,6 @@
       hidden
       ></signup-page>
 
-    <paper-dialog id="postBeginDialog">
-      <div class="layout horizontal">
-        <div class="flex"></div>
-        <h2>Getting Ready!</h2>
-        <div class="flex"></div>
-      </div>
-      <div class="layout horizontal" style="margin-top: 8px; margin-bottom: 4px;">
-        <div class="flex"></div>
-        <p style="margin: 0px;">Fetching presentation data...</p>
-        <div class="flex"></div>
-      </div>
-      <div class="layout horizontal" style="margin-top: 4px; margin-bottom: 8px;">
-        <div class="flex"></div>
-        <b>Please don't reload.</b  >
-        <div class="flex"></div>
-      </div>
-      <div class="layout horizontal" style="margin-top: 8px;">
-        <div class="flex"></div>
-        <paper-spinner active></paper-spinner>
-        <div class="flex"></div>
-      </div>
-    </paper-dialog>
     <paper-toast id="instructions" duration="0" style="padding: 8px;">
       <div class="layout horizontal">
         <div class="layout vertical vcenter">
@@ -175,13 +153,12 @@
         console.log(e);
         this.userData = e.detail;
         this.$.userDataSorage.save("stable");
-        // this.$.postBeginDialog.open();
         // this.$.presentationsAjax.generateRequest();
         // this.$.signupPage.signup();
       },
       _dataReady: function(dates, blocks, presentations, userData) {
         if(dates && blocks && presentations && userData && userData.viewer_id) {
-          this.$.postBeginDialog.close();
+          this.fire('dialog-postbegin-close');
           this.$.signupForm.hidden = true;
           this.$.signupPage.hidden = false;
           this.$.instructions.show();
@@ -208,7 +185,7 @@
       _userDataChanged: function(e) {
         console.log(e);
         if(e && e.viewer_id && e.viewer_key) {
-          this.$.postBeginDialog.open();
+          this.fire('dialog-postbegin-open');
           this.fire('reload-presentations');
           this.fire('goto-page', { page: 'registration' });
         } else {

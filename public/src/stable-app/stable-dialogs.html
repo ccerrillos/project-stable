@@ -1,8 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
-<link rel="import" href="stable-behavior.html">
 <link rel="import" href="../../bower_components/ctech-dialogs/ctech-confirm-dialog.html">
 <link rel="import" href="../../bower_components/ctech-dialogs/ctech-ajax.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="stable-behavior.html">
+
 
 <!--
 A comment describing this element
@@ -22,7 +24,7 @@ Example:
 
 <dom-module id="stable-dialogs">
   <template>
-    <style>
+    <style include="iron-flex iron-flex-alignment">
       :host {
         display: block;
       }
@@ -47,6 +49,28 @@ Example:
       </div>
       
     </ctech-confirm-dialog>
+    <paper-dialog id="postBeginDialog" modal>
+      <div class="layout horizontal">
+        <div class="flex"></div>
+        <h2>Getting Ready!</h2>
+        <div class="flex"></div>
+      </div>
+      <div class="layout horizontal" style="margin-top: 8px; margin-bottom: 4px;">
+        <div class="flex"></div>
+        <p style="margin: 0px;">Fetching presentation data...</p>
+        <div class="flex"></div>
+      </div>
+      <div class="layout horizontal" style="margin-top: 4px; margin-bottom: 8px;">
+        <div class="flex"></div>
+        <b>Please don't reload.</b  >
+        <div class="flex"></div>
+      </div>
+      <div class="layout horizontal" style="margin-top: 8px;">
+        <div class="flex"></div>
+        <paper-spinner active></paper-spinner>
+        <div class="flex"></div>
+      </div>
+    </paper-dialog>
   </template>
   <script>
     Polymer({
@@ -84,11 +108,20 @@ Example:
       signupConfirmClose: function(e) {
         this.$.confirmDialog.close();
       },
+      postBeginOpen: function(e) {
+        this.$.postBeginDialog.open();
+      },
+      postBeginClose: function(e) {
+        this.$.postBeginDialog.close();
+      },
       _submit: function() {
       },
       ready: function() {
         document.addEventListener('dialog-signup-confirm-open', this.signupConfirmOpen.bind(this));
         document.addEventListener('dialog-signup-confirm-close', this.signupConfirmClose.bind(this));
+        document.addEventListener('dialog-postbegin-open', this.postBeginOpen.bind(this));
+        document.addEventListener('dialog-postbegin-close', this.postBeginClose.bind(this));
+
       }
     });
   </script>
