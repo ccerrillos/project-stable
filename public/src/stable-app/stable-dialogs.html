@@ -44,14 +44,6 @@ Example:
         <div>Last Name: <b>[[confirmData.data.lastname]]</b></div>
         <div>Grade: <b>[[_getAttrFromObj(confirmData.data.grade, 'grade_name', grades)]]</b></div>
         <div>House: <b>[[_getAttrFromObj(confirmData.data.house, 'house_name', houses)]]</b></div>
-        <!-- <div class="layout horizontal" style="margin-top: 16px;">
-          <div class="flex"></div>
-          <paper-button id="confirmButton" raised class="start" on-tap="_submit">
-            <paper-spinner id="spinner" active hidden></paper-spinner>
-            <div id="confirmText">Confirm</div>
-          </paper-button>
-          <paper-button id="cancelButton" raised on-tap="" class="reset">Cancel</paper-button>
-        </div> -->
       </div>
       
     </ctech-confirm-dialog>
