@@ -37,7 +37,7 @@ Example:
         content-type="application/json"
         handle-as="json"
         callbacks="[[confirmData.callbacks]]"
-        body="[[_toJson(confirmData.data)]]"
+        body="[[_parseSignupAjax(confirmData.data)]]"
         ></ctech-ajax>
       <div class="layout vertical">
         <h2>Confirm</h2>
@@ -107,6 +107,14 @@ Example:
       },
       signupConfirmClose: function(e) {
         this.$.confirmDialog.close();
+      },
+      _parseSignupAjax: function(e) {
+        return this._toJson({
+          first_name: e.firstname,
+          last_name: e.lastname,
+          grade: e.grade,
+          house: e.house
+        });
       },
       postBeginOpen: function(e) {
         this.$.postBeginDialog.open();
