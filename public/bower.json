@@ -25,7 +25,9 @@
     "iron-pages": "^1.0.8",
     "app-route": "PolymerElements/app-route#^0.9.3",
     "ctech-item-managers": "https://github.com/cacerrillos/ctech-item-managers.git#^1.0.3",
-    "ctech-dialogs": "https://github.com/cacerrillos/ctech-dialogs.git#^1.2.0"
+    "ctech-dialogs": "https://github.com/cacerrillos/ctech-dialogs.git#^1.2.0",
+    "paper-checkbox": "^1.4.2",
+    "app-layout": "^1.0.0"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

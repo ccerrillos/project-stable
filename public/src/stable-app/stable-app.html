@@ -162,6 +162,7 @@
                 houses="[[houses]]"
                 blocks="[[blocks]]"
                 presentations="[[presentations]]"
+                selectable="[[selectable]]"
                 ></registration-page>
               <schedule-page
                 route="{{route}}"
@@ -229,6 +230,10 @@
         },
         tail: {
           type: Object
+        },
+        selectable: {
+          type: Boolean,
+          value: true
         }
       },
       observers: [

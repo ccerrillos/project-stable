@@ -122,6 +122,7 @@ Example:
     </paper-dialog>
 
     <div id="content">
+    <template is="dom-if" if="[[!selectable]]">
       <!-- <template is="dom-repeat" items="[[dates]]" as="date"> -->
         <!-- <template is="dom-repeat" items="[[blocksArr]]" as="block"> -->
           <paper-material elevation="1">
@@ -152,6 +153,33 @@ Example:
           </paper-material>
         <!-- </template> -->
       <!-- </template> -->
+      </template>
+      <template is="dom-if" if="[[selectable]]">
+        <template is="dom-repeat" items="[[dates]]" as="date">
+          <template is="dom-repeat" items="[[blocksArr]]" as="block">
+            <paper-material elevation="1">
+              <h3>[[_parseDate(date.date)]] - [[block.block_name]] Block</h3>
+              <!-- <h3>All Presentations</h3> -->
+              <!-- class$="[[_computeSorter(date.date, block.block_id)]]" -->
+                <template is="dom-repeat" items="[[_filterPresentations(date.date, block.block_id, presentations)]]" as="presentation">
+                <!-- <template is="dom-repeat" items="[[presentationsArray]]" as="presentation"> -->
+
+                  <presentation-row
+                    data="[[presentation]]"
+                    order="[[order]]"
+                    data-id$="[[presentation.presentation_id]]"
+                    on-move-up="_doMoveUp"
+                    on-move-down="_doMoveDown"
+                    on-show-info="_showInfo"
+                    names
+                    selectable
+                    ></presentation-row>
+                </template>
+              
+            </paper-material>
+          </template>
+        </template>
+      </template>
     </div>
 
     <paper-toast id="errorToast" text="An error occurred."></paper-toast>
@@ -191,6 +219,11 @@ Example:
         },
         order: {
           type: Array
+        },
+        selectable: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
         }
       },
       behaviors: [ StableBehavior ],
