@@ -3,6 +3,8 @@
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/app-layout/app-grid/app-grid-style.html">
 <link rel="import" href="../stable-app/stable-behavior.html">
 
 <!--
@@ -23,10 +25,13 @@ Example:
 
 <dom-module id="presentation-row">
   <template>
-    <style include="iron-flex iron-flex-alignment">
+    <style include="iron-flex iron-flex-alignment app-grid-style">
       :host {
         display: block;
         padding: 4px;
+        --app-grid-columns: 3;
+        --app-grid-item-height: 1em;
+        --app-grid-expandible-item-columns: 2;
       }
       .handle-icon {
         width: 32px;
@@ -56,24 +61,42 @@ Example:
       paper-icon-button {
         min-width: 40px;
       }
+      .expand {
+        @apply(--app-grid-expandible-item);
+      }
+      @media (max-width: 640px) {
+        :host {
+          --app-grid-columns: 1;
+        }
+      }
     </style>
     <div class="layout horizontal">
+      <paper-checkbox id="selector" class="vcenter" on-click="_click" on-tap="_tap" on-change="_change" hidden$="[[!selectable]]"></paper-checkbox>
       <h3 id="number" class="vcenter number noselect" hidden$="[[!sortable]]">[[number]]</h3>
       <iron-icon icon="icons:reorder" class="handle vcenter handle-icon noselect" hidden$="[[!sortable]]"></iron-icon>
       <div hidden>
         <paper-icon-button icon="icons:arrow-upward" disabled="[[first]]" on-tap="_moveUp"></paper-icon-button>
         <paper-icon-button icon="icons:arrow-downward" disabled="[[last]]" on-tap="_moveDown"></paper-icon-button>
       </div>
-      <div class="vcenter noselect">[[data.topic]]</div>
-      <!-- <div class="vcenter noselect" hidden$="[[viewerCount]]"><b>|</b> [[data.first_name]] [[data.last_name]]</div> -->
-      <div class="flex"></div>
-      <template is="dom-if" if="[[viewerCount]]">
-        <template is="dom-repeat" items="[[viewerCountData.grades]]">
-          <div class="vcenter" ><b>[[item.count]]</b> [[item.grade_name]]</div>
+      <div class="flex layout vertical">
+        <div class="noselect expand">[[data.topic]]</div>
+        <b class="noselect expand" hidden="[[!names]]">[[data.first_name]] [[data.last_name]]</b>
+        <div class="noselect" hidden$="[[!showDetails]]">[[_getAttrFromObj(data.location_id, 'location_name', locations)]]</div>
+      </div>
+      <!-- <div class="app-grid flex">
+        <div class="vcenter noselect expand">[[data.topic]]</div>
+        <b class="vcenter noselect expand" hidden="[[!names]]">[[data.first_name]] [[data.last_name]]</b>
+        <- <div class="vcenter noselect" hidden$="[[viewerCount]]"><b>|</b> [[data.first_name]] [[data.last_name]]</div> ->
+        <- <div class="flex"></div> ->
+        <- <div class="expand"></div> ->
+        <template is="dom-if" if="[[viewerCount]]">
+          <template is="dom-repeat" items="[[viewerCountData.grades]]">
+            <div class="vcenter" ><b>[[item.count]]</b> [[item.grade_name]]</div>
+          </template>
+          <div class="vcenter"><b>[[viewerCountData.total_count]]</b>/<b>[[viewerCountData.total_limit]]</b> Total</div>
         </template>
-        <div class="vcenter"><b>[[viewerCountData.total_count]]</b>/<b>[[viewerCountData.total_limit]]</b> Total</div>
-      </template>
-      <div class="vcenter" hidden$="[[!showDetails]]">[[_getAttrFromObj(data.location_id, 'location_name', locations)]]</div>
+        <div class="vcenter noselect" hidden$="[[!showDetails]]">[[_getAttrFromObj(data.location_id, 'location_name', locations)]]</div>
+      </div> -->
       <paper-icon-button icon="icons:event-seat" on-tap="_gotoPresentation" hidden$="[[!goToViewers]]"></paper-icon-button>
       <paper-icon-button icon="icons:print" on-tap="_gotoPrint" hidden$="[[!goToPrint]]"></paper-icon-button>
       <paper-icon-button icon="icons:info" on-tap="_showInfo" hidden$="[[hideInfo]]"></paper-icon-button>
@@ -108,6 +131,11 @@ Example:
           value: false,
           reflectToAttribute: true
         },
+        selectable: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        },
         viewerCount: {
           type: Boolean,
           value: false,
@@ -123,6 +151,11 @@ Example:
           reflectToAttribute: true
         },
         showDetails: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        },
+        names: {
           type: Boolean,
           value: false,
           reflectToAttribute: true
@@ -190,6 +223,21 @@ Example:
       },
       _gotoPrint: function(e) {
         window.open(this._computeAPI('/print?presentation_id=' + this.data.presentation_id), '_blank');
+      },
+      _click: function(e) {
+        //console.log(e);
+        //this.fire('presentation-selected', { presentation_id: this.data.presentation_id });
+      },
+      _tap: function(e) {
+        //console.log(e);
+        //this.fire('presentation-selected', { presentation_id: this.data.presentation_id });
+      },
+      _change: function(e) {
+        console.log(e);
+        if(e.target.checked) {
+          console.log('selected: {}')
+        }
+        //if(e.)
       }
       
     });
