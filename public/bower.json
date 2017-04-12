@@ -27,7 +27,8 @@
     "ctech-item-managers": "https://github.com/cacerrillos/ctech-item-managers.git#^1.0.3",
     "ctech-dialogs": "https://github.com/cacerrillos/ctech-dialogs.git#^1.2.0",
     "paper-checkbox": "^1.4.2",
-    "app-layout": "^1.0.0"
+    "app-layout": "^1.0.0",
+    "paper-radio-button": "^1.3.3"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
