@@ -80,7 +80,7 @@ Example:
       </div>
       <div class="flex layout vertical">
         <div class="noselect expand">[[data.topic]]</div>
-        <b class="noselect expand" hidden="[[!names]]">[[data.first_name]] [[data.last_name]]</b>
+        <b class="noselect expand" hidden$="[[!names]]">[[data.first_name]] [[data.last_name]]</b>
         <div class="noselect" hidden$="[[!showDetails]]">[[_getAttrFromObj(data.location_id, 'location_name', locations)]]</div>
       </div>
       <!-- <div class="app-grid flex">

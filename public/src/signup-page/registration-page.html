@@ -148,6 +148,11 @@
         active: {
           type: Boolean,
           observer: '_onActiveChanged'
+        },
+        selectable: {
+          type: Boolean,
+          type: false,
+          reflectToAttribute: true
         }
       },
       behaviors: [ StableBehavior ],
