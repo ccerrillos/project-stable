@@ -9,15 +9,15 @@
     _computeAPI: function (path) {
       switch(path) {
         case '/houses':
-          return '/houses.json';
+          return this.resolveUrl('../../houses.json');
         case '/grades':
-          return '/grades.json';
+          return this.resolveUrl('../../grades.json');
         case '/dates':
-          return '/dates.json';
+          return this.resolveUrl('../../dates.json');
         case '/blocks':
-          return '/blocks.json';
+          return this.resolveUrl('../../blocks.json');
         case '/locations':
-          return '/locations.json';
+          return this.resolveUrl('../../locations.json');
       }
       var apiRootPath = 'https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1';
       return apiRootPath + path;
