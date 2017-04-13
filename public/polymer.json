@@ -16,6 +16,14 @@
     "houses.json",
     "locations.json"
   ],
+  "includeDependencies": [
+    "bower_components/webcomponentsjs/webcomponents-lite.min.js",
+    "blocks.json",
+    "dates.json",
+    "grades.json",
+    "houses.json",
+    "locations.json"
+  ],
   "lint": {
     "rules": ["polymer-1"]
   }
