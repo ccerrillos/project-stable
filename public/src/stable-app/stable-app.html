@@ -58,6 +58,7 @@
       auto
       id="blocksAjax"
       url="[[_computeAPI('/blocks')]]"
+      params="[[_params('always')]]"
       handle-as="json"
       content-type="application/json"
       on-error="_onError"
@@ -67,6 +68,7 @@
       auto
       id="datesAjax"
       url="[[_computeAPI('/dates')]]"
+      params="[[_params('always')]]"
       handle-as="json"
       content-type="application/json"
       on-error="_onError"
@@ -76,6 +78,7 @@
       auto
       id="housesAjax"
       url="[[_computeAPI('/houses')]]"
+      params="[[_params('always')]]"
       handle-as="json"
       content-type="application/json"
       on-error="_onError"
@@ -85,6 +88,7 @@
       auto
       id="gradesAjax"
       url="[[_computeAPI('/grades')]]"
+      params="[[_params('always')]]"
       handle-as="json"
       content-type="application/json"
       on-error="_onError"
@@ -93,6 +97,7 @@
     <iron-ajax
       id="locationsAjax"
       url="[[_computeAPI('/locations')]]"
+      params="[[_params('always')]]"
       handle-as="json"
       content-type="application/json"
       on-error="_onError"
@@ -101,6 +106,7 @@
     <iron-ajax
       id="presentationsAjax"
       url="[[_computeAPI('/presentations')]]"
+      params="[[_params('always')]]"
       handle-as="json"
       content-type="application/json"
       on-error="_onError"
@@ -109,6 +115,7 @@
     <iron-ajax
       id="viewersAjax"
       url="[[_computeAPI('/viewers')]]"
+      params="[[_params('')]]"
       handle-as="json"
       content-type="application/json"
       on-error="_onError"
@@ -117,6 +124,7 @@
     <iron-ajax
       id="scheduleAjax"
       url="[[_computeAPI('/schedule')]]"
+      params="[[_params('always')]]"
       handle-as="json"
       content-type="application/json"
       on-error="_onError"

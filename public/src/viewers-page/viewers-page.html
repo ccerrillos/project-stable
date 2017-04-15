@@ -256,9 +256,9 @@ Example:
         return false;
       },
       _computeParams: function(e) {
-        return {
+        return this._params({
           viewer_id: e.viewer_id
-        };
+        });
       },
       _computeDetailsDataReady: function(viewer, grades, houses, dates, schedule, presentations, locations) {
         if(viewer && grades && houses && dates && schedule && presentations && locations)

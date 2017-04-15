@@ -5,6 +5,7 @@
    *
    * @polymerBehavior
    */
+  var useCache = true;
   StableBehavior = {
     _computeAPI: function (path) {
       switch(path) {
@@ -80,6 +81,19 @@
     },
     _toJson: function(e) {
       return JSON.stringify(e);
+    },
+    _params: function(e) {
+      if(e === undefined || e === null || e === '')
+        e = {};
+      if(e === 'always') {
+        e = {};
+        e["cached"] = true;
+      }
+      
+      if(useCache)
+        e["cached"] = true;
+      console.log(e);
+      return e;
     }
 
   };

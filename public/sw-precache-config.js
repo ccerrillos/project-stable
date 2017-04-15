@@ -7,32 +7,22 @@ module.exports = {
   navigateFallback: 'index.html',
   runtimeCaching: [
     {
-      urlPattern: /^https:\/\/4n5e3ppiq7.execute-api.us-east-2.amazonaws.com\/v1\/.*/,
-      handler: 'cacheFirst',
+      urlPattern: /^https:\/\/4n5e3ppiq7.execute-api.us-east-2.amazonaws.com\/v1\/.*cached.*/,
+      handler: 'fastest',
       options: {
           cache: {
-            maxEntries: 10,
+            maxEntries: 2,
             name: 'api-cache'
           }
       }
     },
     {
       urlPattern: /.*\/.*\.json/,
-      handler: 'cacheFirst',
-      options: {
-          cache: {
-            maxEntries: 10,
-            name: 'json-cache'
-          }
-      }
-    },
-    {
-      urlPattern: /\/articles\//,
       handler: 'fastest',
       options: {
           cache: {
-            maxEntries: 10,
-            name: 'articles-cache'
+            maxEntries: 2,
+            name: 'json-cache'
           }
       }
     }
