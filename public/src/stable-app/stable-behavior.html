@@ -5,8 +5,13 @@
    *
    * @polymerBehavior
    */
-  var useCache = true;
   StableBehavior = {
+    properties: {
+      useCache: {
+        type: Boolean,
+        value: true
+      }
+    },
     _computeAPI: function (path) {
       switch(path) {
         case '/houses':
@@ -90,7 +95,7 @@
         e["cached"] = true;
       }
       
-      if(useCache)
+      if(this.useCache)
         e["cached"] = true;
       console.log(e);
       return e;
