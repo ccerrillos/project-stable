@@ -6,8 +6,7 @@
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
-<link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
-<link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
 
 <link rel="import" href="presentation-row.html">
 <link rel="import" href="../stable-app/stable-behavior.html">
@@ -91,7 +90,7 @@ Example:
       paper-toast {
         z-index: 10001;
       }
-      paper-radio-button.vcenter {
+      paper-checkbox.vcenter {
         padding-left: 8px;
         margin-top: auto;
         margin-bottom: auto;
@@ -174,12 +173,21 @@ Example:
               <h3>[[_parseDate(date.date)]] - [[block.block_name]] Block</h3>
               <!-- <h3>All Presentations</h3> -->
               <!-- class$="[[_computeSorter(date.date, block.block_id)]]" -->
-              <paper-radio-group>
                 <template is="dom-repeat" items="[[_filterPresentations(date.date, block.block_id, presentations)]]" as="presentation">
                 <!-- <template is="dom-repeat" items="[[presentationsArray]]" as="presentation"> -->
                   <div class="layout horizontal highlight">
-                  <paper-radio-button name$="[[presentation.presentation_id]]" id="selector" class="vcenter" on-click="_click" on-tap="_tap" on-change="_change" hidden$="[[!selectable]]"></paper-radio-button>
-
+                  <paper-checkbox
+                    name$="[[presentation.presentation_id]]"
+                    data-date="[[date.date]]"
+                    data-block="[[block.block_id]]"
+                    data-presentation-id="[[presentation.presentation_id]]"
+                    id="selector"
+                    class="vcenter"
+                    on-change="_change"
+                    hidden$="[[!selectable]]"
+                    disabled="[[_pending]]"
+                    ></paper-checkbox>
+                    <!-- presentation.full, presentation.is_registered -->
                   <presentation-row
                     class="flex"
                     data="[[presentation]]"
@@ -194,7 +202,6 @@ Example:
                     </presentation-row>
                   </div>
                 </template>
-              </paper-radio-group>
               
             </paper-material>
           </template>
@@ -240,10 +247,39 @@ Example:
         order: {
           type: Array
         },
+        registrations: {
+          type: Object
+        },
+        /*
+          {
+            "user": [ 1, 2, 3, 4], //registered presentation_ids
+            "all": {
+              1: {}
+            }
+          }
+
+        */
+        registrationsInternal: {
+          type: Object,
+          value: {}
+        },
+        /*
+          {
+            "20170505": {
+              "1": -1,
+              "2": -1,
+              "3": -1
+            }
+          }
+        */
         selectable: {
           type: Boolean,
           value: false,
           reflectToAttribute: true
+        },
+        _pending: {
+          type: Boolean,
+          value: false
         }
       },
       behaviors: [ StableBehavior ],
@@ -389,6 +425,64 @@ Example:
           this.$.errorToast.text = "An error occurred.";
         }
         this.$.errorToast.show();
+      },
+      _change: function(e) {
+        var date = e.model.get('date.date');
+        var block_id = e.model.get('block.block_id');
+        var presentation_id = e.model.get('presentation.presentation_id');
+        if(this.registrationsInternal) {
+          if(!this.registrationsInternal[date]) {
+            this.registrationsInternal[date] = {};
+          }
+          if(!this.registrationsInternal[date][block_id]) {
+            this.registrationsInternal[date][block_id] = -1;
+          }
+
+          if(this.registrationsInternal[date][block_id] == -1) {
+            this.registrationsInternal[date][block_id] = presentation_id;
+          } else {
+            if(e.target.checked) {
+              this._des(date, block_id, this.registrationsInternal[date][block_id]);
+              console.log("warn, already registered in this slot");
+              this.registrationsInternal[date][block_id] = presentation_id;
+            } else {
+              this.registrationsInternal[date][block_id] = -1;
+            }
+            
+          }
+        }
+
+
+        if(e.target.checked) {
+          this._doRegisterReq(e.model.get('presentation.presentation_id'));
+        }
+        this._disableCheckboxes();
+      },
+      _des: function(date, block_id, presentation_id) {
+        var ch = Polymer.dom(this.$.content).querySelectorAll("paper-checkbox");
+        for(var k in ch) {
+          if(!ch.hasOwnProperty(k)) continue;
+
+          var cb = ch[k];
+          if(cb.dataDate == date && cb.dataBlock == block_id && cb.dataPresentationId == presentation_id) {
+            cb.checked = false;
+          }
+        }
+      },
+      _disableCheckboxes: function() {
+        this._pending = true;
+        setTimeout(function(){ this._pending = false; }.bind(this), 3000);
+      },
+      _doRegisterReq: function(presentation_id) {
+        // this.$.ajax.body = JSON.stringify({ presentation_id: p_id, viewer_id:  this.regStatus.viewer_id });
+        // this.$.ajax.generateRequest();
+        /*
+        this.fire('firetoast', { message: "Already Registered!"});
+        this.$.regAjax.generateRequest();
+        */
+      },
+      _or: function(a, b) {
+        return a || b;
       }
     });
   </script>
