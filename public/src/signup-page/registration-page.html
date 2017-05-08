@@ -9,7 +9,6 @@
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../signup-page/signup-form.html">
-<link rel="import" href="../../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
 <link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 
@@ -46,7 +45,6 @@
         z-index: 10001;
       }
     </style>
-    <app-localstorage-document id="userDataSorage" key="stable" data="{{userData}}">
     <app-route route="{{route}}" pattern="/registration" active="{{active}}"></app-route>
     <signup-form
       id="signupForm"
@@ -155,6 +153,10 @@
           type: Boolean,
           value: false,
           reflectToAttribute: true
+        },
+        userSchedule: {
+          type: Array,
+          observer: '_userScheduleChanged'
         }
       },
       behaviors: [ StableBehavior ],
@@ -168,6 +170,7 @@
         this.$.drawer.toggle();
       },
       _doSignup: function(e) {
+        return;
         console.log(e);
         this.userData = e.detail;
         this.$.userDataSorage.save("stable");
@@ -233,9 +236,9 @@
           else
             this.$.completedToast.show();
         }
-        this.userData = {};
+        //this.userData = {};
         this.$.signupForm.reset();
-        this.$.userDataSorage.save("stable");
+        //this.$.userDataSorage.save("stable");
       },
       _onError: function(e) {
         console.log(e);
@@ -247,6 +250,10 @@
       _onActiveChanged: function(e) {
         if(e)
           this.fire('show-back-button', false);
+      },
+      _userScheduleChanged: function(e) {
+        console.log("_userScheduleChanged");
+        console.log(e);
       }
     });
   </script>

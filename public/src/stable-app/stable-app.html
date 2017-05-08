@@ -50,6 +50,7 @@
       }
     </style>
     <app-localstorage-document id="adminCodeStorage" key="admincode" data="{{adminCode}}"></app-localstorage-document>
+    <app-localstorage-document id="userDataSorage" key="stable" data="{{userData}}">
 
     <app-location route="{{route}}" use-hash-as-path></app-location>
     <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{tail}}"></app-route>
@@ -130,6 +131,15 @@
       on-error="_onError"
       on-response="ajaxResponse"
       last-response="{{schedule}}"></iron-ajax>
+    <iron-ajax
+      id="userScheduleAjax"
+      url="[[_computeAPI('/schedule')]]"
+      params="[[_userScheduleAjaxParams(userData)]]"
+      handle-as="json"
+      content-type="application/json"
+      on-error="_onError"
+      on-response="_log"
+      last-response="{{userSchedule}}"></iron-ajax>
     <stable-dialogs houses="[[houses]]" grades="[[grades]]"></stable-dialogs>
     <paper-drawer-panel force-narrow id="paperDrawerPanel">
       <paper-header-panel drawer>
@@ -171,6 +181,8 @@
                 blocks="[[blocks]]"
                 presentations="[[presentations]]"
                 selectable="[[selectable]]"
+                user-data="[[userData]]"
+                user-schedule="[[userSchedule]]"
                 ></registration-page>
               <schedule-page
                 route="{{route}}"
@@ -182,6 +194,7 @@
                 presentations="[[presentations]]"
                 locations="[[locations]]"
                 schedule="[[schedule]]"
+                user-schedule="[[userSchedule]]"
                 admin-code="{{adminCode}}"
                 ></schedule-page>
               <viewers-page
@@ -193,6 +206,7 @@
                 blocks="[[blocks]]"
                 presentations="[[presentations]]"
                 locations="[[locations]]"
+                user-schedule="[[userSchedule]]"
                 name="viewers"
                 ></viewers-page>
               <presentations-page
@@ -242,6 +256,14 @@
         selectable: {
           type: Boolean,
           value: true
+        },
+        userData: {
+          type: Object,
+          observer: '_userDataChanged'
+        },
+        userSchedule: {
+          type: Array,
+          value: []
         }
       },
       observers: [
@@ -259,7 +281,12 @@
         'reload-presentations': '_reloadPresentations',
         'reload-viewers': '_reloadViewers',
         'reload-schedule': '_reloadSchedule',
-        'show-back-button': '_handleShowBackButton'
+        'show-back-button': '_handleShowBackButton',
+        'do-signup': '_log',
+        'signup-done': '_log'
+      },
+      _log: function(e) {
+        console.log(e);
       },
       ready: function(e) {
         console.log("path: " + this.routeData.page);
@@ -356,6 +383,35 @@
             }});
           }
         }
+      },
+      _doSignup: function(e) {
+        console.log(e);
+        this.userData = e.detail;
+        this.$.userDataSorage.save("stable");
+        // this.$.presentationsAjax.generateRequest();
+        // this.$.signupPage.signup();
+      },
+      _signupDone: function(e) {
+        // this.presentation = null;
+        // if(e.detail !== undefined) {
+        //   if(e.detail.closed)
+        //     this.$.closedToast.show();
+        //   else if(e.detail.error)
+        //     this.$.errorToast.show();
+        //   else
+        //     this.$.completedToast.show();
+        // }
+        this.userData = {};
+        //this.$.signupForm.reset();
+        this.$.userDataSorage.save("stable");
+      },
+      _userScheduleAjaxParams: function(userData) {
+        return this._params({
+          'viewer_id': userData.viewer_id
+        });
+      },
+      _userDataChanged: function(e) {
+        this.$.userScheduleAjax.generateRequest();
       }
     });
   </script>
