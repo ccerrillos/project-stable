@@ -336,9 +336,26 @@
         window.history.back();
       },
       _onError: function(e) {
-        this._handleToast({ detail: {
-          message: 'Failed to fetch data! Please reload!'
-        }});
+        // this._handleToast({ detail: {
+        //   message: 'Failed to fetch data! Please reload!'
+        // }});
+        console.log(e);
+        if(e.detail && e.detail.error) {
+          if(e.detail.error instanceof Error) {
+            this._handleToast({ detail: {
+              message: 'An error occurred. ' + e.detail.error.message
+            }});
+          } else if(e.detail.error instanceof ProgressEvent && e.detail.error.type === "error") {
+            //cors error, resubmit request
+            setTimeout(function() {
+              e.target.generateRequest();
+            }, 500);
+          } else {
+            this._handleToast({ detail: {
+              message: 'An unknown error occurred, reload at will.'
+            }});
+          }
+        }
       }
     });
   </script>
