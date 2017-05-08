@@ -61,6 +61,7 @@
       user-data="[[userData]]"
       hidden
       selectable="[[selectable]]"
+      user-schedule="{{userSchedule}}"
       ></signup-page>
 
     <paper-toast id="instructions" duration="0" style="padding: 8px;">
@@ -156,12 +157,17 @@
         },
         userSchedule: {
           type: Array,
-          observer: '_userScheduleChanged'
+          observer: '_userScheduleChanged',
+          notify: true
+        },
+        userScheduleStatus: {
+          type: Boolean,
+          value: false
         }
       },
       behaviors: [ StableBehavior ],
       observers: [
-        '_dataReady(dates, blocks, presentations, userData)'
+        '_dataReady(dates, blocks, presentations, userData, userScheduleStatus)'
       ],
       handleResponse: function(e) {
         console.log(e.detail.response);
@@ -177,8 +183,12 @@
         // this.$.presentationsAjax.generateRequest();
         // this.$.signupPage.signup();
       },
-      _dataReady: function(dates, blocks, presentations, userData) {
+      _dataReady: function(dates, blocks, presentations, userData, userScheduleStatus) {
         if(dates && blocks && presentations && userData && userData.viewer_id) {
+          if(this.selectable && !userScheduleStatus) {
+            console.warn("not ready!");
+            return;
+          }
           this.fire('dialog-postbegin-close');
           this.$.signupForm.hidden = true;
           this.$.signupPage.hidden = false;
@@ -252,8 +262,12 @@
           this.fire('show-back-button', false);
       },
       _userScheduleChanged: function(e) {
+        this.userScheduleStatus = true;
         console.log("_userScheduleChanged");
         console.log(e);
+      },
+      _or: function(a, b) {
+        return a || b;
       }
     });
   </script>
