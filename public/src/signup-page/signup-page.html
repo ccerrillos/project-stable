@@ -123,13 +123,6 @@ Example:
       on-response="_responseSelect"
       on-error="_errorSelect"
       ></iron-ajax>
-    <iron-ajax
-      id="scheduleAjax"
-      url="https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1/schedule"
-      params="[[_scheduleParams(userData.viewer_id)]]"
-      handle-as="json"
-      on-response="_handleSchedule"
-      ></iron-ajax>
 
     <paper-dialog id="infoDialog">
       <paper-icon-button icon="icons:close" dialog-dismiss class="close-btn"></paper-icon-button>
@@ -200,7 +193,11 @@ Example:
               <h3>[[_parseDate(date.date)]] - [[block.block_name]]</h3>
               <!-- <h3>All Presentations</h3> -->
               <!-- class$="[[_computeSorter(date.date, block.block_id)]]" -->
-                <template is="dom-repeat" items="[[_filterPresentations(date.date, block.block_id, presentations)]]" as="presentation">
+                <template
+                  is="dom-repeat"
+                  items="[[_filterPresentations(date.date, block.block_id, presentations)]]"
+                  as="presentation"
+                  on-dom-change="_rendered">
                 <!-- <template is="dom-repeat" items="[[presentationsArray]]" as="presentation"> -->
                   <div class="layout horizontal highlight">
                   <paper-checkbox
@@ -315,6 +312,11 @@ Example:
           type: Array,
           value: [],
           observer: '_log'
+        },
+        userSchedule: {
+          type: Array,
+          observer: '_userScheduleChanged',
+          notify: true
         }
       },
       behaviors: [ StableBehavior ],
@@ -324,7 +326,10 @@ Example:
       reset: function() {
         this.toSave = [];
         this.order = [];
-        this.$.scheduleAjax.generateRequest();
+        this._userScheduleChanged(this.userSchedule);
+      },
+      _rendered: function(e) {
+        this._userScheduleChanged(this.userSchedule);
       },
       _scheduleParams: function(viewer_id) {
         return {
@@ -501,6 +506,11 @@ Example:
         console.log(e);
         if(e.detail.response) {
           if(e.detail.response.status) {
+            if(e.detail.response.data) {
+              this.fire('new-registration-data', e.detail.response.data);
+              //tmp
+              this.userSchedule = e.detail.response.data;
+            }
             
             //load presentation data & go to preferences page
             //this.fire('do-signup', e.detail.response);
@@ -639,25 +649,27 @@ Example:
           this.registrationsInternal[date][block_id] = presentation_id;
         }
       },
-      _handleSchedule: function(e) {
-        console.log(e);
-        if(e && e.detail && e.detail.response) {
-          var arr = e.detail.response;
-          console.log(arr);
-          for(var k in arr) {
-            if(!arr.hasOwnProperty(k)) continue;
+      _userScheduleChanged: function(arr) {
+        console.log("SCHED CHNG");
+        console.log(arr);
+        this._setCheckBox(-1,-1,-1, false);
+        for(var k in arr) {
+          if(!arr.hasOwnProperty(k)) continue;
 
-            var data = arr[k];
-            this._changeSetInternal(data.date, data.block_id, data.presentation_id);
-            this._setCheckBox(data.date, data.block_id, data.presentation_id, true);
-          }
+          var data = arr[k];
+          this._changeSetInternal(data.date, data.block_id, data.presentation_id);
+          this._setCheckBox(data.date, data.block_id, data.presentation_id, true);
         }
       },
       _setCheckBox: function(date, block_id, presentation_id, checked)  {
-        var selector = "paper-checkbox[data-date='" + date + "'][data-block='" + block_id + "'][data-presentation-id='" + presentation_id + "']";
-        var checkbox = Polymer.dom(this.$.content).querySelector(selector);
-        if(checkbox) {
-          checkbox.checked = checked;
+        var selector = date == -1 || block_id == -1 || presentation_id == -1 ? ""
+                          : "[data-date='" + date + "'][data-block='" + block_id + "'][data-presentation-id='" + presentation_id + "']";
+        var checkboxes = Polymer.dom(this.$.content).querySelectorAll("paper-checkbox" + selector);
+
+        for(var k in checkboxes) {
+          if(!checkboxes.hasOwnProperty(k)) continue;
+
+          checkboxes[k].checked = checked;
         }
       },
       _disableCheckboxes: function(date, block_id, disabled) {
