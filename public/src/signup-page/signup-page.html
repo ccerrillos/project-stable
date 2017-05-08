@@ -215,12 +215,15 @@ Example:
                     class="flex"
                     data="[[presentation]]"
                     order="[[order]]"
+                    data-date$="[[date.date]]"
+                    data-block$="[[block.block_id]]"
                     data-id$="[[presentation.presentation_id]]"
                     on-move-up="_doMoveUp"
                     on-move-down="_doMoveDown"
                     on-show-info="_showInfo"
                     names
                     selectable
+                    full="[[_checkFull(full, date.date, block.block_id, presentation.presentation_id)]]"
                     >
                     </presentation-row>
                   </div>
@@ -317,6 +320,11 @@ Example:
           type: Array,
           observer: '_userScheduleChanged',
           notify: true
+        },
+        _full: {
+          type: Array,
+          value: [],
+          observer: '_checkFull'
         }
       },
       behaviors: [ StableBehavior ],
@@ -462,7 +470,6 @@ Example:
       _error: function(e) {
         console.log(e);
         this._enableConfirm();
-
         if(e.detail.error.message) {
           if(e.detail.error.message.indexOf("418") !== -1) {
             this.fire('signup-done', { closed: true });
@@ -510,6 +517,10 @@ Example:
               this.fire('new-registration-data', e.detail.response.data);
               //tmp
               this.userSchedule = e.detail.response.data;
+
+            }
+            if(e.detail.response.full) {
+              this._full = e.detail.response.full;
             }
             
             //load presentation data & go to preferences page
@@ -579,7 +590,18 @@ Example:
         }
         // this._enableConfirm();
 
-        if(e.detail.error.message) {
+        if(e.detail.request.response) {
+          var data = e.detail.request.response;
+
+          this.$.errorToast.text = "An error occurred. " + (data.Message ? data.Message : "");
+          if(data.data) {
+            this.userSchedule = data.data;
+          }
+          if(data.full) {
+            this._full = data.full;
+            console.log(data.full);
+          }
+        } else if(e.detail.error.message) {
           if(e.detail.error.message.indexOf("418") !== -1) {
             // this.fire('signup-done', { closed: true });
             // this.$.confirmDialog.close();
@@ -697,6 +719,19 @@ Example:
         this.fire('firetoast', { message: "Already Registered!"});
         this.$.regAjax.generateRequest();
         */
+      },
+      _checkFull: function(full) {
+        //var selector = "presentation-row[data-date='" + date + "'][data-block='" + block_id + "'][data-presentation-id='" + presentation_id + "']";
+        var rows = Polymer.dom(this.$.content).querySelectorAll("presentation-row");
+        for(var k in rows) {
+          if(!rows.hasOwnProperty(k)) continue;
+          var row = rows[k];
+
+          var f = full.findIndex(function(e) {
+            return (e.date == row.getAttribute('data-date') && e.block_id == row.getAttribute('data-block') && e.presentation_id == row.getAttribute('data-id'));
+          }) != -1;
+          rows[k].full = f;
+        }
       },
       _or: function(a, b) {
         return a || b;

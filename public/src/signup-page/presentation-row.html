@@ -79,7 +79,7 @@ Example:
         <paper-icon-button icon="icons:arrow-downward" disabled="[[last]]" on-tap="_moveDown"></paper-icon-button>
       </div>
       <div class="flex layout vertical">
-        <div class="noselect expand">[[data.topic]]</div>
+        <div class="noselect expand" id="topic">[[data.topic]]</div>
         <b class="noselect expand" hidden$="[[!names]]">[[data.first_name]] [[data.last_name]]</b>
         <div class="noselect" hidden$="[[!showDetails]]">[[_getAttrFromObj(data.location_id, 'location_name', locations)]]</div>
       </div>
@@ -172,12 +172,20 @@ Example:
         },
         locations: {
           type: Object
+        },
+        full: {
+          type: Boolean,
+          value: false,
+          observer: '_full'
         }
       },
       behaviors: [ StableBehavior ],
       observers: [
         '_computeFirstLast(order, data)'
       ],
+      _full: function(e) {
+        this.$.topic.style.color = e ? "red" : "black";
+      },
       _computeNumber: function (order, data) {
         var number = -1;
         if(order && order.length > 0) {
