@@ -107,6 +107,16 @@ Example:
       handle-as="json"
       on-response="_response"
       on-error="_error"></iron-ajax>
+    <iron-ajax
+      id="selectAjax"
+      url="https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1/register"
+      method="POST"
+      content-type="application/json"
+      handle-as="json"
+      on-request="_request"
+      on-response="_responseSelect"
+      on-error="_errorSelect"
+      ></iron-ajax>
 
     <paper-dialog id="infoDialog">
       <paper-icon-button icon="icons:close" dialog-dismiss class="close-btn"></paper-icon-button>
@@ -184,7 +194,6 @@ Example:
                     class="vcenter"
                     on-change="_change"
                     hidden$="[[!selectable]]"
-                    disabled="[[_pending]]"
                     ></paper-checkbox>
                     <!-- presentation.full, presentation.is_registered -->
                   <presentation-row
@@ -279,9 +288,21 @@ Example:
         _pending: {
           type: Boolean,
           value: false
+        },
+        _pendingBySession: {
+          type: Object,
+          value: {}
+        },
+        _requests: {
+          type: Array,
+          value: [],
+          observer: '_log'
         }
       },
       behaviors: [ StableBehavior ],
+      _log: function(e) {
+        console.log(e);
+      },
       reset: function() {
         this.toSave = [];
         this.order = [];
@@ -425,10 +446,120 @@ Example:
         }
         this.$.errorToast.show();
       },
+      _request: function(e) {
+        console.log(e);
+        this.push('_requests', e.detail);
+        console.log(this._requests);
+      },
+      _responseSelect: function(e) {
+        var requestData = this._requests.find(function(v) {
+          return v.request === e.detail.request;
+        });
+
+        var date, block_id;
+
+        if(requestData) {
+          var body = JSON.parse(requestData.options.body);
+          if(body.date && body.block_id) {
+            date = body.date;
+            block_id = body.block_id;
+          }
+
+          //Remove request data from the array
+          this.splice('_requests', this._requests.indexOf(requestData), 1);
+        }
+        if(date && block_id) {
+          this._disableCheckboxes(date, block_id, false);
+        } //else if ...
+
+        console.log(e);
+        if(e.detail.response) {
+          if(e.detail.response.status) {
+            
+            //load presentation data & go to preferences page
+            //this.fire('do-signup', e.detail.response);
+
+            // this.$.confirmDialog.close();
+            // this.fire('signup-done', { error: false });
+            
+          } else {
+            if(e.detail.response.code !== undefined) {
+              // this.fire('signup-done', { error: true });
+              // this.$.confirmDialog.close();
+            } else {
+              if(e.detail.response.details) {
+                this.$.errorToast.text = "An error occurred. " + e.detail.response.details;
+              } else {
+                this.$.errorToast.text = "An error occurred.";
+              }
+              this.$.errorToast.show();
+            }
+            
+            // this._enableConfirm();
+          }
+        }
+      },
+      _errorSelect: function(e) {
+        console.log(e);
+        console.log(e.detail.request);
+        console.log(e.detail.request.body);
+        var requestData = this._requests.find(function(v) {
+          return v.request === e.detail.request;
+        });
+
+        var date, block_id, presentation_id;
+
+        if(requestData) {
+          var body = JSON.parse(requestData.options.body);
+          if(body.date && body.block_id && body.presentation_id) {
+            date = body.date;
+            block_id = body.block_id;
+            presentation_id = body.presentation_id;
+            this._setCheckBox(date,block_id, presentation_id, false);
+          }
+
+          //Remove request data from the array
+          this.splice('_requests', this._requests.indexOf(requestData), 1);
+        }
+
+        if(e.detail.request) {
+          var response = e.detail.request.response;
+          if(date && block_id) {
+            this._disableCheckboxes(date, block_id, false);
+            console.log("eff!");
+          } else if(response &&
+            response.date &&
+            response.block_id) {
+            this._disableCheckboxes(response.date, response.block_id, false);
+          } else {
+            this._disableCheckboxes(-1, -1, false);
+          }
+          if(response && response.data) {
+            //update registration data
+          } else {
+
+            //unset checkbox
+          }
+        }
+        // this._enableConfirm();
+
+        if(e.detail.error.message) {
+          if(e.detail.error.message.indexOf("418") !== -1) {
+            // this.fire('signup-done', { closed: true });
+            // this.$.confirmDialog.close();
+            return;
+          }
+          this.$.errorToast.text = "An error occurred. " + e.detail.error.message;
+        } else {
+          this.$.errorToast.text = "An error occurred.";
+        }
+        this.$.errorToast.show();
+      },
       _change: function(e) {
         var date = e.model.get('date.date');
         var block_id = e.model.get('block.block_id');
         var presentation_id = e.model.get('presentation.presentation_id');
+        var handle = false;
         if(this.registrationsInternal) {
           if(!this.registrationsInternal[date]) {
             this.registrationsInternal[date] = {};
@@ -438,39 +569,60 @@ Example:
           }
 
           if(this.registrationsInternal[date][block_id] == -1) {
-            this.registrationsInternal[date][block_id] = presentation_id;
+            handle = true;
           } else {
             if(e.target.checked) {
-              this._des(date, block_id, this.registrationsInternal[date][block_id]);
+              this._setCheckBox(date, block_id, this.registrationsInternal[date][block_id], false);
               console.log("warn, already registered in this slot");
-              this.registrationsInternal[date][block_id] = presentation_id;
+              handle = true;
+              
             } else {
               this.registrationsInternal[date][block_id] = -1;
             }
             
           }
         }
+        if(handle) {
+          this.registrationsInternal[date][block_id] = presentation_id;
+          this.$.selectAjax.body = JSON.stringify({
+            'date': date,
+            'block_id': block_id,
+            'presentation_id': presentation_id
+          });
+          this.$.selectAjax.generateRequest();
+        }
 
 
         if(e.target.checked) {
           this._doRegisterReq(e.model.get('presentation.presentation_id'));
         }
-        this._disableCheckboxes();
+        this._disableCheckboxes(date, block_id, true);
       },
-      _des: function(date, block_id, presentation_id) {
+      _setCheckBox: function(date, block_id, presentation_id, checked)  {
         var ch = Polymer.dom(this.$.content).querySelectorAll("paper-checkbox");
         for(var k in ch) {
           if(!ch.hasOwnProperty(k)) continue;
 
           var cb = ch[k];
           if(cb.dataDate == date && cb.dataBlock == block_id && cb.dataPresentationId == presentation_id) {
-            cb.checked = false;
+            cb.checked = checked;
           }
         }
       },
-      _disableCheckboxes: function() {
-        this._pending = true;
-        setTimeout(function(){ this._pending = false; }.bind(this), 3000);
+      _disableCheckboxes: function(date, block_id, disabled) {
+        var checkboxes = Polymer.dom(this.$.content).querySelectorAll("paper-checkbox");
+
+        if(date && block_id) {
+          var all = date == -1 && block_id == -1;  
+          for(var k in checkboxes) {
+            if(!checkboxes.hasOwnProperty(k)) continue;
+
+            var cb = checkboxes[k];
+            if(all || (cb.dataDate == date && cb.dataBlock == block_id)) {
+              cb.disabled = disabled;
+            }
+          }
+        }
       },
       _doRegisterReq: function(presentation_id) {
         // this.$.ajax.body = JSON.stringify({ presentation_id: p_id, viewer_id:  this.regStatus.viewer_id });
