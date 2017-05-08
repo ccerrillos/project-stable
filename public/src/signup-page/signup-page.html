@@ -453,7 +453,7 @@ Example:
       },
       _responseSelect: function(e) {
         var requestData = this._requests.find(function(v) {
-          return v.request === e.detail.request;
+          return v.request.xhr === e.detail.xhr;
         });
 
         var date, block_id;
