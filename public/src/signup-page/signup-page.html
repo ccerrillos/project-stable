@@ -105,7 +105,6 @@ Example:
       method="POST"
       content-type="application/json"
       handle-as="json"
-      on-request="_request"
       on-response="_response"
       on-error="_error"></iron-ajax>
 
@@ -170,7 +169,7 @@ Example:
         <template is="dom-repeat" items="[[dates]]" as="date">
           <template is="dom-repeat" items="[[blocksArr]]" as="block">
             <paper-material elevation="1">
-              <h3>[[_parseDate(date.date)]] - [[block.block_name]] Block</h3>
+              <h3>[[_parseDate(date.date)]] - [[block.block_name]]</h3>
               <!-- <h3>All Presentations</h3> -->
               <!-- class$="[[_computeSorter(date.date, block.block_id)]]" -->
                 <template is="dom-repeat" items="[[_filterPresentations(date.date, block.block_id, presentations)]]" as="presentation">
