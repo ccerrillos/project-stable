@@ -7,6 +7,7 @@
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 
 <link rel="import" href="presentation-row.html">
 <link rel="import" href="../stable-app/stable-behavior.html">
@@ -98,6 +99,11 @@ Example:
       paper-radio-group {
         width: 100%;
       }
+      .spinner-center {
+        position: absolute;
+        left: 48%;
+        top: 48%;
+      }
     </style>
     <iron-ajax
       id="signupAjax"
@@ -116,6 +122,13 @@ Example:
       on-request="_request"
       on-response="_responseSelect"
       on-error="_errorSelect"
+      ></iron-ajax>
+    <iron-ajax
+      id="scheduleAjax"
+      url="https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1/schedule"
+      params="[[_scheduleParams(userData.viewer_id)]]"
+      handle-as="json"
+      on-response="_handleSchedule"
       ></iron-ajax>
 
     <paper-dialog id="infoDialog">
@@ -179,6 +192,11 @@ Example:
         <template is="dom-repeat" items="[[dates]]" as="date">
           <template is="dom-repeat" items="[[blocksArr]]" as="block">
             <paper-material elevation="1">
+              <paper-spinner
+              class="spinner-center"
+              data-date$="[[date.date]]"
+              data-block$="[[block.block_id]]"
+              hidden></paper-spinner>
               <h3>[[_parseDate(date.date)]] - [[block.block_name]]</h3>
               <!-- <h3>All Presentations</h3> -->
               <!-- class$="[[_computeSorter(date.date, block.block_id)]]" -->
@@ -187,9 +205,9 @@ Example:
                   <div class="layout horizontal highlight">
                   <paper-checkbox
                     name$="[[presentation.presentation_id]]"
-                    data-date="[[date.date]]"
-                    data-block="[[block.block_id]]"
-                    data-presentation-id="[[presentation.presentation_id]]"
+                    data-date$="[[date.date]]"
+                    data-block$="[[block.block_id]]"
+                    data-presentation-id$="[[presentation.presentation_id]]"
                     id="selector"
                     class="vcenter"
                     on-change="_change"
@@ -306,6 +324,12 @@ Example:
       reset: function() {
         this.toSave = [];
         this.order = [];
+        this.$.scheduleAjax.generateRequest();
+      },
+      _scheduleParams: function(viewer_id) {
+        return {
+          'viewer_id': viewer_id
+        };
       },
       _getPresentations: function(dateblock, presentations) {
         return presentations[dateblock.guid];
@@ -452,6 +476,7 @@ Example:
         console.log(this._requests);
       },
       _responseSelect: function(e) {
+
         var requestData = this._requests.find(function(v) {
           return v.request.xhr === e.detail.xhr;
         });
@@ -459,6 +484,7 @@ Example:
         var date, block_id;
 
         if(requestData) {
+          console.log(requestData);
           var body = JSON.parse(requestData.options.body);
           if(body.date && body.block_id) {
             date = body.date;
@@ -560,6 +586,40 @@ Example:
         var block_id = e.model.get('block.block_id');
         var presentation_id = e.model.get('presentation.presentation_id');
         var handle = false;
+        
+        if(e.target.checked) {
+          if(this._changeGetInternal(date, block_id) != -1) {
+            this._setCheckBox(date, block_id, this.registrationsInternal[date][block_id], false);
+            console.log("warn, already registered in this slot");
+          }
+          handle = true;
+        } else {
+          //this.registrationsInternal[date][block_id] = -1;
+          e.target.checked = true;
+          console.log("can't unregister!");
+        }
+
+        this._changeSetInternal(date, block_id, presentation_id);
+
+        if(handle) {
+          this.$.selectAjax.body = JSON.stringify({
+            'viewer_id': parseInt(this.userData.viewer_id),
+            'viewer_key': this.userData.viewer_key,
+            'date': date,
+            'block_id': block_id,
+            'presentation_id': presentation_id
+          });
+          this.$.selectAjax.generateRequest();
+          this._disableCheckboxes(date, block_id, true);
+        }
+
+
+        // if(e.target.checked) {
+        //   this._doRegisterReq(e.model.get('presentation.presentation_id'));
+        // }
+        
+      },
+      _changeGetInternal: function(date, block_id) {
         if(this.registrationsInternal) {
           if(!this.registrationsInternal[date]) {
             this.registrationsInternal[date] = {};
@@ -567,61 +627,55 @@ Example:
           if(!this.registrationsInternal[date][block_id]) {
             this.registrationsInternal[date][block_id] = -1;
           }
+          return this.registrationsInternal[date][block_id];
+        }
+      },
+      _changeSetInternal: function(date, block_id, presentation_id) {
+        if(this.registrationsInternal) {
+          if(!this.registrationsInternal[date]) {
+            this.registrationsInternal[date] = {};
+          }
 
-          if(this.registrationsInternal[date][block_id] == -1) {
-            handle = true;
-          } else {
-            if(e.target.checked) {
-              this._setCheckBox(date, block_id, this.registrationsInternal[date][block_id], false);
-              console.log("warn, already registered in this slot");
-              handle = true;
-              
-            } else {
-              this.registrationsInternal[date][block_id] = -1;
-            }
-            
+          this.registrationsInternal[date][block_id] = presentation_id;
+        }
+      },
+      _handleSchedule: function(e) {
+        console.log(e);
+        if(e && e.detail && e.detail.response) {
+          var arr = e.detail.response;
+          console.log(arr);
+          for(var k in arr) {
+            if(!arr.hasOwnProperty(k)) continue;
+
+            var data = arr[k];
+            this._changeSetInternal(data.date, data.block_id, data.presentation_id);
+            this._setCheckBox(data.date, data.block_id, data.presentation_id, true);
           }
         }
-        if(handle) {
-          this.registrationsInternal[date][block_id] = presentation_id;
-          this.$.selectAjax.body = JSON.stringify({
-            'date': date,
-            'block_id': block_id,
-            'presentation_id': presentation_id
-          });
-          this.$.selectAjax.generateRequest();
-        }
-
-
-        if(e.target.checked) {
-          this._doRegisterReq(e.model.get('presentation.presentation_id'));
-        }
-        this._disableCheckboxes(date, block_id, true);
       },
       _setCheckBox: function(date, block_id, presentation_id, checked)  {
-        var ch = Polymer.dom(this.$.content).querySelectorAll("paper-checkbox");
-        for(var k in ch) {
-          if(!ch.hasOwnProperty(k)) continue;
-
-          var cb = ch[k];
-          if(cb.dataDate == date && cb.dataBlock == block_id && cb.dataPresentationId == presentation_id) {
-            cb.checked = checked;
-          }
+        var selector = "paper-checkbox[data-date='" + date + "'][data-block='" + block_id + "'][data-presentation-id='" + presentation_id + "']";
+        var checkbox = Polymer.dom(this.$.content).querySelector(selector);
+        if(checkbox) {
+          checkbox.checked = checked;
         }
       },
       _disableCheckboxes: function(date, block_id, disabled) {
-        var checkboxes = Polymer.dom(this.$.content).querySelectorAll("paper-checkbox");
+        var selectorPartTwo = date == -1 && block_id == -1 ? "" : "[data-date='" + date + "'][data-block='" + block_id + "']";
+        var checkboxes = Polymer.dom(this.$.content).querySelectorAll("paper-checkbox" + selectorPartTwo);
+        var spinners = Polymer.dom(this.$.content).querySelectorAll("paper-spinner" + selectorPartTwo);
 
-        if(date && block_id) {
-          var all = date == -1 && block_id == -1;  
-          for(var k in checkboxes) {
-            if(!checkboxes.hasOwnProperty(k)) continue;
 
-            var cb = checkboxes[k];
-            if(all || (cb.dataDate == date && cb.dataBlock == block_id)) {
-              cb.disabled = disabled;
-            }
-          }
+        for(var k in checkboxes) {
+          if(!checkboxes.hasOwnProperty(k)) continue;
+
+          checkboxes[k].disabled = disabled;
+        }
+        for(var k in spinners) {
+          if(!spinners.hasOwnProperty(k)) continue;
+
+          spinners[k].hidden = !disabled;
+          spinners[k].active = disabled;
         }
       },
       _doRegisterReq: function(presentation_id) {
