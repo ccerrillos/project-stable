@@ -76,6 +76,10 @@ Example:
         z-index: 10000;
         background-color: var(--paper-green-500);
       }
+      paper-fab[disabled] {
+        background-color: var(--paper-grey-500);
+        color: white;
+      }
       paper-button[disabled] {
         background-color: var(--paper-grey-500);
         color: white;
@@ -122,6 +126,13 @@ Example:
       on-request="_request"
       on-response="_responseSelect"
       on-error="_errorSelect"
+      ></iron-ajax>
+    <iron-ajax
+      id="fullAjax"
+      url="https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1/full"
+      content-type="application/json"
+      handle-as="json"
+      on-response="_onFullData"
       ></iron-ajax>
 
     <paper-dialog id="infoDialog">
@@ -236,12 +247,16 @@ Example:
     </div>
 
     <paper-toast id="errorToast" text="An error occurred."></paper-toast>
-    <paper-fab icon="save" on-tap="_confirm"></paper-fab>
+    <paper-fab icon="save" on-tap="_confirm" disabled="[[_pending]]"></paper-fab>
   </template>
   <script>
     Polymer({
       is: 'signup-page',
       properties: {
+        active: {
+          type: Boolean,
+          value: false
+        },
         dates: {
           type: Array
         },
@@ -307,10 +322,6 @@ Example:
           type: Boolean,
           value: false
         },
-        _pendingBySession: {
-          type: Object,
-          value: {}
-        },
         _requests: {
           type: Array,
           value: [],
@@ -328,13 +339,35 @@ Example:
         }
       },
       behaviors: [ StableBehavior ],
+      observers: [
+        '_requestsChanged(_requests.splices)'
+      ],
       _log: function(e) {
         console.log(e);
+      },
+      _requestsChanged: function(e) {
+        this._pending = this._requests.length != 0;
+      },
+      ready: function() {
+        this.$.fullAjax.generateRequest();
+        setTimeout(this._fetchData.bind(this), 5000);
+      },
+      _fetchData: function() {
+        if(this.active && this.userData && this.userData.viewer_id) {
+          this.$.fullAjax.generateRequest();
+        }
+        setTimeout(this._fetchData.bind(this), 15000);
+      },
+      _onFullData: function(e) {
+        if(e.detail.response) {
+          this._full = e.detail.response;
+        }
       },
       reset: function() {
         this.toSave = [];
         this.order = [];
         this._userScheduleChanged(this.userSchedule);
+        this.$.fullAjax.generateRequest();
       },
       _rendered: function(e) {
         this._userScheduleChanged(this.userSchedule);
