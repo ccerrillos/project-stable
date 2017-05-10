@@ -137,7 +137,7 @@
       params="[[_userScheduleAjaxParams(userData)]]"
       handle-as="json"
       content-type="application/json"
-      on-error="_onError"
+      on-error=""
       on-response="_log"
       last-response="{{userSchedule}}"></iron-ajax>
     <stable-dialogs houses="[[houses]]" grades="[[grades]]"></stable-dialogs>
@@ -282,8 +282,8 @@
         'reload-viewers': '_reloadViewers',
         'reload-schedule': '_reloadSchedule',
         'show-back-button': '_handleShowBackButton',
-        'do-signup': '_log',
-        'signup-done': '_log'
+        'do-signup': '_doSignup',
+        'signup-done': '_signupDone'
       },
       _log: function(e) {
         console.log(e);
@@ -392,15 +392,6 @@
         // this.$.signupPage.signup();
       },
       _signupDone: function(e) {
-        // this.presentation = null;
-        // if(e.detail !== undefined) {
-        //   if(e.detail.closed)
-        //     this.$.closedToast.show();
-        //   else if(e.detail.error)
-        //     this.$.errorToast.show();
-        //   else
-        //     this.$.completedToast.show();
-        // }
         this.userData = {};
         //this.$.signupForm.reset();
         this.$.userDataSorage.save("stable");

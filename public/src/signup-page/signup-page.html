@@ -474,6 +474,7 @@ Example:
       },
       _response: function(e) {
         console.log(e);
+        this._enableConfirm();
         if(e.detail.response) {
           if(e.detail.response.status) {
             
@@ -484,9 +485,10 @@ Example:
             this.fire('signup-done', { error: false });
             
           } else {
-            if(e.detail.response.code !== undefined) {
+            if(e.detail.response.code !== undefined || e.detail.response.error !== undefined) {
               this.fire('signup-done', { error: true });
               this.$.confirmDialog.close();
+              return;
             } else {
               if(e.detail.response.details) {
                 this.$.errorToast.text = "An error occurred. " + e.detail.response.details;
@@ -495,8 +497,6 @@ Example:
               }
               this.$.errorToast.show();
             }
-            
-            this._enableConfirm();
           }
         }
       },
@@ -563,17 +563,18 @@ Example:
             // this.fire('signup-done', { error: false });
             
           } else {
-            if(e.detail.response.code !== undefined) {
-              // this.fire('signup-done', { error: true });
-              // this.$.confirmDialog.close();
-            } else {
-              if(e.detail.response.details) {
-                this.$.errorToast.text = "An error occurred. " + e.detail.response.details;
+            if(e.detail.response.error !== undefined) {
+              if(e.detail.response.error.code == 103) {
+                this.fire('signup-done', { error: true });
+                this.$.confirmDialog.close();
+                return;
               } else {
-                this.$.errorToast.text = "An error occurred.";
+                this.$.errorToast.text = "An error occurred. " + e.detail.response.error.message;
               }
-              this.$.errorToast.show();
+            } else {
+              this.$.errorToast.text = "An error occurred.";
             }
+            this.$.errorToast.show();
             
             // this._enableConfirm();
           }
