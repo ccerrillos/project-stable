@@ -4,7 +4,7 @@ module.exports = {
     'manifest.json',
     'bower_components/webcomponentsjs/webcomponents-lite.min.js',
   ],
-  navigateFallback: 'index.html',
+  navigateFallback: '',
   runtimeCaching: [
     {
       urlPattern: /^https:\/\/4n5e3ppiq7.execute-api.us-east-2.amazonaws.com\/v1\/.*cached.*/,
