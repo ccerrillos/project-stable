@@ -105,6 +105,7 @@
       on-response="ajaxResponse"
       last-response="{{locations}}"></iron-ajax>
     <iron-ajax
+      auto
       id="presentationsAjax"
       url="[[_computeAPI('/presentations')]]"
       params="[[_params('always')]]"
@@ -140,11 +141,11 @@
       on-error=""
       on-response="_log"
       last-response="{{userSchedule}}"></iron-ajax>
-    <stable-dialogs houses="[[houses]]" grades="[[grades]]"></stable-dialogs>
+    <stable-dialogs houses="[[houses]]" grades="[[grades]]" presentations="[[presentations]]" blocks="[[blocks]]"></stable-dialogs>
     <paper-drawer-panel force-narrow id="paperDrawerPanel">
       <paper-header-panel drawer>
         <paper-toolbar>
-          <div>iPoly Career Day</div>
+          <div>iPoly Capstone</div>
         </paper-toolbar>
         <div class="layout vertical side-bar-content">
           <paper-menu attr-for-selected="name" selected="{{routeData.page}}" on-tap="_closeDrawer">
@@ -167,7 +168,7 @@
         <paper-toolbar>
           <paper-icon-button id="backButton" icon="icons:arrow-back" on-tap="_goBack" hidden></paper-icon-button>
           <paper-icon-button id="menuButton" icon="icons:menu" paper-drawer-toggle></paper-icon-button>
-          <div>iPoly Career Day [[titleText]]</div>
+          <div>iPoly Capstone [[titleText]]</div>
         </paper-toolbar>
         <div class="container">
           <div class="content">

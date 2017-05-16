@@ -129,6 +129,7 @@ Example:
           data="[[presentation]]"
           data-id$="[[presentation.presentation_id]]"
           go-to-print
+          names
           hide-info
           ></presentation-row>
       </template>
@@ -315,22 +316,10 @@ Example:
         var presentation_id = e.detail.presentation_id;
         this.set('route.path', '/schedule/' + date + '/' + block_id + '/' + presentation_id);
       },
-      _onDetailsActiveChanged: function(e) {
-        if(e) {
-          this.fire('show-back-button', true);
-        } else {
-          this.presentationViewers = null;
-        }
-      },
       _onMainActiveChanged: function(e) {
         if(e) {
           this.fire('show-back-button', false);
         }
-      },
-      _onPresentationViewersChanged: function(e) {
-        if(e === undefined || e === null)
-          return false;
-        return true;
       },
       _viewerDetails: function(e) {
         var viewer_id = e.detail.viewer_id;

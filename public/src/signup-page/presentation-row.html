@@ -28,7 +28,6 @@ Example:
     <style include="iron-flex iron-flex-alignment app-grid-style">
       :host {
         display: block;
-        padding: 4px;
         --app-grid-columns: 3;
         --app-grid-item-height: 1em;
         --app-grid-expandible-item-columns: 2;
@@ -78,10 +77,10 @@ Example:
         <paper-icon-button icon="icons:arrow-upward" disabled="[[first]]" on-tap="_moveUp"></paper-icon-button>
         <paper-icon-button icon="icons:arrow-downward" disabled="[[last]]" on-tap="_moveDown"></paper-icon-button>
       </div>
-      <div class="flex layout vertical">
-        <div class="noselect expand" id="topic">[[data.topic]] <div style="display: inline-block;" hidden$="[[!full]]">- FULL</div></div>
-        <b class="noselect expand" hidden$="[[!names]]">[[data.first_name]] [[data.last_name]]</b>
-        <div class="noselect" hidden$="[[!showDetails]]">[[_getAttrFromObj(data.location_id, 'location_name', locations)]]</div>
+      <div class="flex layout horizontal">
+        <div class="noselect expand vcenter" id="topic">[[data.topic]] <div style="display: inline-block;" hidden$="[[!full]]">- FULL</div></div>
+        <b class="noselect expand vcenter" hidden$="[[!names]]">[[data.first_name]] [[data.last_name]]</b>
+        <div class="noselect vcenter" hidden$="[[!showDetails]]">[[_getAttrFromObj(data.location_id, 'location_name', locations)]]</div>
       </div>
       <!-- <div class="app-grid flex">
         <div class="vcenter noselect expand">[[data.topic]]</div>
@@ -177,6 +176,12 @@ Example:
           type: Boolean,
           value: false,
           observer: '_full'
+        },
+        date: {
+          type: Number
+        },
+        blockId: {
+          type: Number
         }
       },
       behaviors: [ StableBehavior ],

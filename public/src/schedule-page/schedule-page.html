@@ -110,7 +110,7 @@ Example:
     </style>
     <iron-ajax
       id="ajax"
-      url="https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1/presentations"
+      url="[[_computeAPI('/presentations')]]"
       method="POST"
       content-type="application/json"
       handle-as="json"
@@ -125,7 +125,7 @@ Example:
       content-type="application/json"
       handle-as="json"
       params="[[_params(detailsData)]]"
-      last-response="{{presentationViewers}}"
+      last-response="{{prePresentationViewers}}"
       ></iron-ajax>
 
     <app-route
@@ -231,6 +231,9 @@ Example:
               on-goto-presentation="_gotoPresentation"
               locations="[[locations]]"
               go-to-viewers
+              date="[[date.date]]"
+              block-id="[[block.block_id]]"
+              names
               viewer-count-data="[[countData]]"
               ></presentation-row>
           </template>
@@ -239,7 +242,7 @@ Example:
         </template>
         
       </template>
-      <paper-fab icon="icons:add" on-tap="_addPresentation"></paper-fab>
+      <!-- <paper-fab icon="icons:add" on-tap="_addPresentation"></paper-fab> -->
     </template>
     <template is="dom-if" if="[[detailsActiveAndLoaded]]">
       <paper-material elevation="1">
@@ -252,6 +255,11 @@ Example:
           <div class="layout horizontal" hidden$="[[viewersLoader]]">
             <div class="flex"></div>
             <paper-spinner active></paper-spinner>
+            <div class="flex"></div>
+          </div>
+          <div class="layout horizontal" hidden$="[[!_noViewers(presentationViewers)]]">
+            <div class="flex"></div>
+            <div>No Viewers.</div>
             <div class="flex"></div>
           </div>
           <template is="dom-repeat" items="[[_sortViewers(presentationViewers)]]" as="viewer">
@@ -342,9 +350,12 @@ Example:
           type: Object,
           computed: '_getObjByKey(presentations, detailsData.presentation_id)'
         },
+        prePresentationViewers: {
+          type: Object,
+        },
         presentationViewers: {
           type: Array,
-          value: null
+          computed: '_presentationViewers(prePresentationViewers)'
         },
         viewersLoader: {
           type: Boolean,
@@ -490,7 +501,7 @@ Example:
         if(e) {
           this.fire('show-back-button', true);
         } else {
-          this.presentationViewers = null;
+          this.presentationViewers = undefined;
         }
       },
       _onMainActiveChanged: function(e) {
@@ -508,8 +519,22 @@ Example:
 
         this.set('route.path', '/viewers/' + viewer_id);
       },
+      _noViewers: function(e) {
+        if(typeof(e) == 'Array') {
+          return e.length == 0;
+        }
+        return true;
+      },
+      _presentationViewers: function(e) {
+        if(Array.isArray(e))
+          return e;
+        return this._objToArray(e);
+      },
       _sortViewers: function(arr) {
-        if(arr)
+        console.warn('trace me');
+        console.log(arr);
+        console.log(Array.isArray(arr));
+        if(arr !== undefined && Array.isArray(arr))
           arr.sort(this._dynamicSortMultiple("last_name", "first_name"));
         return arr;
       }

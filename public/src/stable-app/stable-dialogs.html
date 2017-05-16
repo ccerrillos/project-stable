@@ -3,6 +3,8 @@
 <link rel="import" href="../../bower_components/ctech-dialogs/ctech-confirm-dialog.html">
 <link rel="import" href="../../bower_components/ctech-dialogs/ctech-ajax.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="stable-behavior.html">
 
 
@@ -27,6 +29,26 @@ Example:
     <style include="iron-flex iron-flex-alignment">
       :host {
         display: block;
+      }
+      th {
+        text-align: left;
+      }
+      td {
+        vertical-align: center;
+      }
+      tr.hover:hover {
+        background-color: #f0f0f0;
+      }
+      paper-checkbox {
+        margin-left: 0.5em;
+        margin-top: 0.25em;
+        margin-bottom: 0.25em;
+      }
+      #reservedSpot {
+        --ctech-dialog-content {
+          padding-left: 0;
+          padding-right: 0;
+        }
       }
     </style>
     <ctech-confirm-dialog id="confirmDialog" modal>
@@ -71,6 +93,34 @@ Example:
         <div class="flex"></div>
       </div>
     </paper-dialog>
+    <ctech-confirm-dialog id="reservedSpot" modal on-ctech-dialog-confirm="reservedSpotConfirm" on-ctech-dialog-dismiss="reservedSpotCancel" on-iron-overlay-closed="_log">
+      <h2 class="center">Select your presentation...</h2>
+      <paper-dialog-scrollable style="padding: 0;">
+      <table id="blockTemplate" style="margin-top: 1em;">
+        <tr>
+          <th></th>
+          <th>Block</th>
+          <th>First</th>
+          <th>Last</th>
+          <th>Topic</th>
+        </tr>
+        <template  is="dom-repeat" items="[[_objToArray(blocks)]]" as="b">
+        
+          <template is="dom-repeat" items="[[_filter(presentations, b)]]" as="p">
+            <tr class="hover">
+              <td><paper-checkbox on-change="_checked" data-id$="[[p.presentation_id]]"></paper-checkbox></td>
+              <td>[[p.block_id]]</td>
+              <td>[[p.first_name]]</td>
+              <td>[[p.last_name]]</td>
+              <td>[[p.topic]]</td>
+            </tr>
+          </template>
+          <div style="height: 2em;"></div>
+        </template>
+      </table>
+      
+      </paper-dialog-scrollable>
+    </ctech-confirm-dialog>
   </template>
   <script>
     Polymer({
@@ -84,6 +134,23 @@ Example:
         },
         houses: {
           type: Object
+        },
+        blocks: {
+          type: Object
+        },
+        presentations: {
+          type: Object
+        },
+        presentationsArray: {
+          type: Array,
+          computed: '_objToArray(presentations)'
+        },
+        presentationCallbacks: {
+          type: Object
+        },
+        selectedPresentation: {
+          type: Number,
+          value: -1
         }
       },
       listeners: {
@@ -109,11 +176,19 @@ Example:
         this.$.confirmDialog.close();
       },
       _parseSignupAjax: function(e) {
+        console.log(this._toJson({
+          first_name: e.firstname,
+          last_name: e.lastname,
+          grade: e.grade,
+          house: e.house,
+          reserved: e.reserved
+        }));
         return this._toJson({
           first_name: e.firstname,
           last_name: e.lastname,
           grade: e.grade,
-          house: e.house
+          house: e.house,
+          reserved: e.reserved
         });
       },
       postBeginOpen: function(e) {
@@ -122,14 +197,66 @@ Example:
       postBeginClose: function(e) {
         this.$.postBeginDialog.close();
       },
+      reservedSpotOpen: function(e) {
+        this.selectedPresentation = -1;
+        this._uncheckBoxes(-1);
+        this.presentationCallbacks = e.detail;
+        this.$.reservedSpot.open();
+      },
+      reservedSpotClose: function(e) {
+        this.$.reservedSpot.close();
+      },
+      reservedSpotCancel: function(e) {
+        console.log(e);
+        this.presentationCallbacks.callbacks.cancelCallback();
+      },
       _submit: function() {
+      },
+      _log: function(e) {
+        console.log(e);
+      },
+      _filter: function(presentations, block) {
+        var arr = [];
+        if(presentations && block) {
+          for(var k in presentations) {
+            if(!presentations.hasOwnProperty(k)) continue;
+
+            if(presentations[k].block_id == block.block_id)
+              arr.push(presentations[k]);
+
+          }
+        }
+        return arr;
+      },
+      reservedSpotConfirm: function(e) {
+        this.presentationCallbacks.callbacks.confirmCallback(this.selectedPresentation);
+      },
+      _checked: function(e) {
+        var id = e.model.get('p.presentation_id');
+        if(e.target.checked) {
+          if(this.selectedPresentation != id) {
+            e.target.disabled = true;
+            this._uncheckBoxes(id);
+          }
+          this.selectedPresentation = id;
+        }
+      },
+      _uncheckBoxes: function(id) {
+        var arr = Polymer.dom(this.$.blockTemplate).querySelectorAll('paper-checkbox');
+        for(var x = 0; x < arr.length; x++) {
+          if(arr[x].getAttribute('data-id') == id)
+            continue;
+          arr[x].checked = false;
+          arr[x].disabled = false;
+        }
       },
       ready: function() {
         document.addEventListener('dialog-signup-confirm-open', this.signupConfirmOpen.bind(this));
         document.addEventListener('dialog-signup-confirm-close', this.signupConfirmClose.bind(this));
         document.addEventListener('dialog-postbegin-open', this.postBeginOpen.bind(this));
         document.addEventListener('dialog-postbegin-close', this.postBeginClose.bind(this));
-
+        document.addEventListener('dialog-reservedspot-open', this.reservedSpotOpen.bind(this));
+        document.addEventListener('dialog-reservedspot-close', this.reservedSpotClose.bind(this));
       }
     });
   </script>

@@ -115,7 +115,7 @@ Example:
     </style>
     <iron-ajax
       id="signupAjax"
-      url="https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1/signup/finish"
+      url="[[_computeAPI('/signup/finish')]]"
       method="POST"
       content-type="application/json"
       handle-as="json"
@@ -123,7 +123,7 @@ Example:
       on-error="_error"></iron-ajax>
     <iron-ajax
       id="selectAjax"
-      url="https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1/register"
+      url="[[_computeAPI('/register')]]"
       method="POST"
       content-type="application/json"
       handle-as="json"
@@ -133,7 +133,7 @@ Example:
       ></iron-ajax>
     <iron-ajax
       id="fullAjax"
-      url="https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1/full"
+      url="[[_computeAPI('/full')]]"
       content-type="application/json"
       handle-as="json"
       on-response="_onFullData"
@@ -238,7 +238,7 @@ Example:
                     on-show-info="_showInfo"
                     names
                     selectable
-                    full="[[_checkFull(_full, date.date, block.block_id, presentation.presentation_id)]]"
+                    full="[[_checkFull(_full, userData.grade_id, date.date, block.block_id, presentation.presentation_id)]]"
                     >
                     </presentation-row>
                   </div>
@@ -337,9 +337,8 @@ Example:
           notify: true
         },
         _full: {
-          type: Array,
-          value: [],
-          observer: '_checkFull'
+          type: Object,
+          value: {}
         }
       },
       behaviors: [ StableBehavior ],
@@ -712,6 +711,8 @@ Example:
       _userScheduleChanged: function(arr) {
         console.log("SCHED CHNG");
         console.log(arr);
+        if(arr == undefined || arr == null)
+          return;
         this._setCheckBox(-1,-1,-1, false);
         for(var k in arr) {
           if(!arr.hasOwnProperty(k)) continue;
@@ -758,18 +759,32 @@ Example:
         this.$.regAjax.generateRequest();
         */
       },
-      _checkFull: function(full) {
+      _checkFull: function(full, g, d, b, id) {
+        if(full == null || full == undefined || full[g] == undefined || g == undefined || d == undefined || b == undefined || id == undefined)
+          return false;
+        // console.log(full);
+        // console.log(full[g]);
+        if(!Array.isArray(full[g]))
+          return false;
+        return full[g].findIndex(function(e) {
+          return (e.date == d && e.block_id == b && e.presentation_id == id);
+        }) != -1;
         //var selector = "presentation-row[data-date='" + date + "'][data-block='" + block_id + "'][data-presentation-id='" + presentation_id + "']";
-        var rows = Polymer.dom(this.$.content).querySelectorAll("presentation-row");
-        for(var k in rows) {
-          if(!rows.hasOwnProperty(k)) continue;
-          var row = rows[k];
-
-          var f = full.findIndex(function(e) {
-            return (e.date == row.getAttribute('data-date') && e.block_id == row.getAttribute('data-block') && e.presentation_id == row.getAttribute('data-id'));
-          }) != -1;
-          rows[k].full = f;
-        }
+        // var rows = Polymer.dom(this.$.content).querySelectorAll("presentation-row");
+        // for(var k in rows) {
+        //   if(!rows.hasOwnProperty(k)) continue;
+        //   var row = rows[k];
+        //   // console.log(full);
+        //   // console.log(userData);
+        //   // console.log(full[g]);
+        //   return full[g].findIndex(function(e) {
+        //     return (e.date == row.getAttribute('data-date') && e.block_id == row.getAttribute('data-block') && e.presentation_id == row.getAttribute('data-id'));
+        //   }) != -1;
+        //   // var f = full[g].findIndex(function(e) {
+        //   //   return (e.date == row.getAttribute('data-date') && e.block_id == row.getAttribute('data-block') && e.presentation_id == row.getAttribute('data-id'));
+        //   // }) != -1;
+        //   //rows[k].full = f;
+        // }
       },
       _or: function(a, b) {
         return a || b;

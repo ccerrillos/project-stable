@@ -11,6 +11,7 @@
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../stable-app/stable-behavior.html">
 
 <!--
 A comment describing this element
@@ -90,7 +91,7 @@ Example:
     </style>
     <iron-ajax
       id="signupAjax"
-      url="https://4n5e3ppiq7.execute-api.us-east-2.amazonaws.com/v1/signup"
+      url="[[_computeAPI('/signup')]]"
       method="POST"
       content-type="application/json"
       handle-as="json"
@@ -114,6 +115,8 @@ Example:
             <paper-radio-button data-id$="[[item.house_id]]">[[item.house_name]]</paper-radio-button>
           </template>
         </paper-radio-group>
+        <h4 hidden$="[[!isSenior]]">My Presentation</h4>
+        <div class="center" hidden$="[[!isSenior]]">[[_seniorInfo(senior, presentations)]]</div>
         <div class="layout horizontal" style="margin-top: 16px;">
           <div class="flex"></div>
           <paper-button id="submit" class="start" raised on-tap="_confirm">Start!</paper-button>
@@ -176,7 +179,8 @@ Example:
         },
         grade: {
           type: String,
-          value: '-1'
+          value: '-1',
+          observer: '_grade'
         },
         house: {
           type: String,
@@ -189,22 +193,31 @@ Example:
         _dataReady: {
           type: Boolean,
           value: false,
-          computed: '_computeDataReady(houses, grades)'
+          computed: '_computeDataReady(presentations, houses, grades)'
+        },
+        presentations: {
+          type: Object
+        },
+        isSenior: {
+          type: Boolean,
+          computed: '_isSenior(grade)'
+        },
+        senior: {
+          type: Number
         }
       },
       observers: [
         '_inputChanged(firstname, lastname, grade, house)'
       ],
-      _objToArray: function(obj) {
-        if(obj)
-          return Object.keys(obj).map(function (key) { return obj[key]; });
-        return [];
-      },
-      _getAttrFromObj: function(key, attr, obj) {
-        if(obj && obj[key] && obj[key][attr]) {
-          return obj[key][attr];
+      behaviors: [
+        StableBehavior
+      ],
+      _seniorInfo: function(id, p) {
+        if(id !== undefined && p) {
+          var t = p[id];
+          return t.first_name + " " + t.last_name + " - " + t.topic;
         }
-        return "error";
+        return "Error.";
       },
       _inputChanged: function(firstname, lastname, grade, house) {
         this.$.submit.disabled = firstname.length == 0 || lastname.length == 0 || grade == '-1' || house == '-1';
@@ -216,8 +229,8 @@ Example:
         if(lastname.length != 0 && this._toTitleCase(lastname) != lastname)
           this.lastname = this._toTitleCase(lastname);
       },
-      _computeDataReady: function(houses, grades) {
-        return houses && grades;
+      _computeDataReady: function(presentations, houses, grades) {
+        return presentations && houses && grades;
       },
       _reset: function() {
         this.firstname = '';
@@ -240,7 +253,8 @@ Example:
               firstname: this.firstname,
               lastname: this.lastname,
               grade: this.grade,
-              house: this.house
+              house: this.house,
+              reserved: this.senior
             }
           });
       },
@@ -310,6 +324,32 @@ Example:
         this.lastname = '';
         this.house = '-1';
         this.grade = '-1';
+      },
+      _reserveCancel: function(e) {
+        console.log("yOYOYOYOY");
+        console.log(this.grade);
+        this.grade = '-1';
+      },
+      _reserveConfirm: function(e) {
+        this.senior = e;
+      },
+      _grade: function(e) {
+        console.log(e);
+        if(e == 4) {
+          this.senior = undefined;
+          this.fire('dialog-reservedspot-open', {
+            callbacks: {
+              requestCallback: this._request.bind(this),
+              responseCallback: this._response.bind(this),
+              errorCallback: this._error.bind(this),
+              confirmCallback: this._reserveConfirm.bind(this),
+              cancelCallback: this._reserveCancel.bind(this)
+            }
+          });
+        }
+      },
+      _isSenior: function(e) {
+        return e == 4;
       }
     });
   </script>
