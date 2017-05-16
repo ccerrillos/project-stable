@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../stable-app/stable-behavior.html">
 <link rel="import" href="viewer-row.html">
 <link rel="import" href="../signup-page/presentation-row.html">
@@ -110,8 +111,6 @@ Example:
                     <presentation-row
                       class="flex"
                       data="[[_filterReg(date.date, block.block_id, schedule, presentations)]]"
-                      date="[[date.date]]"
-                      block-id="[[block.block_id]]"
                       locations="[[locations]]"
                       show-details
                       hide-info
@@ -194,6 +193,15 @@ Example:
         },
         schedule: {
           type: Array
+        },
+        dates: {
+          type: Array
+        },
+        blocks: {
+          type: Object
+        },
+        locations: {
+          type: Object
         }
       },
       behaviors: [ StableBehavior ],

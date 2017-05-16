@@ -8,6 +8,10 @@
 <link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
 <link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
 
 <link rel="import" href="presentation-row.html">
 <link rel="import" href="../stable-app/stable-behavior.html">
@@ -234,7 +238,7 @@ Example:
                     on-show-info="_showInfo"
                     names
                     selectable
-                    full="[[_checkFull(full, date.date, block.block_id, presentation.presentation_id)]]"
+                    full="[[_checkFull(_full, date.date, block.block_id, presentation.presentation_id)]]"
                     >
                     </presentation-row>
                   </div>

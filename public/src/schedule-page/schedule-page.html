@@ -5,6 +5,14 @@
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
 
 <link rel="import" href="../signup-page/presentation-row.html">
 <link rel="import" href="../stable-app/stable-behavior.html">
@@ -221,9 +229,6 @@ Example:
               data-id$="[[presentation.presentation_id]]"
               on-show-info="_showInfo"
               on-goto-presentation="_gotoPresentation"
-              grades="[[gradesArray]]"
-              date="[[date.date]]"
-              block-id="[[block.block_id]]"
               locations="[[locations]]"
               go-to-viewers
               viewer-count-data="[[countData]]"
@@ -277,6 +282,9 @@ Example:
         blocksArray: {
           type: Array,
           computed: '_objToArray(blocks)'
+        },
+        grades: {
+          type: Object
         },
         gradesArray: {
           type: Array,
@@ -348,6 +356,18 @@ Example:
         },
         locations: {
           type: Object
+        },
+        houses: {
+          type: Object
+        },
+        blocks: {
+          type: Object
+        },
+        presentations: {
+          type: Object
+        },
+        schedule: {
+          type: Array
         }
       },
       behaviors: [ StableBehavior ],

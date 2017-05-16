@@ -194,7 +194,6 @@
                 presentations="[[presentations]]"
                 locations="[[locations]]"
                 schedule="[[schedule]]"
-                user-schedule="[[userSchedule]]"
                 admin-code="{{adminCode}}"
                 ></schedule-page>
               <viewers-page
@@ -206,7 +205,6 @@
                 blocks="[[blocks]]"
                 presentations="[[presentations]]"
                 locations="[[locations]]"
-                user-schedule="[[userSchedule]]"
                 name="viewers"
                 ></viewers-page>
               <presentations-page
@@ -264,6 +262,18 @@
         userSchedule: {
           type: Array,
           value: []
+        },
+        grades: {
+          type: Object
+        },
+        houses: {
+          type: Object
+        },
+        schedule: {
+          type: Array
+        },
+        locations: {
+          type: Object
         }
       },
       observers: [
@@ -289,6 +299,7 @@
         console.log(e);
       },
       ready: function(e) {
+        console.log("1.0.0");
         console.log("path: " + this.routeData.page);
         console.log(this.routeData);
         if(this.routeData) {

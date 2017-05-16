@@ -5,6 +5,7 @@
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 
 <link rel="import" href="../signup-page/presentation-row.html">
 <link rel="import" href="../stable-app/stable-behavior.html">
@@ -156,6 +157,9 @@ Example:
         locationsArray: {
           type: Array,
           computed: '_objToArray(locations)'
+        },
+        presentations: {
+          type: Object
         },
         presentationsArray: {
           type: Array,

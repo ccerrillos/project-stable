@@ -79,13 +79,13 @@ Example:
         <paper-icon-button icon="icons:arrow-downward" disabled="[[last]]" on-tap="_moveDown"></paper-icon-button>
       </div>
       <div class="flex layout vertical">
-        <div class="noselect expand" id="topic">[[data.topic]] <div style="display: inline-block;" hidden="[[!full]]">- FULL</div></div>
+        <div class="noselect expand" id="topic">[[data.topic]] <div style="display: inline-block;" hidden$="[[!full]]">- FULL</div></div>
         <b class="noselect expand" hidden$="[[!names]]">[[data.first_name]] [[data.last_name]]</b>
         <div class="noselect" hidden$="[[!showDetails]]">[[_getAttrFromObj(data.location_id, 'location_name', locations)]]</div>
       </div>
       <!-- <div class="app-grid flex">
         <div class="vcenter noselect expand">[[data.topic]]</div>
-        <b class="vcenter noselect expand" hidden="[[!names]]">[[data.first_name]] [[data.last_name]]</b>
+        <b class="vcenter noselect expand" hidden$="[[!names]]">[[data.first_name]] [[data.last_name]]</b>
         <- <div class="vcenter noselect" hidden$="[[viewerCount]]"><b>|</b> [[data.first_name]] [[data.last_name]]</div> ->
         <- <div class="flex"></div> ->
         <- <div class="expand"></div> ->
