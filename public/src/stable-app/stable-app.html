@@ -139,7 +139,7 @@
       handle-as="json"
       content-type="application/json"
       on-error=""
-      on-response="_log"
+      on-response="userScheduleLoaded"
       last-response="{{userSchedule}}"></iron-ajax>
     <stable-dialogs houses="[[houses]]" grades="[[grades]]" presentations="[[presentations]]" blocks="[[blocks]]"></stable-dialogs>
     <paper-drawer-panel force-narrow id="paperDrawerPanel">
@@ -398,6 +398,8 @@
       },
       _doSignup: function(e) {
         console.log(e);
+        this.userSchedule = [];
+        this.fire('user-schedule-unloaded');
         this.userData = e.detail;
         this.$.userDataSorage.save("stable");
         // this.$.presentationsAjax.generateRequest();
@@ -407,6 +409,9 @@
         this.userData = {};
         //this.$.signupForm.reset();
         this.$.userDataSorage.save("stable");
+      },
+      userScheduleLoaded: function(e) {
+        this.fire('user-schedule-loaded');
       },
       _userScheduleAjaxParams: function(userData) {
         return this._params({
