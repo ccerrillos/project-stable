@@ -384,12 +384,18 @@
             this._handleToast({ detail: {
               message: 'An error occurred. ' + e.detail.error.message
             }});
+            setTimeout(function() {
+              e.target.generateRequest();
+            }, 500);
           } else if(e.detail.error instanceof ProgressEvent && e.detail.error.type === "error") {
             //cors error, resubmit request
             setTimeout(function() {
               e.target.generateRequest();
             }, 500);
           } else {
+            setTimeout(function() {
+              e.target.generateRequest();
+            }, 500);
             this._handleToast({ detail: {
               message: 'An unknown error occurred, reload at will.'
             }});
