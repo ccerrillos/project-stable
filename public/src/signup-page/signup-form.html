@@ -200,10 +200,14 @@ Example:
         },
         isSenior: {
           type: Boolean,
-          computed: '_isSenior(grade)'
+          computed: '_isSenior(grade, seniorPresentations)'
         },
         senior: {
           type: Number
+        },
+        seniorPresentations: {
+          type: Boolean,
+          value: false
         }
       },
       observers: [
@@ -335,7 +339,7 @@ Example:
       },
       _grade: function(e) {
         console.log(e);
-        if(e == 4) {
+        if(e == 4 && this.seniorPresentations) {
           this.senior = undefined;
           this.fire('dialog-reservedspot-open', {
             callbacks: {
@@ -348,8 +352,8 @@ Example:
           });
         }
       },
-      _isSenior: function(e) {
-        return e == 4;
+      _isSenior: function(a, b) {
+        return a == 4 && b;
       }
     });
   </script>
