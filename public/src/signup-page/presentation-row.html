@@ -82,6 +82,9 @@ Example:
         <b class="noselect expand vcenter" hidden$="[[!names]]">[[data.first_name]] [[data.last_name]]</b>
         <div class="noselect vcenter" hidden$="[[!showDetails]]">[[_getAttrFromObj(data.location_id, 'location_name', locations)]]</div>
       </div>
+      <div class="vcenter" hidden$="[[_checkCo(data.presentation_id)]]">
+        * Has a Corequisite
+      </div>
       <!-- <div class="app-grid flex">
         <div class="vcenter noselect expand">[[data.topic]]</div>
         <b class="vcenter noselect expand" hidden$="[[!names]]">[[data.first_name]] [[data.last_name]]</b>
@@ -217,6 +220,14 @@ Example:
         }
 
         return number;
+      },
+      _checkCo: function(e) {
+        if(e == undefined) {
+          return true;
+        }
+        if(e == 50 || e == 77 || e == 78 || e == 91)
+          return false;
+        return true;
       },
       _computeFirstLast: function(order, data) {
         this.first = parseInt(order[0]) === data.presentation_id;
