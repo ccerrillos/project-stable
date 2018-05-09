@@ -145,7 +145,7 @@
     <paper-drawer-panel force-narrow id="paperDrawerPanel">
       <paper-header-panel drawer>
         <paper-toolbar>
-          <div>iPoly Capstone</div>
+          <div>iPoly Career Day</div>
         </paper-toolbar>
         <div class="layout vertical side-bar-content">
           <paper-menu attr-for-selected="name" selected="{{routeData.page}}" on-tap="_closeDrawer">
@@ -168,7 +168,7 @@
         <paper-toolbar>
           <paper-icon-button id="backButton" icon="icons:arrow-back" on-tap="_goBack" hidden></paper-icon-button>
           <paper-icon-button id="menuButton" icon="icons:menu" paper-drawer-toggle></paper-icon-button>
-          <div>iPoly Capstone [[titleText]]</div>
+          <div>iPoly Career Day [[titleText]]</div>
         </paper-toolbar>
         <div class="container">
           <div class="content">
@@ -184,6 +184,7 @@
                 selectable="[[selectable]]"
                 user-data="[[userData]]"
                 user-schedule="{{userSchedule}}"
+                senior-presentations="[[seniorPresentations]]"
                 ></registration-page>
               <schedule-page
                 route="{{route}}"
@@ -254,7 +255,11 @@
         },
         selectable: {
           type: Boolean,
-          value: true
+          value: false
+        },
+        seniorPresentations: {
+          type: Boolean,
+          value: false
         },
         userData: {
           type: Object,
@@ -275,6 +280,10 @@
         },
         locations: {
           type: Object
+        },
+        defaultToRegister: {
+          type: Boolean,
+          value: false
         }
       },
       observers: [
@@ -306,7 +315,10 @@
         if(this.routeData) {
           if(this.routeData.page == undefined || this.routeData.page == '') {
             //this.set('route.path', '/registration');
-            window.location.href = '#/registration';
+            if(this.defaultToRegister)
+              window.location.href = '#/registration';
+            else
+              window.location.href = '#/viewers';
           }
         }
       },
@@ -420,12 +432,16 @@
         this.fire('user-schedule-loaded');
       },
       _userScheduleAjaxParams: function(userData) {
-        return this._params({
-          'viewer_id': userData.viewer_id
-        });
+        if(userData && userData.viewer_id !== undefined) {
+          return this._params({
+            'viewer_id': userData.viewer_id
+          });
+        }
+        return null;
       },
       _userDataChanged: function(e) {
-        this.$.userScheduleAjax.generateRequest();
+        if(this.userData && this.userData.viewer_id)
+          this.$.userScheduleAjax.generateRequest();
       }
     });
   </script>

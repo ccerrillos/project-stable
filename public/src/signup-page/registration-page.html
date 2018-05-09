@@ -52,6 +52,7 @@
       grades="[[grades]]"
       presentations="[[presentations]]"
       on-do-signup="_doSignup"
+      senior-presentations="[[seniorPresentations]]"
       ></signup-form>
     <signup-page
       id="signupPage"
@@ -164,6 +165,11 @@
         userScheduleStatus: {
           type: Boolean,
           value: false
+        },
+        seniorPresentations: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
         }
       },
       behaviors: [ StableBehavior ],
