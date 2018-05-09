@@ -159,7 +159,6 @@
         },
         userSchedule: {
           type: Array,
-          observer: '_userScheduleChanged',
           notify: true
         },
         userScheduleStatus: {
@@ -201,7 +200,8 @@
         }
       },
       ready: function(e) {
-        
+        document.addEventListener('user-schedule-loaded', this._userScheduleLoaded.bind(this));
+        document.addEventListener('user-schedule-unloaded', this._userScheduleUnloaded.bind(this));
       },
       _closeToastI: function(e) {
         this.selectable ? this.$.instructionsSelectable.hide() : this.$.instructions.hide();
@@ -263,10 +263,14 @@
         if(e)
           this.fire('show-back-button', false);
       },
-      _userScheduleChanged: function(e) {
+      _userScheduleLoaded: function(e) {
         this.userScheduleStatus = true;
-        console.log("_userScheduleChanged");
+        console.log("_userScheduleLoaded");
         console.log(e);
+      },
+      _userScheduleUnloaded: function(e) {
+        this.userScheduleStatus = false;
+        console.log("_userScheduleUnloaded");
       },
       _or: function(a, b) {
         return a || b;
