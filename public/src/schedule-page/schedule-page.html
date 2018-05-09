@@ -125,6 +125,7 @@ Example:
       content-type="application/json"
       handle-as="json"
       params="[[_params(detailsData)]]"
+      on-error="__error"
       last-response="{{prePresentationViewers}}"
       ></iron-ajax>
 
@@ -486,6 +487,11 @@ Example:
       },
       _error: function(e) {
         this._enableConfirm();
+      },
+      __error: function(e) {
+        setTimeout(function() {
+          e.target.generateRequest();
+        }, 500);
       },
       _response: function(e) {
         this._enableConfirm();
