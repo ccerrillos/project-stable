@@ -144,7 +144,7 @@ Example:
 
     <paper-dialog id="infoDialog">
       <div class="close-btn">
-        <paper-icon-button icon="icons:create" on-tap="_editPresentation"></paper-icon-button>
+        <!--<paper-icon-button icon="icons:create" on-tap="_editPresentation"></paper-icon-button>-->
         <paper-icon-button icon="icons:close" dialog-dismiss></paper-icon-button>
       </div>
       
@@ -520,7 +520,7 @@ Example:
         this.set('route.path', '/viewers/' + viewer_id);
       },
       _noViewers: function(e) {
-        if(typeof(e) == 'Array') {
+        if(e !== undefined && Array.isArray(e)) {
           return e.length == 0;
         }
         return true;
