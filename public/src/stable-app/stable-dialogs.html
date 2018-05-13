@@ -93,7 +93,7 @@ Example:
         <div class="flex"></div>
       </div>
     </paper-dialog>
-    <ctech-confirm-dialog id="reservedSpot" modal on-ctech-dialog-confirm="reservedSpotConfirm" on-ctech-dialog-dismiss="reservedSpotCancel" on-iron-overlay-closed="_log">
+    <ctech-confirm-dialog id="reservedSpot" modal on-ctech-dialog-confirm="reservedSpotConfirm" on-ctech-dialog-dismiss="reservedSpotCancel" on-iron-overlay-opened="_resize" on-iron-overlay-closed="_log">
       <h2 class="center">Select your presentation...</h2>
       <paper-dialog-scrollable style="padding: 0;">
       <table id="blockTemplate" style="margin-top: 1em;">
@@ -106,7 +106,7 @@ Example:
         </tr>
         <template  is="dom-repeat" items="[[_objToArray(blocks)]]" as="b">
         
-          <template is="dom-repeat" items="[[_filter(presentations, b)]]" as="p">
+          <template is="dom-repeat" items="[[_filter(presentations, schedule, b)]]" as="p">
             <tr class="hover">
               <td><paper-checkbox on-change="_checked" data-id$="[[p.presentation_id]]"></paper-checkbox></td>
               <td>[[p.block_id]]</td>
@@ -136,10 +136,16 @@ Example:
           type: Object
         },
         blocks: {
-          type: Object
+          type: Object,
+          observer: '_log'
         },
         presentations: {
-          type: Object
+          type: Object,
+          observer: '_log'
+        },
+        schedule: {
+          type: Object,
+          observer: '_log'
         },
         presentationsArray: {
           type: Array,
@@ -157,6 +163,9 @@ Example:
         'iron-ajax-request': '_onIronAjaxRequest',
         'iron-ajax-response': '_onIronAjaxResponse',
         'iron-ajax-error': '_onIronAjaxError'
+      },
+      _log: function(e) {
+        console.log(e);
       },
       behaviors: [ StableBehavior ],
       _onIronAjaxRequest: function(e) {
@@ -201,7 +210,9 @@ Example:
         this.selectedPresentation = -1;
         this._uncheckBoxes(-1);
         this.presentationCallbacks = e.detail;
-        this.$.reservedSpot.open();
+        this.async(function() {
+          this.$.reservedSpot.open();
+        });
       },
       reservedSpotClose: function(e) {
         this.$.reservedSpot.close();
@@ -215,17 +226,23 @@ Example:
       _log: function(e) {
         console.log(e);
       },
-      _filter: function(presentations, block) {
+      _resize: function() {
+        this.async(function() {
+          this.$.reservedSpot.notifyResize();
+        });
+      },
+      _filter: function(presentations, schedule, block) {
         var arr = [];
-        if(presentations && block) {
-          for(var k in presentations) {
-            if(!presentations.hasOwnProperty(k)) continue;
 
-            if(presentations[k].block_id == block.block_id)
-              arr.push(presentations[k]);
+        if(presentations && schedule && block) {
+          for(var k in schedule) {
+            if(!schedule.hasOwnProperty(k)) continue;
 
+            if(schedule[k].block_id == block.block_id)
+              arr.push(presentations[schedule[k].presentation_id]);
           }
         }
+
         return arr;
       },
       reservedSpotConfirm: function(e) {

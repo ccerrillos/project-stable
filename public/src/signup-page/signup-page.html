@@ -210,7 +210,7 @@ Example:
               <!-- class$="[[_computeSorter(date.date, block.block_id)]]" -->
                 <template
                   is="dom-repeat"
-                  items="[[_filterPresentations(date.date, block.block_id, presentations)]]"
+                  items="[[_filterPresentations(date.date, block.block_id, schedule, presentations)]]"
                   as="presentation"
                   on-dom-change="_rendered">
                 <!-- <template is="dom-repeat" items="[[presentationsArray]]" as="presentation"> -->
@@ -331,6 +331,9 @@ Example:
           value: [],
           observer: '_log'
         },
+        schedule: {
+          type: Array
+        },
         userSchedule: {
           type: Array,
           observer: '_userScheduleChanged',
@@ -383,16 +386,14 @@ Example:
       _getPresentations: function(dateblock, presentations) {
         return presentations[dateblock.guid];
       },
-      _filterPresentations: function(date, block, presentations) {
+      _filterPresentations: function(date, block, schedule, presentations) {
         var result = [];
+        for(var k in schedule) {
+          if(!schedule.hasOwnProperty(k)) continue;
 
-        for(var k in presentations) {
-          if(!presentations.hasOwnProperty(k)) continue;
-          
-          var thisPresentation = presentations[k];
-
-          if(thisPresentation.date === date && thisPresentation.block_id === block)
-            result.push(thisPresentation);
+          if(schedule[k].date === date && schedule[k].block_id === block) {
+            result.push(presentations[schedule[k].presentation_id]);
+          }
         }
 
         return result;

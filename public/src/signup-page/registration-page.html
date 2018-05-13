@@ -62,6 +62,7 @@
       on-signup-done="_signupDone"
       user-data="[[userData]]"
       hidden
+      schedule="[[schedule]]"
       selectable="[[selectable]]"
       user-schedule="{{userSchedule}}"
       active="[[active]]"
@@ -162,6 +163,9 @@
           type: Array,
           notify: true
         },
+        schedule: {
+          type: Array
+        },
         userScheduleStatus: {
           type: Boolean,
           value: false
@@ -174,7 +178,7 @@
       },
       behaviors: [ StableBehavior ],
       observers: [
-        '_dataReady(dates, blocks, presentations, userData, userScheduleStatus)'
+        '_dataReady(dates, blocks, presentations, schedule, userData, userScheduleStatus)'
       ],
       handleResponse: function(e) {
         console.log(e.detail.response);
@@ -190,8 +194,8 @@
         // this.$.presentationsAjax.generateRequest();
         // this.$.signupPage.signup();
       },
-      _dataReady: function(dates, blocks, presentations, userData, userScheduleStatus) {
-        if(dates && blocks && presentations && userData && userData.viewer_id) {
+      _dataReady: function(dates, blocks, presentations, schedule, userData, userScheduleStatus) {
+        if(dates && blocks && presentations && schedule && userData && userData.viewer_id) {
           if(this.selectable && !userScheduleStatus) {
             console.warn("not ready!");
             return;
@@ -266,8 +270,11 @@
         // }, 500);
       },
       _onActiveChanged: function(e) {
-        if(e)
+        if(e) {
           this.fire('show-back-button', false);
+
+          this.fire("reload-schedule");
+        }
       },
       _userScheduleLoaded: function(e) {
         this.userScheduleStatus = true;

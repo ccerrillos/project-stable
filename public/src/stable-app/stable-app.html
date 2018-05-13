@@ -141,7 +141,7 @@
       on-error=""
       on-response="userScheduleLoaded"
       last-response="{{userSchedule}}"></iron-ajax>
-    <stable-dialogs houses="[[houses]]" grades="[[grades]]" presentations="[[presentations]]" blocks="[[blocks]]"></stable-dialogs>
+    <stable-dialogs houses="[[houses]]" grades="[[grades]]" presentations="[[presentations]]" blocks="[[blocks]]" schedule="[[schedule]]"></stable-dialogs>
     <paper-drawer-panel force-narrow id="paperDrawerPanel">
       <paper-header-panel drawer>
         <paper-toolbar>
@@ -182,6 +182,7 @@
                 blocks="[[blocks]]"
                 presentations="[[presentations]]"
                 selectable="[[selectable]]"
+                schedule="[[schedule]]"
                 user-data="[[userData]]"
                 user-schedule="{{userSchedule}}"
                 senior-presentations="[[seniorPresentations]]"
@@ -255,11 +256,11 @@
         },
         selectable: {
           type: Boolean,
-          value: false
+          value: true
         },
         seniorPresentations: {
           type: Boolean,
-          value: false
+          value: true
         },
         userData: {
           type: Object,
@@ -438,6 +439,9 @@
           });
         }
         return null;
+      },
+      ajaxResponse: function(e) {
+        console.log(e);
       },
       _userDataChanged: function(e) {
         if(this.userData && this.userData.viewer_id)
