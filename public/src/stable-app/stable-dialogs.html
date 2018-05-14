@@ -238,7 +238,7 @@ Example:
           for(var k in schedule) {
             if(!schedule.hasOwnProperty(k)) continue;
 
-            if(schedule[k].block_id == block.block_id)
+            if(schedule[k].block_id == block.block_id && schedule[k].presentation_id < 142)
               arr.push(presentations[schedule[k].presentation_id]);
           }
         }

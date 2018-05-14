@@ -418,7 +418,8 @@ Example:
 
         for(var x = 0; x < schedule.length; x++) {
           if(date == schedule[x].date && block == schedule[x].block_id) {
-            result.push(presentations[schedule[x].presentation_id]);
+            if(schedule[x].presentation_id < 142)
+              result.push(presentations[schedule[x].presentation_id]);
           }
         }
 

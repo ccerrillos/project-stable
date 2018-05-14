@@ -226,8 +226,18 @@ Example:
         console.log(e);
       },
       _objToArray: function(obj) {
-        if(obj)
-          return Object.keys(obj).map(function (key) { return obj[key]; });
+        
+        if(obj) {
+          var arr = Object.keys(obj).map(function (key) { return obj[key]; });
+          
+          for(var x = 0; x < 19; x++)
+            arr.pop();
+
+
+          return arr;
+        }
+
+        return undefined;
       },
       _activeChanged: function(e) {
         if(e) {
