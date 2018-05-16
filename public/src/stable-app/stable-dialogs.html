@@ -136,16 +136,13 @@ Example:
           type: Object
         },
         blocks: {
-          type: Object,
-          observer: '_log'
+          type: Object
         },
         presentations: {
-          type: Object,
-          observer: '_log'
+          type: Object
         },
         schedule: {
-          type: Object,
-          observer: '_log'
+          type: Object
         },
         presentationsArray: {
           type: Array,
@@ -190,14 +187,16 @@ Example:
           last_name: e.lastname,
           grade: e.grade,
           house: e.house,
-          reserved: e.reserved
+          reserved: e.reserved,
+          version: '1.0'
         }));
         return this._toJson({
           first_name: e.firstname,
           last_name: e.lastname,
           grade: e.grade,
           house: e.house,
-          reserved: e.reserved
+          reserved: e.reserved,
+          version: '1.0'
         });
       },
       postBeginOpen: function(e) {
