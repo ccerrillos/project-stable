@@ -203,7 +203,8 @@ Example:
           computed: '_isSenior(grade, seniorPresentations)'
         },
         senior: {
-          type: Number
+          type: Number,
+          notify: true
         },
         seniorPresentations: {
           type: Boolean,
@@ -258,7 +259,7 @@ Example:
               lastname: this.lastname,
               grade: this.grade,
               house: this.house,
-              reserved: this.senior
+              reserved: this.senior !== undefined ? this.senior : -1
             }
           });
       },

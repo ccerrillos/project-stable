@@ -112,6 +112,11 @@ Example:
         left: 48%;
         top: 48%;
       }
+      .locked {
+        color:red;
+        -webkit-text-stroke-width: 1px;
+        -webkit-text-stroke-color: white;
+      }
     </style>
     <iron-ajax
       id="signupAjax"
@@ -205,6 +210,9 @@ Example:
               data-date$="[[date.date]]"
               data-block$="[[block.block_id]]"
               hidden></paper-spinner>
+              <h2 class="spinner-center locked"
+              data-date$="[[date.date]]"
+              data-block$="[[block.block_id]]" hidden>Locked!</h2>
               <h3>[[_parseDate(date.date)]] - [[block.block_name]]</h3>
               <!-- <h3>All Presentations</h3> -->
               <!-- class$="[[_computeSorter(date.date, block.block_id)]]" -->
@@ -287,7 +295,8 @@ Example:
           value: {}
         },
         userData: {
-          type: Object
+          type: Object,
+          observer: '_resetLocked'
         },
         order: {
           type: Array
@@ -361,6 +370,8 @@ Example:
       _fetchData: function() {
         if(this.active && this.userData && this.userData.viewer_id) {
           this.$.fullAjax.generateRequest();
+
+          this._disabledReservedSpots(this.schedule, this.userData);
         }
         setTimeout(this._fetchData.bind(this), 15000);
       },
@@ -377,6 +388,8 @@ Example:
       },
       _rendered: function(e) {
         this._userScheduleChanged(this.userSchedule);
+
+        this._disabledReservedSpots(this.schedule, this.userData);
       },
       _scheduleParams: function(viewer_id) {
         return {
@@ -745,11 +758,57 @@ Example:
 
           checkboxes[k].disabled = disabled;
         }
+
         for(var k in spinners) {
           if(!spinners.hasOwnProperty(k)) continue;
 
           spinners[k].hidden = !disabled;
           spinners[k].active = disabled;
+        }
+
+        if(date == -1 && block_id == -1) {
+          this._disabledReservedSpots(this.schedule, this.userData);
+        }
+      },
+      _disabledReservedSpots: function(schedule, userData) {
+        if(!schedule || !userData)
+          return;
+
+        console.log(userData.reserved);
+        if(userData.reserved != -1 && userData.grade_id == 4) {
+            var user_schedule = schedule.filter(function(obj) {
+              return obj.presentation_id == userData.reserved;
+            });
+            console.log(user_schedule);
+            if(user_schedule.length == 1) {
+              console.log(user_schedule);
+              this._lockPres(user_schedule[0].date, user_schedule[0].block_id, true);
+              if(user_schedule[0].block_id != 1 && user_schedule[0].block_id != 6) {
+                this._lockPres(user_schedule[0].date, user_schedule[0].block_id - 1, true);
+              }
+            }
+          }
+      },
+      _resetLocked: function(e) {
+        this._lockPres(-1, -1, false);
+      },
+      _lockPres: function(date, block_id, disabled) {
+        var selectorPartTwo = date == -1 && block_id == -1 ? "" : "[data-date='" + date + "'][data-block='" + block_id + "']";
+        var checkboxes = Polymer.dom(this.$.content).querySelectorAll("paper-checkbox" + selectorPartTwo);
+        var locked = Polymer.dom(this.$.content).querySelectorAll("h2" + selectorPartTwo);
+
+
+        for(var k in checkboxes) {
+          if(!checkboxes.hasOwnProperty(k)) continue;
+
+          checkboxes[k].disabled = disabled;
+        }
+        
+        for(var k in locked) {
+          if(!locked.hasOwnProperty(k)) continue;
+
+          locked[k].hidden = !disabled;
+          locked[k].active = disabled;
         }
       },
       _doRegisterReq: function(presentation_id) {
