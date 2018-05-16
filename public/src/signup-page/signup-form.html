@@ -13,6 +13,8 @@
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../stable-app/stable-behavior.html">
 
+<link rel="import" href="../../bower_components/gold-email-input/gold-email-input.html">
+
 <!--
 A comment describing this element
 
@@ -73,7 +75,7 @@ Example:
       }
       #placeholder {
         width: 288px;
-        height: 305px;
+        height: 813px;
       }
       .center {
         margin-left: auto;
@@ -89,20 +91,17 @@ Example:
         z-index: 10001;
       }
     </style>
-    <iron-ajax
-      id="signupAjax"
-      url="[[_computeAPI('/signup')]]"
-      method="POST"
-      content-type="application/json"
-      handle-as="json"
-      on-request="_request"
-      on-response="_response"
-      on-error="_error"></iron-ajax>
     <paper-material elevation="1">
       <div class="layout vertical" id="mainForm" hidden$="[[!_dataReady]]">
         <!-- <h4>Signup!</h4> -->
-        <paper-input label="First Name" value="{{firstname::input}}"></paper-input>
-        <paper-input label="Last Name" value="{{lastname::input}}"></paper-input>
+        <paper-input id="fn" label="First Name" value="{{firstname::input}}"></paper-input>
+        <paper-input id="ln" label="Last Name" value="{{lastname::input}}"></paper-input>
+        <gold-email-input id="email" label="Email" type="email" value="{{email::input}}"
+        auto-validate></gold-email-input>
+        
+        <paper-input id="password" label="Password" type="password" value="{{password::input}}"></paper-input>
+        <paper-input id="passwordConfirm" label="Confirm Password" type="password" value="{{passwordConfirm::input}}"></paper-input>
+        
         <h4>Grade</h4>
         <paper-radio-group attr-for-selected="data-id" selected="{{grade}}" class="grades">
           <template is="dom-repeat" items="[[_objToArray(grades)]]">
@@ -122,6 +121,17 @@ Example:
           <paper-button id="submit" class="start" raised on-tap="_confirm">Start!</paper-button>
           <paper-button id="reset" class="reset" raised on-tap="_reset">Reset</paper-button>
         </div>
+
+        <!-- Login -->
+        <br>
+        <br>
+        <h3 class="center">Change / Resume</h3>
+        <paper-input id="emailLogin" label="Email" type="email" value="{{emailLogin::input}}"></paper-input>
+        <paper-input id="passwordLogin" label="Password" type="password" value="{{passwordLogin::input}}"></paper-input>
+        <div class="layout horizontal" style="margin-top: 16px;">
+            <div class="flex"></div>
+            <paper-button id="login" class="start" raised on-tap="_confirmLogin">Resume!</paper-button>
+          </div>
       </div>
       <div class="layout vertical" id="placeholder" hidden$="[[_dataReady]]">
         <div class="flex"></div>
@@ -139,25 +149,6 @@ Example:
       </div>
       
     </paper-material>
-    <paper-dialog id="confirmDialog">
-      <div class="layout vertical">
-        <h2>Confirm</h2>
-        <p>Are you sure this information is correct?</p>
-        <div>First Name: <b>[[firstname]]</b></div>
-        <div>Last Name: <b>[[lastname]]</b></div>
-        <div>Grade: <b>[[_getAttrFromObj(grade, 'grade_name', grades)]]</b></div>
-        <div>House: <b>[[_getAttrFromObj(house, 'house_name', houses)]]</b></div>
-        <div class="layout horizontal" style="margin-top: 16px;">
-          <div class="flex"></div>
-          <paper-button id="confirmButton" raised class="start" on-tap="_submit">
-            <paper-spinner id="spinner" active hidden></paper-spinner>
-            <div id="confirmText">Confirm</div>
-          </paper-button>
-          <paper-button id="cancelButton" raised on-tap="_cancel" class="reset">Cancel</paper-button>
-        </div>
-      </div>
-      
-    </paper-dialog>
   </template>
   <script>
     Polymer({
@@ -174,6 +165,18 @@ Example:
           value: ''
         },
         lastname: {
+          type: String,
+          value: ''
+        },
+        email: {
+          type: String,
+          value: ''
+        },
+        password: {
+          type: String,
+          value: ''
+        },
+        passwordConfirm: {
           type: String,
           value: ''
         },
@@ -209,10 +212,19 @@ Example:
         seniorPresentations: {
           type: Boolean,
           value: false
+        },
+        emailLogin: {
+          type: String,
+          value: ''
+        },
+        passwordLogin: {
+          type: String,
+          value: ''
         }
       },
       observers: [
-        '_inputChanged(firstname, lastname, grade, house)'
+        '_inputChanged(firstname, lastname, grade, house, email, password, passwordConfirm)',
+        '_inputChangedLogin(emailLogin, passwordLogin)'
       ],
       behaviors: [
         StableBehavior
@@ -224,9 +236,27 @@ Example:
         }
         return "Error.";
       },
-      _inputChanged: function(firstname, lastname, grade, house) {
-        this.$.submit.disabled = firstname.length == 0 || lastname.length == 0 || grade == '-1' || house == '-1';
-        this.$.reset.disabled = firstname.length == 0 && lastname.length == 0 && grade == '-1' && house == '-1';
+      _inputChangedLogin: function(emailLogin, passwordLogin) {
+        this.$.login.disabled = emailLogin.length == 0 || passwordLogin.length == 0;
+
+      },
+      _inputChanged: function(firstname, lastname, grade, house, email, password, passwordConfirm) {
+        this.$.submit.disabled = firstname.length == 0 || lastname.length == 0 || grade == '-1' || house == '-1' || email.length == 0
+        || password.length == 0 || passwordConfirm.length == 0;
+        this.$.reset.disabled = firstname.length == 0 && lastname.length == 0 && grade == '-1' && house == '-1' && email.length == 0
+        && password.length == 0 && passwordConfirm.length == 0;
+
+        if(this.$.email.invalid)
+          this.$.submit.disabled = true;
+
+        if(password != passwordConfirm) {
+          this.$.submit.disabled = true;
+          this.$.password.invalid = true;
+          this.$.passwordConfirm.invalid = true;
+        } else {
+          this.$.password.invalid = false;
+          this.$.passwordConfirm.invalid = false;
+        }
 
         if(firstname.length != 0 && this._toTitleCase(firstname) != firstname)
           this.firstname = this._toTitleCase(firstname);
@@ -242,6 +272,13 @@ Example:
         this.lastname = '';
         this.grade = '-1';
         this.house = '-1';
+        this.email = '';
+        this.password = '';
+        this.passwordConfirm = '';
+        this.senior = undefined;
+
+        this.emailLogin = '';
+        this.passwordLogin = '';
       },
       _toTitleCase: function(str) {
         return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
@@ -259,36 +296,38 @@ Example:
               lastname: this.lastname,
               grade: this.grade,
               house: this.house,
-              reserved: this.senior !== undefined ? this.senior : -1
+              reserved: this.senior !== undefined ? this.senior : -1,
+              email: this.email,
+              password: this.password,
+              resume: false
             }
           });
       },
-      _submit: function() {
-        this._disableConfirm();
-        this.$.signupAjax.body = JSON.stringify({
-          'first_name': this.firstname,
-          'last_name': this.lastname,
-          'grade': this.grade,
-          'house': this.house
-        });
-        this._ajaxRequest = this.$.signupAjax.generateRequest();
+      _confirmLogin: function() {
+        this.fire('dialog-signup-confirm-open',
+          {
+            callbacks: {
+              requestCallback: this._request.bind(this),
+              responseCallback: this._response.bind(this),
+              errorCallback: this._error.bind(this),
+            },
+            data: {
+              firstname: this.emailLogin,
+              lastname: '***',
+              grade: 0,
+              house: 0,
+              reserved: -1,
+              email: this.emailLogin,
+              password: this.passwordLogin,
+              resume: true
+            }
+          });
       },
       _log: function(e) {
         console.log(e);
       },
       _request: function(e) {
         console.log(e);
-      },
-      _disableConfirm: function() {
-        this.$.confirmButton.disabled = true;
-        this.$.confirmText.hidden = true;
-        this.$.spinner.hidden = false;
-      },
-      _enableConfirm: function() {
-        this.$.confirmButton.disabled = false;
-        this.$.confirmText.hidden = false;
-        this.$.spinner.hidden = true;
-        this._ajaxRequest = null;
       },
       _response: function(e) {
         console.log(e);
@@ -310,7 +349,7 @@ Example:
       },
       _error: function(e) {
         console.log(e);
-
+        this.passwordLogin = '';
         if(e.detail.error.message) {
           if(e.detail.error.message.indexOf("418") !== -1) {
             this.fire('firetoast', { message: "Signups are closed!" });
@@ -332,12 +371,6 @@ Example:
       ready: function() {
         
       },
-      reset: function() {
-        this.firstname = '';
-        this.lastname = '';
-        this.house = '-1';
-        this.grade = '-1';
-      },
       _reserveCancel: function(e) {
         console.log("yOYOYOYOY");
         console.log(this.grade);
@@ -348,6 +381,7 @@ Example:
       },
       _grade: function(e) {
         console.log(e);
+        this.senior = undefined;
         if(e == 4 && this.seniorPresentations) {
           this.senior = undefined;
           this.fire('dialog-reservedspot-open', {
