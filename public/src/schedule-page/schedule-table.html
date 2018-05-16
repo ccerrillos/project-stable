@@ -1,0 +1,273 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-fab/paper-fab.html">
+
+<link rel="import" href="../signup-page/presentation-row.html">
+<link rel="import" href="../stable-app/stable-behavior.html">
+<link rel="import" href="../viewers-page/viewer-row.html">
+<!--
+A comment describing this element
+
+Example:
+
+    <my-elem></my-elem>
+
+Example:
+
+    <my-elem>
+      <h2>Hello my-elem</h2>
+    </my-elem>
+
+@demo demo/index.html
+-->
+
+<dom-module id="schedule-table">
+  <template>
+    <style include="iron-flex iron-flex-alignment">
+      :host {
+        display: block;
+        padding-bottom: 48px;
+      }
+      paper-material {
+        background-color: white;
+        padding: 8px;
+        margin-bottom: 16px;
+      }
+      h3 {
+        margin: 0px;
+      }
+      presentation-row:hover {
+        background-color: #e6e6e6;
+      }
+      div.page-load {
+
+      }
+      .page-load {
+        position: fixed;
+        left: 50vw;
+        top: 50vh;
+        z-index: 5000;
+      }
+      paper-dialog {
+        padding: 16px;
+        max-width: 400px;
+        background-color: white;
+        z-index: 10000;
+      }
+      .center {
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .close-btn {
+        position: absolute;
+        right: 4px;
+        top: 4px;
+        margin: 0;
+        padding: 0;
+        z-index: 10001;
+      }
+      .save {
+        background-color: var(--paper-blue-500);
+        color: white;
+      }
+      .cancel {
+        background-color: var(--paper-red-500);
+        color: white;
+      }
+      paper-button[disabled] {
+        background-color: var(--paper-grey-500);
+        color: white;
+      }
+      paper-fab {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 10000;
+        background-color: var(--paper-green-500);
+      }
+      p {
+        margin-top: 0;
+        margin-bottom: 0.5em;
+      }
+      .viewers {
+        min-height: 64px;
+      }
+      viewer-row:hover {
+        background-color: #e6e6e6;
+      }
+      .content {
+        position: absolute;
+        left: 24px;
+        right: 24px;
+      }
+      #table {
+        overflow-x: auto;
+      }
+      tr:nth-child(even) {
+        background-color: #f0f0f0;
+      }
+    </style>
+    
+    <paper-material class="content" elevation="1">
+      <table id="table">
+        <tr>
+          <th>Location</th>
+          <template is="dom-repeat" items="[[dates]]" as="date">
+              <template is="dom-repeat" items="[[blocksArray]]" as="block">
+                <th>[[block.block_id]]</th>
+              </template>
+          </template>
+          
+          
+        </tr>
+        
+        <template is="dom-repeat" items="[[_sortLocations(locationsArray)]]" as="location">
+          <tr>
+            <td>[[location.location_name]]</td>
+            
+            <template is="dom-repeat" items="[[dates]]" as="date">
+                <template is="dom-repeat" items="[[blocksArray]]" as="block">
+                  <td>
+                    [[_getPresentations(date,block,location,presentations, schedule, 'false')]]
+                    <!-- <br> -->
+                    <!-- <paper-icon-button icon="icons:event-seat" on-tap="_gotoPresentation" data-id$="[[_getPresentations(date,block,location,presentations, schedule, 'true')]]"></paper-icon-button> -->
+                    
+                  </td>
+                </template>
+            </template>            
+          </tr>
+        </template>
+        
+      </table>
+    </paper-material>
+    
+  </template>
+
+  <script>
+    Polymer({
+      is: 'schedule-table',
+      properties: {
+        dates: {
+          type: Array
+        },
+        locations: {
+          type: Object
+        },
+        houses: {
+          type: Object
+        },
+        blocks: {
+          type: Object
+        },
+        blocksArray: {
+          type: Array,
+          computed: '_objToArray(blocks)'
+        },
+        locationsArray: {
+          type: Array,
+          computed: '_objToArray(locations)'
+        },
+        presentations: {
+          type: Object
+        },
+        schedule: {
+          type: Array
+        }
+      },
+      _objToArray: function(obj) {
+        if(obj)
+          return Object.keys(obj).map(function (key) { return obj[key]; });
+      },
+      _sortLocations: function(locations) {
+        locations.sort(function(a, b) {
+          return a.location_name.localeCompare(b.location_name);
+        });
+        
+        return locations;
+      },
+      _gotoPresentation: function(e) {
+        console.log(e.model);
+        var target = Polymer.dom(e).localTarget;
+        var p_id = target.getAttribute("data-id");
+        var date = e.model.get("date");
+        var block = e.model.get("block");
+
+        console.log(p_id);
+        console.log(date);
+        console.log(block);
+
+        if(p_id && date && block) {
+          console.log(this.fire('goto-presentation', { presentation_id: p_id, date: date.date, block_id: block.block_id }));
+        }
+      },
+      _getPresentations: function(date, block, location, presentations, schedule, idOnly) {
+        if(date && block && location && presentations) {
+          var filteredPres = this._getPresentationsByLocation(location, presentations);
+
+          var filteredSchedule = [];
+
+          for(var k in schedule) {
+            if(!schedule.hasOwnProperty(k)) continue;
+
+            if(schedule[k].date == date.date && schedule[k].block_id == block.block_id)
+              filteredSchedule.push(schedule[k]);
+          }
+
+          var result = [];
+          
+          for(var x = 0; x < filteredSchedule.length; x++) {
+            for(var y = 0; y < filteredPres.length; y++) {
+              if(filteredPres[y].presentation_id == filteredSchedule[x].presentation_id) {
+                // result.push(filteredPres[y].presentation_id);
+                if(idOnly == "true") {
+                  result.push(filteredPres[y].presentation_id);
+                } else {
+                  if(filteredPres[y].topic == "PREP")
+
+                    result.push("PREP");
+
+                  else
+                    result.push(filteredPres[y].first_name + " " + filteredPres[y].last_name + " (" + filteredPres[y].presentation_id + ")");
+                }
+                
+              }
+            }
+          }
+
+
+          return result.join(", ");
+        }
+      },
+      _getPresentationsByLocation(location, presentations) {
+        var arr = [];
+
+        for(var k in presentations) {
+          if(!presentations.hasOwnProperty(k)) continue;
+
+          if(presentations[k].location_id == location.location_id)
+            arr.push(presentations[k]);
+        }
+        
+        return arr;
+
+        var str = arr.length > 0 ? arr.join(", ") : "None";
+
+        return str;
+      }
+
+      
+    });
+  </script>
+</dom-module>
