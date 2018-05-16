@@ -216,6 +216,11 @@ Example:
               <h3>[[_parseDate(date.date)]] - [[block.block_name]]</h3>
               <!-- <h3>All Presentations</h3> -->
               <!-- class$="[[_computeSorter(date.date, block.block_id)]]" -->
+              <div class="layout horizontal" hidden$="[[_hasPresentations(date, block, schedule)]]">
+                <div class="flex"></div>
+                <b>No Presentations!</b>
+                <div class="flex"></div>
+              </div>
                 <template
                   is="dom-repeat"
                   items="[[_filterPresentations(date.date, block.block_id, schedule, presentations)]]"
@@ -398,6 +403,16 @@ Example:
       },
       _getPresentations: function(dateblock, presentations) {
         return presentations[dateblock.guid];
+      },
+      _hasPresentations: function(date, block, schedule) {
+        if(date && block && schedule) {
+          for(var x = 0; x < schedule.length; x++) {
+            if(schedule[x].date == date.date && schedule[x].block_id == block.block_id)
+              return true;
+          }
+        }
+
+        return false;
       },
       _filterPresentations: function(date, block, schedule, presentations) {
         var result = [];
@@ -723,10 +738,11 @@ Example:
         }
       },
       _userScheduleChanged: function(arr) {
+        if(arr === undefined || arr === null)
+          return;
+        
         console.log("SCHED CHNG");
         console.log(arr);
-        if(arr == undefined || arr == null)
-          return;
         this._setCheckBox(-1,-1,-1, false);
         for(var k in arr) {
           if(!arr.hasOwnProperty(k)) continue;
@@ -774,7 +790,7 @@ Example:
         if(!schedule || !userData)
           return;
 
-        console.log(userData.reserved);
+        // console.log(userData.reserved);
         if(userData.reserved != -1 && userData.grade_id == 4) {
             var user_schedule = schedule.filter(function(obj) {
               return obj.presentation_id == userData.reserved;
