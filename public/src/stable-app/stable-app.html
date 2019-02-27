@@ -160,7 +160,7 @@
             <paper-item name="schedule">Schedule</paper-item>
             <paper-item name="viewers">Viewers</paper-item>
             <paper-item name="editPresentations" hidden$="{{!isAdmin}}">Edit Presentations</paper-item>
-            <paper-item name="locations" hidden$="{{!isAdmin}}">Locations</paper-item>
+            <paper-item name="locations" hidden$="{{!isAdmin}}">Edit Locations</paper-item>
 
           </paper-menu>
           <div class="flex"></div>
@@ -235,6 +235,7 @@
                 route="{{route}}"
                 name="editPresentations"
                 presentations="[[presentations]]"
+                locations="[[locations]]"
                 admin-code="{{adminCode}}"
                 ></edit-presentations-page>
             </iron-pages>

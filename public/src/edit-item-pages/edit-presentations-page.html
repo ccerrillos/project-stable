@@ -4,6 +4,11 @@
 <link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
+
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+
 <link rel="import" href="../stable-app/stable-behavior.html">
 
 
@@ -41,7 +46,7 @@ Example:
       on-error="_error"
       on-response="ajaxResponse"></iron-ajax>
 
-    <app-route route="{{route}}" pattern="/presentations" active="{{active}}"></app-route>
+    <app-route route="{{route}}" pattern="/editPresentations" active="{{active}}"></app-route>
 
     <ctech-confirm-dialog id="addDialog" on-ctech-dialog-confirm="doAdd" confirm-text="Create" valid-color="#8BC34A" modal>
       <div class="layout horizontal">
@@ -53,6 +58,13 @@ Example:
         <paper-input label="First Name" id="firstName" maxlength="255" char-counter class="ctech-input"></paper-input>
         <paper-input label="Last Name" id="lastName" maxlength="255" char-counter class="ctech-input"></paper-input>
         <paper-input label="Topic" id="topic" maxlength="255" char-counter class="ctech-input"></paper-input>
+        <paper-dropdown-menu label="Location">
+          <paper-listbox id="location" class="dropdown-content" attr-for-selected="data-id">
+            <template is="dom-repeat" items="[[_objToArray(locations)]]">
+              <paper-item data-id$="[[item.location_id]]">[[item.location_name]]</paper-item>
+            </template>
+          </paper-listbox>
+        </paper-dropdown-menu>
 
         <paper-input label="Admin Code" type="password" value="{{adminCode::input}}"></paper-input>
       </div>
@@ -69,6 +81,13 @@ Example:
         <paper-input label="First Name" maxlength="255" char-counter class="ctech-input" value="{{editFirstName}}"></paper-input>
         <paper-input label="Last Name" maxlength="255" char-counter class="ctech-input" value="{{editLastName}}"></paper-input>
         <paper-input label="Topic" maxlength="255" char-counter class="ctech-input" value="{{editTopic}}"></paper-input>
+        <paper-dropdown-menu label="Location">
+            <paper-listbox class="dropdown-content" attr-for-selected="data-id" selected="{{editLocation}}">
+              <template is="dom-repeat" items="[[_objToArray(locations)]]">
+                <paper-item data-id$="[[item.location_id]]">[[item.location_name]]</paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dropdown-menu>
 
         <paper-input label="Admin Code" type="password" value="{{adminCode::input}}"></paper-input>
       </div>
@@ -102,8 +121,7 @@ Example:
               <paper-icon-button icon="create" on-tap="_doPreEdit"></paper-icon-button>
 
               <paper-icon-button icon="delete" on-tap="_doPreDelete"></paper-icon-button>
-              
-              [[item.last_name]], [[item.first_name]], [[item.topic]] - [[item.location_id]]
+              [[item.last_name]], [[item.first_name]], [[item.topic]] - [[_getAttrFromObj(item.location_id, 'location_name', locations)]]
             </paper-item>
           </template>
 
@@ -126,6 +144,9 @@ Example:
           type: Object,
           observer: '_presentationsChanged'
         },
+        locations: {
+          type: Object
+        },
         selectedPresentation: {
           type: Object
         },
@@ -138,6 +159,9 @@ Example:
         },
         editTopic: {
           type: String
+        },
+        editLocation: {
+          type: Number
         },
         //end data
         adminCode: {
@@ -172,6 +196,7 @@ Example:
         this.editFirstName = this.selectedPresentation.first_name;
         this.editLastName = this.selectedPresentation.last_name;
         this.editTopic = this.selectedPresentation.topic;
+        this.editLocation = this.selectedPresentation.location_id;
 
         this.$.editDialog._validateForm();
         this.$.editDialog.open();
@@ -191,7 +216,7 @@ Example:
             'first_name': this.$.firstName.value,
             'last_name': this.$.lastName.value,
             'topic': this.$.topic.value,
-            'location_id': 1 //this.$.locationId.selected
+            'location_id': parseInt(this.$.location.selected)
           });
         this.$.ajax.generateRequest();
       },
@@ -206,7 +231,7 @@ Example:
             'first_name': this.editFirstName,
             'last_name': this.editLastName,
             'topic': this.editTopic,
-            'location_id': 1 //this.$.locationId.selected
+            'location_id': this.editLocation
           });
         this.$.ajax.generateRequest();
       },
@@ -277,8 +302,10 @@ Example:
         }
       },
       _activeChanged: function(e) {
-        if(e)
+        if(e) {
           this.fire('reload-presentations');
+          this.fire('reload-locations');
+        }
       }
     });
   </script>

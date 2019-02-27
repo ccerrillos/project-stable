@@ -84,7 +84,7 @@ Example:
 
     <!-- <div class="container content">
       <ctech-item-manager-menubar
-        id="selector"
+        //id="selector"
         items="{{locations}}"
         selected="{{selectedLocation}}"
         attr-for-selected="location_id"
@@ -101,7 +101,7 @@ Example:
             <paper-button raised on-tap="_doAddDialog">Add Location</paper-button>
           </paper-item>
             
-          <!-- <iron-selector attr-for-selected="data-id"> -->
+          //<!-- <iron-selector attr-for-selected="data-id"> -->
           <template is="dom-repeat" items="[[_objToArray(locations)]]">
             
             <paper-item data-id="[[item.location_id]]">
@@ -118,7 +118,7 @@ Example:
             <paper-button raised on-tap="_doAddDialog">Add Location</paper-button>
           </paper-item>
           
-        <!-- </iron-selector> -->
+        //<!-- </iron-selector> -->
 
       </paper-material>
       
@@ -254,7 +254,7 @@ Example:
         
       },
       _locationsChanged: function(e) {
-        this.$.selector.select();
+        //this.$.selector.select();
       },
       _error: function(e) {
         console.log(e);
