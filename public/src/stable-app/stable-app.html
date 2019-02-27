@@ -15,9 +15,15 @@
 <link rel="import" href="../schedule-page/schedule-page.html">
 <link rel="import" href="../viewers-page/viewers-page.html">
 <link rel="import" href="../presentations-page/presentations-page.html">
-<!-- <link rel="import" href="../edit-item-pages/edit-locations-page.html"> -->
+<link rel="import" href="../edit-item-pages/edit-locations-page.html">
+<link rel="import" href="../edit-item-pages/edit-presentations-page.html">
+
 <link rel="import" href="stable-behavior.html">
 <link rel="import" href="stable-dialogs.html">
+
+
+<link rel="import" href="login-form.html">
+
 
 <dom-module id="stable-app">
   <template>
@@ -153,8 +159,12 @@
             <paper-item name="presentations" class="layout horizontal">Printing<div class="flex"></div><iron-icon icon="icons:print"></iron-icon></paper-item>
             <paper-item name="schedule">Schedule</paper-item>
             <paper-item name="viewers">Viewers</paper-item>
-            <!-- <paper-item name="locations">Locations</paper-item> -->
-          </paper-menu>          
+            <paper-item name="editPresentations" hidden$="{{!isAdmin}}">Edit Presentations</paper-item>
+            <paper-item name="locations" hidden$="{{!isAdmin}}">Locations</paper-item>
+
+          </paper-menu>
+          <div class="flex"></div>
+          <!-- <login-form admin="{{isAdmin}}"></login-form> -->
         </div>
         <div class="shameless layout horizontal">
         <div class="flex"></div>
@@ -215,12 +225,18 @@
                 route="{{route}}"
                 presentations="[[presentations]]"
                 ></presentations-page>
-              <!-- <edit-locations-page
+              <edit-locations-page
                 route="{{route}}"
                 name="locations"
                 locations="[[locations]]"
                 admin-code="{{adminCode}}"
-                ></edit-locations-page> -->
+                ></edit-locations-page>
+              <edit-presentations-page
+                route="{{route}}"
+                name="editPresentations"
+                presentations="[[presentations]]"
+                admin-code="{{adminCode}}"
+                ></edit-presentations-page>
             </iron-pages>
             
           </div>
@@ -235,6 +251,10 @@
       is: 'stable-app',
 
       properties: {
+        isAdmin: {
+          type: Boolean,
+          value: true
+        },
         titleText: {
           type: String,
           value: ''
@@ -256,11 +276,11 @@
         },
         selectable: {
           type: Boolean,
-          value: true
+          value: false
         },
         seniorPresentations: {
           type: Boolean,
-          value: true
+          value: false
         },
         userData: {
           type: Object,
@@ -284,7 +304,7 @@
         },
         defaultToRegister: {
           type: Boolean,
-          value: false
+          value: true
         }
       },
       observers: [
