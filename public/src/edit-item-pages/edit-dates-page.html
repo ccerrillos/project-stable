@@ -23,7 +23,7 @@ Example:
 @demo demo/index.html
 -->
 
-<dom-module id="edit-locations-page">
+<dom-module id="edit-dates-page">
   <template>
     <style>
       :host {
@@ -35,35 +35,23 @@ Example:
     </style>
     <iron-ajax
       id="ajax"
-      url="[[_computeAPI('/locations')]]"
+      url="[[_computeAPI('/dates')]]"
       handle-as="json"
       content-type="application/json"
       on-error="_error"
       on-response="ajaxResponse"></iron-ajax>
 
-    <app-route route="{{route}}" pattern="/locations" active="{{active}}"></app-route>
+    <app-route route="{{route}}" pattern="/editDates" active="{{active}}"></app-route>
 
     <ctech-confirm-dialog id="addDialog" on-ctech-dialog-confirm="doAdd" confirm-text="Create" valid-color="#8BC34A" modal>
       <div class="layout horizontal">
         <div class="flex"></div>
-        <h2>New Location</h2>
+        <h2>Add Date</h2>
         <div class="flex"></div>
       </div>
       <div class="layout vertical">
-        <paper-input label="Location Name" id="locationName" maxlength="255" char-counter class="ctech-input"></paper-input>
-        <paper-input label="Admin Code" type="password" value="{{adminCode::input}}"></paper-input>
-      </div>
-    </ctech-confirm-dialog>
-
-
-    <ctech-confirm-dialog id="editDialog" on-ctech-dialog-confirm="doEdit" confirm-text="Edit" valid-color="#2196f3" modal>
-      <div class="layout horizontal">
-        <div class="flex"></div>
-        <h2>Edit Location</h2>
-        <div class="flex"></div>
-      </div>
-      <div class="layout vertical">
-        <paper-input label="Location Name" maxlength="255" char-counter class="ctech-input" value="{{editLocationName}}"></paper-input>
+        <p>The format must be YYYYMMDD</p>
+        <paper-input type="number" label="Date" id="date" maxlength="8" char-counter class="ctech-input"></paper-input>
         <paper-input label="Admin Code" type="password" value="{{adminCode::input}}"></paper-input>
       </div>
     </ctech-confirm-dialog>
@@ -71,76 +59,43 @@ Example:
     <ctech-confirm-dialog id="deleteDialog" on-ctech-dialog-confirm="doDelete" confirm-text="Delete" valid-color="#c62828" modal reset-on-dismiss="false">
       <div class="layout horizontal">
         <div class="flex"></div>
-        <h2>Delete Location</h2>
+        <h2>Delete Date</h2>
         <div class="flex"></div>
       </div>
       <div class="layout vertical">
-        <div>Are you sure you want to delete <b>[[selectedLocation.location_name]]</b>?</div>
+        <div>Are you sure you want to delete <b>[[selectedDate.date]]</b>?</div>
         <paper-input label="Admin Code" type="password" value="{{adminCode::input}}"></paper-input>
       </div>
     </ctech-confirm-dialog>
 
 
 
-    <!-- <div class="container content">
+    <div class="container content">
       <ctech-item-manager-menubar
-        //id="selector"
-        items="{{locations}}"
-        selected="{{selectedLocation}}"
-        attr-for-selected="location_id"
-        attr-for-text="location_name"
+        id="selector"
+        items="{{dates}}"
+        selected="{{selectedDate}}"
+        attr-for-selected="date"
+        attr-for-text="date"
         on-ctech-item-manager-do-add="_doAddDialog"
         on-ctech-item-manager-do-edit="_doEditDialog"
         on-ctech-item-manager-do-delete="_doDeleteDialog"
         ></ctech-item-manager-menubar>
-    </div> -->
-    <div class="container content">
-      
-      <paper-material elevation="1">
-          <paper-item>
-            <paper-button raised on-tap="_doAddDialog">Add Location</paper-button>
-          </paper-item>
-            
-          <!-- <iron-selector attr-for-selected="data-id"> -->
-          <template is="dom-repeat" items="[[_objToArray(locations)]]">
-            
-            <paper-item data-id="[[item.location_id]]">
-              <paper-icon-button icon="create" on-tap="_doPreEdit"></paper-icon-button>
-
-              <paper-icon-button icon="delete" on-tap="_doPreDelete"></paper-icon-button>
-              
-              [[item.location_name]]
-            </paper-item>
-          </template>
-
-          
-          <paper-item>
-            <paper-button raised on-tap="_doAddDialog">Add Location</paper-button>
-          </paper-item>
-          
-        <!-- </iron-selector> -->
-
-      </paper-material>
-      
     </div>
   </template>
   <script>
     Polymer({
-      is: 'edit-locations-page',
+      is: 'edit-dates-page',
       properties: {
-        locations: {
+        dates: {
           type: Object,
-          observer: '_locationsChanged'
+          observer: '_datesChanged'
         },
-        selectedLocation: {
+        selectedDate: {
           type: Object
         },
-        editLocationName: {
+        editDate: {
           type: String
-        },
-        locationsArray: {
-          type: Array,
-          computed: '_computeAPI(locations)'
         },
         adminCode: {
           type: String,
@@ -156,21 +111,15 @@ Example:
         }
       },
       behaviors: [StableBehavior],
-      _doPreEdit: function(e) {
-        this.selectedLocation = e.model.get('item');
-        this._doEditDialog();
-      },
       _doPreDelete: function(e) {
-        this.selectedLocation = e.model.get('item');
+        this.selectedDate = e.model.get('item');
         this._doDeleteDialog();
       },
       _doAddDialog: function(e) {
         this.$.addDialog.open();
       },
       _doEditDialog: function(e) {
-        this.editLocationName = this.selectedLocation.location_name;
-        this.$.editDialog._validateForm();
-        this.$.editDialog.open();
+        this.fire('firetoast', { message: "Edit date not supported, use Add/Delete!"});
       },
       _doDeleteDialog: function(e) {
         this.$.deleteDialog.open();
@@ -183,7 +132,7 @@ Example:
         };
         this.$.ajax.body =
           JSON.stringify({
-            'location_name': this.$.locationName.value
+            'date': this.$.date.value
           });
         this.$.ajax.generateRequest();
       },
@@ -194,25 +143,24 @@ Example:
         };
         this.$.ajax.body =
           JSON.stringify({
-            'location_id': this.selectedLocation.location_id,
-            'location_name': this.editLocationName
+            'date': this.editDate
           });
         this.$.ajax.generateRequest();
       },
       doDelete: function(e){
         this.$.ajax.method = "DELETE";
         // var o_out = {};
-        // o_out[this.selectedLocation.location_id] = this.selectedLocation;
+        // o_out[this.selectedDate.location_id] = this.selectedDate;
         this.$.ajax.headers = {
           'admin_code': this.adminCode
         };
-        this.$.ajax.body = JSON.stringify(this.selectedLocation);
+        this.$.ajax.body = JSON.stringify(this.selectedDate);
         this.$.ajax.generateRequest();
       },
       ajaxResponse: function(e){
         if(e.detail.response === true){
           this.$.addDialog.resetForm();
-          this.$.editDialog.resetForm();
+          // this.$.editDialog.resetForm();
           var action_word = "";
           switch(e.target.method) {
             case "DELETE":
@@ -224,15 +172,15 @@ Example:
             case "PUT":
               action_word = "updated";
           }
-          this.fire('firetoast', { message: "Location " + action_word + "!"});
-          this.fire("reload-locations", { });
+          this.fire('firetoast', { message: "Date " + action_word + "!"});
+          this.fire("reload-dates", { });
         } else {
           var det = "NO_DETAILS";
           if(e.detail.response.status_details) {
             det = e.detail.response.status_details;
             switch(det) {
               case 1062:
-                det = "Duplicate Location Name";
+                det = "Duplicate Date";
                 break;
               default:
                 break;
@@ -249,12 +197,9 @@ Example:
             case "PUT":
               action_word = "update";
           }
-          this.fire('firetoast', { message: "FAILED to " + action_word + " Location! [" + det + "]"});
+          this.fire('firetoast', { message: "FAILED to " + action_word + " Date! [" + det + "]"});
         }
         
-      },
-      _locationsChanged: function(e) {
-        //this.$.selector.select();
       },
       _error: function(e) {
         console.log(e);
@@ -264,9 +209,12 @@ Example:
           this.fire('firetoast', { message: "An error occurred." });
         }
       },
+      _datesChanged: function(e) {
+        this.$.selector.select();
+      },
       _activeChanged: function(e) {
         if(e)
-          this.fire('reload-locations');
+          this.fire('reload-dates');
       }
     });
   </script>

@@ -23,7 +23,7 @@ Example:
 @demo demo/index.html
 -->
 
-<dom-module id="edit-locations-page">
+<dom-module id="edit-blocks-page">
   <template>
     <style>
       :host {
@@ -35,22 +35,22 @@ Example:
     </style>
     <iron-ajax
       id="ajax"
-      url="[[_computeAPI('/locations')]]"
+      url="[[_computeAPI('/blocks')]]"
       handle-as="json"
       content-type="application/json"
       on-error="_error"
       on-response="ajaxResponse"></iron-ajax>
 
-    <app-route route="{{route}}" pattern="/locations" active="{{active}}"></app-route>
+    <app-route route="{{route}}" pattern="/editBlocks" active="{{active}}"></app-route>
 
     <ctech-confirm-dialog id="addDialog" on-ctech-dialog-confirm="doAdd" confirm-text="Create" valid-color="#8BC34A" modal>
       <div class="layout horizontal">
         <div class="flex"></div>
-        <h2>New Location</h2>
+        <h2>New Block</h2>
         <div class="flex"></div>
       </div>
       <div class="layout vertical">
-        <paper-input label="Location Name" id="locationName" maxlength="255" char-counter class="ctech-input"></paper-input>
+        <paper-input label="Block Name" id="blockName" maxlength="255" char-counter class="ctech-input"></paper-input>
         <paper-input label="Admin Code" type="password" value="{{adminCode::input}}"></paper-input>
       </div>
     </ctech-confirm-dialog>
@@ -59,11 +59,11 @@ Example:
     <ctech-confirm-dialog id="editDialog" on-ctech-dialog-confirm="doEdit" confirm-text="Edit" valid-color="#2196f3" modal>
       <div class="layout horizontal">
         <div class="flex"></div>
-        <h2>Edit Location</h2>
+        <h2>Edit Block</h2>
         <div class="flex"></div>
       </div>
       <div class="layout vertical">
-        <paper-input label="Location Name" maxlength="255" char-counter class="ctech-input" value="{{editLocationName}}"></paper-input>
+        <paper-input label="Block Name" maxlength="255" char-counter class="ctech-input" value="{{editBlockName}}"></paper-input>
         <paper-input label="Admin Code" type="password" value="{{adminCode::input}}"></paper-input>
       </div>
     </ctech-confirm-dialog>
@@ -71,76 +71,43 @@ Example:
     <ctech-confirm-dialog id="deleteDialog" on-ctech-dialog-confirm="doDelete" confirm-text="Delete" valid-color="#c62828" modal reset-on-dismiss="false">
       <div class="layout horizontal">
         <div class="flex"></div>
-        <h2>Delete Location</h2>
+        <h2>Delete Block</h2>
         <div class="flex"></div>
       </div>
       <div class="layout vertical">
-        <div>Are you sure you want to delete <b>[[selectedLocation.location_name]]</b>?</div>
+        <div>Are you sure you want to delete <b>[[selectedBlock.block_name]]</b>?</div>
         <paper-input label="Admin Code" type="password" value="{{adminCode::input}}"></paper-input>
       </div>
     </ctech-confirm-dialog>
 
 
 
-    <!-- <div class="container content">
+    <div class="container content">
       <ctech-item-manager-menubar
-        //id="selector"
-        items="{{locations}}"
-        selected="{{selectedLocation}}"
-        attr-for-selected="location_id"
-        attr-for-text="location_name"
+        id="selector"
+        items="{{blocks}}"
+        selected="{{selectedBlock}}"
+        attr-for-selected="block_id"
+        attr-for-text="block_name"
         on-ctech-item-manager-do-add="_doAddDialog"
         on-ctech-item-manager-do-edit="_doEditDialog"
         on-ctech-item-manager-do-delete="_doDeleteDialog"
         ></ctech-item-manager-menubar>
-    </div> -->
-    <div class="container content">
-      
-      <paper-material elevation="1">
-          <paper-item>
-            <paper-button raised on-tap="_doAddDialog">Add Location</paper-button>
-          </paper-item>
-            
-          <!-- <iron-selector attr-for-selected="data-id"> -->
-          <template is="dom-repeat" items="[[_objToArray(locations)]]">
-            
-            <paper-item data-id="[[item.location_id]]">
-              <paper-icon-button icon="create" on-tap="_doPreEdit"></paper-icon-button>
-
-              <paper-icon-button icon="delete" on-tap="_doPreDelete"></paper-icon-button>
-              
-              [[item.location_name]]
-            </paper-item>
-          </template>
-
-          
-          <paper-item>
-            <paper-button raised on-tap="_doAddDialog">Add Location</paper-button>
-          </paper-item>
-          
-        <!-- </iron-selector> -->
-
-      </paper-material>
-      
     </div>
   </template>
   <script>
     Polymer({
-      is: 'edit-locations-page',
+      is: 'edit-blocks-page',
       properties: {
-        locations: {
+        blocks: {
           type: Object,
-          observer: '_locationsChanged'
+          observer: '_blocksChanged'
         },
-        selectedLocation: {
+        selectedBlock: {
           type: Object
         },
-        editLocationName: {
+        editBlockName: {
           type: String
-        },
-        locationsArray: {
-          type: Array,
-          computed: '_computeAPI(locations)'
         },
         adminCode: {
           type: String,
@@ -157,18 +124,18 @@ Example:
       },
       behaviors: [StableBehavior],
       _doPreEdit: function(e) {
-        this.selectedLocation = e.model.get('item');
+        this.selectedBlock = e.model.get('item');
         this._doEditDialog();
       },
       _doPreDelete: function(e) {
-        this.selectedLocation = e.model.get('item');
+        this.selectedBlock = e.model.get('item');
         this._doDeleteDialog();
       },
       _doAddDialog: function(e) {
         this.$.addDialog.open();
       },
       _doEditDialog: function(e) {
-        this.editLocationName = this.selectedLocation.location_name;
+        this.editBlockName = this.selectedBlock.block_name;
         this.$.editDialog._validateForm();
         this.$.editDialog.open();
       },
@@ -183,7 +150,7 @@ Example:
         };
         this.$.ajax.body =
           JSON.stringify({
-            'location_name': this.$.locationName.value
+            'block_name': this.$.blockName.value
           });
         this.$.ajax.generateRequest();
       },
@@ -194,19 +161,19 @@ Example:
         };
         this.$.ajax.body =
           JSON.stringify({
-            'location_id': this.selectedLocation.location_id,
-            'location_name': this.editLocationName
+            'block_id': this.selectedBlock.block_id,
+            'block_name': this.editBlockName
           });
         this.$.ajax.generateRequest();
       },
       doDelete: function(e){
         this.$.ajax.method = "DELETE";
         // var o_out = {};
-        // o_out[this.selectedLocation.location_id] = this.selectedLocation;
+        // o_out[this.selectedBlock.block_id] = this.selectedBlock;
         this.$.ajax.headers = {
           'admin_code': this.adminCode
         };
-        this.$.ajax.body = JSON.stringify(this.selectedLocation);
+        this.$.ajax.body = JSON.stringify(this.selectedBlock);
         this.$.ajax.generateRequest();
       },
       ajaxResponse: function(e){
@@ -224,15 +191,15 @@ Example:
             case "PUT":
               action_word = "updated";
           }
-          this.fire('firetoast', { message: "Location " + action_word + "!"});
-          this.fire("reload-locations", { });
+          this.fire('firetoast', { message: "Block " + action_word + "!"});
+          this.fire("reload-blocks", { });
         } else {
           var det = "NO_DETAILS";
           if(e.detail.response.status_details) {
             det = e.detail.response.status_details;
             switch(det) {
               case 1062:
-                det = "Duplicate Location Name";
+                det = "Duplicate Block Name";
                 break;
               default:
                 break;
@@ -249,12 +216,12 @@ Example:
             case "PUT":
               action_word = "update";
           }
-          this.fire('firetoast', { message: "FAILED to " + action_word + " Location! [" + det + "]"});
+          this.fire('firetoast', { message: "FAILED to " + action_word + " Block! [" + det + "]"});
         }
         
       },
-      _locationsChanged: function(e) {
-        //this.$.selector.select();
+      _blocksChanged: function(e) {
+        this.$.selector.select();
       },
       _error: function(e) {
         console.log(e);
@@ -266,7 +233,7 @@ Example:
       },
       _activeChanged: function(e) {
         if(e)
-          this.fire('reload-locations');
+          this.fire('reload-blocks');
       }
     });
   </script>

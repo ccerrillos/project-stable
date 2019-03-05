@@ -15,6 +15,9 @@
 <link rel="import" href="../schedule-page/schedule-page.html">
 <link rel="import" href="../viewers-page/viewers-page.html">
 <link rel="import" href="../presentations-page/presentations-page.html">
+<link rel="import" href="../edit-item-pages/edit-blocks-page.html">
+<link rel="import" href="../edit-item-pages/edit-dates-page.html">
+<link rel="import" href="../edit-item-pages/edit-schedule-page.html">
 <link rel="import" href="../edit-item-pages/edit-locations-page.html">
 <link rel="import" href="../edit-item-pages/edit-presentations-page.html">
 
@@ -159,8 +162,12 @@
             <paper-item name="presentations" class="layout horizontal">Printing<div class="flex"></div><iron-icon icon="icons:print"></iron-icon></paper-item>
             <paper-item name="schedule">Schedule</paper-item>
             <paper-item name="viewers">Viewers</paper-item>
-            <paper-item name="editPresentations" hidden$="{{!isAdmin}}">Edit Presentations</paper-item>
+            
+            <paper-item name="editDates" hidden$="{{!isAdmin}}">Edit Dates</paper-item>
+            <paper-item name="editBlocks" hidden$="{{!isAdmin}}">Edit Blocks</paper-item>
+            <paper-item name="editSchedule" hidden$="{{!isAdmin}}">Edit Schedule</paper-item>
             <paper-item name="locations" hidden$="{{!isAdmin}}">Edit Locations</paper-item>
+            <paper-item name="editPresentations" hidden$="{{!isAdmin}}">Edit Presentations</paper-item>
 
           </paper-menu>
           <div class="flex"></div>
@@ -225,6 +232,18 @@
                 route="{{route}}"
                 presentations="[[presentations]]"
                 ></presentations-page>
+              <edit-blocks-page
+                route="{{route}}"
+                name="editBlocks"
+                blocks="[[blocks]]"
+                admin-code="{{adminCode}}"
+                ></edit-blocks-page>
+              <edit-dates-page
+                route="{{route}}"
+                name="editDates"
+                dates="[[dates]]"
+                admin-code="{{adminCode}}"
+                ></edit-dates-page>
               <edit-locations-page
                 route="{{route}}"
                 name="locations"
@@ -238,6 +257,16 @@
                 locations="[[locations]]"
                 admin-code="{{adminCode}}"
                 ></edit-presentations-page>
+                <edit-schedule-page
+                route="{{route}}"
+                name="editSchedule"
+                dates="[[dates]]"
+                blocks="[[blocks]]"
+                locations="[[locations]]"
+                schedule="[[schedule]]"
+                presentations="[[presentations]]"
+                admin-code="{{adminCode}}"
+                ></edit-schedule-page>
             </iron-pages>
             
           </div>
@@ -277,11 +306,11 @@
         },
         selectable: {
           type: Boolean,
-          value: false
+          value: true
         },
         seniorPresentations: {
           type: Boolean,
-          value: false
+          value: true
         },
         userData: {
           type: Object,
