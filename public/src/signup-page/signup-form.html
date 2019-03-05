@@ -36,8 +36,7 @@ Example:
     <style include="iron-flex iron-flex-alignment">
       :host {
         display: block;
-        background-color: white;
-        max-width: 320px;
+        
       }
       paper-input {
         margin: 0;
@@ -45,6 +44,8 @@ Example:
       }
       paper-material {
         padding: 16px;
+        background-color: white;
+        max-width: 320px;
       }
       paper-button[disabled] {
         background-color: var(--paper-grey-500);
@@ -89,6 +90,9 @@ Example:
       }
       paper-toast {
         z-index: 10001;
+      }
+      #woah {
+        width: 700px;
       }
     </style>
     <paper-material elevation="1">
@@ -148,6 +152,14 @@ Example:
         <div class="flex"></div>
       </div>
       
+    </paper-material>
+    
+    <paper-material elevation="1" style="margin-top: 2em;">
+      <h3>Notes</h3>
+      <p>A real email is not required, it is used to limit duplicate signups, and to allow you to change your selection. <b>No emails will be sent to the address, they will be deleted after career day.</b></p>
+      <p>Passwords are individually salted and hashed according to industry standards (sha256). All connections are encrypted. Feel free to use a bogus password.</p>
+      <p>The placement algorithm will go through each block and pick a student at random. They are then placed into their most preferred presentation that is available during that block.</p>
+      <p>The algorithm has been improved from last year for fairness. Previously students were picked at random, then placed in each block. Generally this meant that if a student was randomly picked towards the end, they were stuck with their least preferred presentations.</p>
     </paper-material>
   </template>
   <script>

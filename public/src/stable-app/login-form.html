@@ -1,0 +1,38 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+
+<dom-module id="login-form">
+  <template>
+    <style>
+      :host {
+        display: block;
+        padding-left: 1em;
+        padding-right: 1em;
+      }
+    </style>
+    
+    <paper-input label="Admin Key" type="password" value="{{password::input}}"></paper-input>
+
+    
+  </template>
+  <script>
+    Polymer({
+      is: 'login-form',
+      properties: {
+        password: {
+          type: String,
+          observer: '_passwordChanged'
+        },
+        admin: {
+          type: Boolean,
+          readOnly: true,
+          notify: true
+
+        }
+      },
+      _passwordChanged(e) {
+        this._setAdmin(e && e.length > 0);
+      }
+    });
+  </script>
+</dom-module>
