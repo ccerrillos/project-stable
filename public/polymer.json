@@ -10,11 +10,6 @@
   ],
   "extraDependencies": [
     "bower_components/webcomponentsjs/webcomponents-lite.min.js",
-    "blocks.json",
-    "dates.json",
-    "grades.json",
-    "houses.json",
-    "locations.json",
     "manifest.json"
   ],
   "builds": [
