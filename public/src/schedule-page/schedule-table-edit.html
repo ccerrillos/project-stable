@@ -33,7 +33,7 @@ Example:
 @demo demo/index.html
 -->
 
-<dom-module id="schedule-table">
+<dom-module id="schedule-table-edit">
   <template>
     <style include="iron-flex iron-flex-alignment">
       :host {
@@ -122,6 +122,42 @@ Example:
       }
       
     </style>
+
+<ctech-confirm-dialog id="addDialog" on-ctech-dialog-confirm="doAdd" confirm-text="Create" valid-color="#8BC34A" modal>
+    <div class="layout horizontal">
+      <div class="flex"></div>
+      <h2>Schedule Presentation</h2>
+      <div class="flex"></div>
+    </div>
+    <div class="layout vertical">
+      <paper-input label="Date" disabled value="[[selectedSchedule.date.date]]"></paper-input>
+      <paper-input label="Block" disabled value="[[selectedSchedule.block.block_name]]"></paper-input>
+      <paper-input label="Location" disabled value="[[selectedSchedule.location.location_name]]"></paper-input>
+
+      <paper-dropdown-menu label="Presentation" class="ctech-input">
+          <paper-listbox class="dropdown-content" attr-for-selected="data-id">
+            <template is="dom-repeat" items="[[_objToArray(presentations)]]">
+              <paper-item data-id$="[[item.presentation_id]]">[[item.first_name]] [[item.last_name]]</paper-item>
+            </template>
+          </paper-listbox>
+        </paper-dropdown-menu>
+      <paper-input label="Admin Code" type="password" value="{{adminCode::input}}"></paper-input>
+    </div>
+  </ctech-confirm-dialog>
+
+
+  <ctech-confirm-dialog id="deleteDialog" on-ctech-dialog-confirm="doDelete" confirm-text="Delete" valid-color="#c62828" modal reset-on-dismiss="false">
+    <div class="layout horizontal">
+      <div class="flex"></div>
+      <h2>Remove Presentations</h2>
+      <div class="flex"></div>
+    </div>
+    <div class="layout vertical">
+      <div>Are you sure you want to remove <b>[[_getPresentations(selectedSchedule.date,selectedSchedule.block,selectedSchedule.location,presentations, schedule, 'false')]]</b>?</div>
+      <paper-input label="Admin Code" type="password" value="{{adminCode::input}}"></paper-input>
+    </div>
+  </ctech-confirm-dialog>
+
     <div class="content">
         <paper-material  elevation="1">
             <table id="table">
@@ -143,6 +179,9 @@ Example:
                   <template is="dom-repeat" items="[[dates]]" as="date">
                       <template is="dom-repeat" items="[[blocksArray]]" as="block">
                         <td>
+                          
+                          <paper-icon-button icon="icons:add" on-tap="_doPreAdd" hidden$="[[_hasPresentations(date,block,location,presentations, schedule)]]"></paper-icon-button>
+                          <paper-icon-button icon="icons:delete" on-tap="_doPreDelete" hidden$="[[!_hasPresentations(date,block,location,presentations, schedule)]]"></paper-icon-button>
                           <!-- [[_hasPresentations(date,block,location,presentations,schedule)]] -->
                           [[_getPresentations(date,block,location,presentations, schedule, 'false')]]
                           <!-- <br> -->
@@ -163,7 +202,7 @@ Example:
 
   <script>
     Polymer({
-      is: 'schedule-table',
+      is: 'schedule-table-edit',
       properties: {
         dates: {
           type: Array
@@ -175,6 +214,9 @@ Example:
           type: Object
         },
         blocks: {
+          type: Object
+        },
+        selectedSchedule: {
           type: Object
         },
         blocksArray: {
@@ -192,6 +234,36 @@ Example:
           type: Array
         }
       },
+      _doPreAdd: function(e) {
+        console.log(e);
+        this.selectedSchedule = {
+          date: e.model.get('date'),
+          block: e.model.get('block'),
+          location: e.model.get('location')
+        };
+        console.log(this.selectedSchedule);
+        this._doAddDialog();
+      },
+      _doPreDelete: function(e) {
+        this.selectedSchedule = {
+          date: e.model.get('date'),
+          block: e.model.get('block'),
+          location: e.model.get('location')
+        };
+                console.log(this.selectedSchedule);
+
+        this._doDeleteDialog();
+      },
+      doDelete: function(e){
+        this.$.ajax.method = "DELETE";
+        // var o_out = {};
+        // o_out[this.selectedLocation.location_id] = this.selectedLocation;
+        this.$.ajax.headers = {
+          'admin_code': this.adminCode
+        };
+        this.$.ajax.body = JSON.stringify(this.selectedLocation);
+        this.$.ajax.generateRequest();
+      },
       _objToArray: function(obj) {
         if(obj)
           return Object.keys(obj).map(function (key) { return obj[key]; });
@@ -202,6 +274,14 @@ Example:
         });
         
         return locations;
+      },
+      _doAddDialog: function(e) {
+        this.$.addDialog.open();
+      },
+
+      
+      _doDeleteDialog: function(e) {
+        this.$.deleteDialog.open();
       },
       _gotoPresentation: function(e) {
         console.log(e.model);
