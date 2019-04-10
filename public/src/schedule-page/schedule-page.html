@@ -290,7 +290,7 @@ Example:
         <p>[[presentation.first_name]] [[presentation.last_name]]</p>
         <p>[[presentation.topic]]</p>
         <p>Date: <b>[[_parseDate(detailsData.date)]], [[_getAttrFromObj(detailsData.block_id, 'block_name', blocks)]]</b></p>
-        <p>Location: <b>[[_getAttrFromObj(presentation.location_id, 'location_name', locations)]]</b></p>
+        <p>Location: <b>[[_getAttrFromObj(presentationSchedule.location_id, 'location_name', locations)]]</b></p>
         <b>Viewers:</b>
         <div class="viewers">
           <div class="layout horizontal" hidden$="[[viewersLoader]]">
@@ -391,6 +391,10 @@ Example:
           type: Object,
           computed: '_getObjByKey(presentations, detailsData.presentation_id)'
         },
+        presentationSchedule: {
+          type: Object,
+          computed: '_getSchedule(schedule, detailsData)'
+        },
         prePresentationViewers: {
           type: Object,
         },
@@ -461,6 +465,26 @@ Example:
           this.fire('reload-schedule');
         }
       },
+      _getScheduleById: function(schedule, presentation_id) {
+        if(schedule && presentation_id !== undefined) {
+          for(var x = 0; x < schedule.length; x++) {
+            if(schedule[x].presentation_id == presentation_id)
+              return schedule[x];
+          }
+        }
+        return {};
+      },
+      _getSchedule: function(schedule, detailsData) {
+        if(schedule && detailsData) {
+          for(var x = 0; x < schedule.length; x++) {
+            var s = schedule[x];
+
+            if(s.date == detailsData.date && s.block_id == detailsData.block_id && s.presentation_id == detailsData.presentation_id)
+              return s;
+          }
+        }
+        return {};
+      },
       _filterPresentations: function(date, block, presentations, schedule) {
         var result = [];
 
@@ -484,6 +508,12 @@ Example:
       _showInfo: function(e) {
         if(e && e.detail) {
           this.infoData = JSON.parse(JSON.stringify(this.presentations[e.detail.presentation_id]));
+          var schedule = this._getScheduleById(this.schedule, this.infoData.presentation_id);
+
+          if(schedule && schedule.location_id) {
+            this.set('infoData.location_id', schedule.location_id);
+          }
+
           this.$.infoDialog.open();
         }
       },

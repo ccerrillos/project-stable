@@ -114,7 +114,7 @@ Example:
                       date="[[date.date]]"
                       block-id="[[block.block_id]]"
                       locations="[[locations]]"
-                      schedule="[[schedule]]"
+                      schedule="[[presentationSchedule]]"
                       show-details
                       hide-info
                       go-to-viewers
@@ -197,6 +197,9 @@ Example:
         schedule: {
           type: Array
         },
+        presentationSchedule: {
+          type: Array
+        },
         dates: {
           type: Array
         },
@@ -244,6 +247,7 @@ Example:
             this.fire('reload-presentations');
           if(this.locations === undefined)
             this.fire('reload-locations');
+          this.fire('reload-schedule');
         }
       },
       _onMainActiveChanged: function(e) {
