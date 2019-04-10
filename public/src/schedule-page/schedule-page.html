@@ -424,6 +424,10 @@ Example:
         tableView: {
           type: Boolean,
           value: false
+        },
+        prepPresentationId: {
+          type: Number,
+          value: 167
         }
       },
       behaviors: [ StableBehavior ],
@@ -462,7 +466,7 @@ Example:
 
         for(var x = 0; x < schedule.length; x++) {
           if(date == schedule[x].date && block == schedule[x].block_id) {
-            if(schedule[x].presentation_id < 142)
+            if(schedule[x].presentation_id != this.prepPresentationId)
               result.push(presentations[schedule[x].presentation_id]);
           }
         }
@@ -582,9 +586,9 @@ Example:
         return this._objToArray(e);
       },
       _sortViewers: function(arr) {
-        console.warn('trace me');
-        console.log(arr);
-        console.log(Array.isArray(arr));
+        // console.warn('trace me');
+        // console.log(arr);
+        // console.log(Array.isArray(arr));
         if(arr !== undefined && Array.isArray(arr))
           arr.sort(this._dynamicSortMultiple("last_name", "first_name"));
         return arr;

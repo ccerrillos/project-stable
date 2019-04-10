@@ -356,6 +356,10 @@ Example:
         _full: {
           type: Object,
           value: {}
+        },
+        prepPresentationId: {
+          type: Number,
+          value: 167
         }
       },
       behaviors: [ StableBehavior ],
@@ -845,6 +849,9 @@ Example:
           return false;
         // console.log(full);
         // console.log(full[g]);
+        if(id == this.prepPresentationId)
+          return true;
+        
         if(!Array.isArray(full[g]))
           return false;
         return full[g].findIndex(function(e) {

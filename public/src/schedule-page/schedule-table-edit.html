@@ -122,8 +122,14 @@ Example:
       }
       
     </style>
-
-<ctech-confirm-dialog id="addDialog" on-ctech-dialog-confirm="doAdd" confirm-text="Create" valid-color="#8BC34A" modal>
+    <iron-ajax
+      id="ajax"
+      url="[[_computeAPI('/schedule')]]"
+      handle-as="json"
+      content-type="application/json"
+      on-error="_error"
+      on-response="ajaxResponse"></iron-ajax>
+<ctech-confirm-dialog id="addDialog" on-ctech-dialog-confirm="_doAdd" confirm-text="Create" valid-color="#8BC34A" modal>
     <div class="layout horizontal">
       <div class="flex"></div>
       <h2>Schedule Presentation</h2>
@@ -134,13 +140,14 @@ Example:
       <paper-input label="Block" disabled value="[[selectedSchedule.block.block_name]]"></paper-input>
       <paper-input label="Location" disabled value="[[selectedSchedule.location.location_name]]"></paper-input>
 
-      <paper-dropdown-menu label="Presentation" class="ctech-input">
-          <paper-listbox class="dropdown-content" attr-for-selected="data-id">
-            <template is="dom-repeat" items="[[_objToArray(presentations)]]">
-              <paper-item data-id$="[[item.presentation_id]]">[[item.first_name]] [[item.last_name]]</paper-item>
-            </template>
-          </paper-listbox>
-        </paper-dropdown-menu>
+      <paper-dropdown-menu label="Presentation">
+        <paper-listbox class="dropdown-content" class="ctech-input" attr-for-selected="data-id" selected="{{addPresentation}}">
+          <template is="dom-repeat" items="[[_filterPres(presentations, schedule)]]">
+            <paper-item data-id$="[[item.presentation_id]]">[[item.first_name]] [[item.last_name]]</paper-item>
+          </template>
+        </paper-listbox>
+      </paper-dropdown-menu>
+
       <paper-input label="Admin Code" type="password" value="{{adminCode::input}}"></paper-input>
     </div>
   </ctech-confirm-dialog>
@@ -204,6 +211,10 @@ Example:
     Polymer({
       is: 'schedule-table-edit',
       properties: {
+        adminCode: {
+          type: String,
+          notify: true
+        },
         dates: {
           type: Array
         },
@@ -232,8 +243,17 @@ Example:
         },
         schedule: {
           type: Array
+        },
+        addPresentation: {
+          type: Number,
+          value: -1
+        },
+        prepPresentationId: {
+          type: Number,
+          value: 167
         }
       },
+      behaviors: [ StableBehavior ],
       _doPreAdd: function(e) {
         console.log(e);
         this.selectedSchedule = {
@@ -241,8 +261,24 @@ Example:
           block: e.model.get('block'),
           location: e.model.get('location')
         };
+        this.addPresentation = -1;
         console.log(this.selectedSchedule);
         this._doAddDialog();
+      },
+      _doAdd: function(e) {
+        console.log(e);
+        this.$.ajax.method = "POST";
+        this.$.ajax.headers = {
+          'admin_code': this.adminCode
+        };
+        this.$.ajax.body =
+          JSON.stringify({
+          date: this.selectedSchedule.date.date,
+          block_id: this.selectedSchedule.block.block_id,
+          location_id: this.selectedSchedule.location.location_id,
+          presentation_id: parseInt(this.addPresentation)
+        });
+        this.$.ajax.generateRequest();
       },
       _doPreDelete: function(e) {
         this.selectedSchedule = {
@@ -261,8 +297,108 @@ Example:
         this.$.ajax.headers = {
           'admin_code': this.adminCode
         };
-        this.$.ajax.body = JSON.stringify(this.selectedLocation);
-        this.$.ajax.generateRequest();
+        console.log(this.schedule);
+        console.log(this.selectedSchedule)
+        var deletePresentation = -1;
+        for(var x = 0; x < this.schedule.length; x++) {
+          var s = this.schedule[x];
+          if(s.date == this.selectedSchedule.date.date && s.block_id == this.selectedSchedule.block.block_id && s.location_id == this.selectedSchedule.location.location_id) {
+            deletePresentation = s.presentation_id;
+            break;
+          }
+          
+        }
+        
+        if(deletePresentation > -1) {
+          this.$.ajax.body = JSON.stringify({
+            date: this.selectedSchedule.date.date,
+            block_id: this.selectedSchedule.block.block_id,
+            location_id: this.selectedSchedule.location.location_id,
+            presentation_id: deletePresentation
+          });
+          this.$.ajax.generateRequest();
+        }
+      },
+      ajaxResponse: function(e){
+        if(e.detail.response === true){
+          this.$.addDialog.resetForm();
+          // this.$.editDialog.resetForm();
+          var action_word = "";
+          switch(e.target.method) {
+            case "DELETE":
+              action_word = "deleted";
+              break;
+            case "POST":
+              action_word = "added";
+              break;
+            case "PUT":
+              action_word = "updated";
+          }
+          this.fire('firetoast', { message: "Schedule " + action_word + "!"});
+          this.fire("reload-schedule", { });
+        } else {
+          var det = "NO_DETAILS";
+          if(e.detail.response.status_details) {
+            det = e.detail.response.status_details;
+            switch(det) {
+              case 1062:
+                det = "Duplicate Schedule Key";
+                break;
+              default:
+                break;
+            }
+          }
+          var action_word = "";
+          switch(e.target.method) {
+            case "DELETE":
+              action_word = "delete";
+              break;
+            case "POST":
+              action_word = "add";
+              break;
+            case "PUT":
+              action_word = "update";
+          }
+          this.fire('firetoast', { message: "FAILED to " + action_word + " Schedule! [" + det + "]"});
+        }
+        
+      },
+      _error: function(e) {
+        console.log(e);
+        if(e.detail.error.message) {
+          this.fire('firetoast', { message: "An error occurred. " + e.detail.error.message });
+        } else {
+          this.fire('firetoast', { message: "An error occurred." });
+        }
+      },
+      _filterPres: function(obj, schedule) {
+        var presentationArr = this._objToArray(obj);
+
+        
+        presentationArr.sort(function(a, b) {
+          var f_name = a.first_name.localeCompare(b.first_name);
+          
+          if(f_name != 0)
+            return f_name;
+          
+          var l_name = a.last_name.localeCompare(b.last_name);
+          
+          return l_name;
+
+        });
+
+        presentationArr = presentationArr.filter(function(e) {
+          if(e.presentation_id == this.prepPresentationId)
+            return true;
+            
+          for(var x = 0; x < schedule.length; x++) {
+            if(schedule[x].presentation_id == e.presentation_id )
+              return false;
+          }
+
+          return true;
+        });
+        return presentationArr;
       },
       _objToArray: function(obj) {
         if(obj)
@@ -300,14 +436,14 @@ Example:
       },
       _hasPresentations: function(date, block, location, presentations, schedule) {
         if(date && block && location && presentations) {
-          var filteredPres = this._getPresentationsByLocation(location, presentations);
+          var filteredPres = this._objToArray(presentations);
 
           var filteredSchedule = [];
 
           for(var k in schedule) {
             if(!schedule.hasOwnProperty(k)) continue;
 
-            if(schedule[k].date == date.date && schedule[k].block_id == block.block_id)
+            if(schedule[k].date == date.date && schedule[k].block_id == block.block_id && schedule[k].location_id == location.location_id)
               filteredSchedule.push(schedule[k]);
           }
 
@@ -318,7 +454,7 @@ Example:
               if(filteredPres[y].presentation_id == filteredSchedule[x].presentation_id) {
                 // result.push(filteredPres[y].presentation_id);
         
-                if(filteredPres[y].topic != "PREP")
+                //if(filteredPres[y].topic != "PREP")
 
                   result.push(filteredPres[y].first_name + " " + filteredPres[y].last_name + " (" + filteredPres[y].presentation_id + ")");
                 
@@ -332,14 +468,14 @@ Example:
       },
       _getPresentations: function(date, block, location, presentations, schedule, idOnly) {
         if(date && block && location && presentations) {
-          var filteredPres = this._getPresentationsByLocation(location, presentations);
+          var filteredPres = this._objToArray(presentations);
 
           var filteredSchedule = [];
 
           for(var k in schedule) {
             if(!schedule.hasOwnProperty(k)) continue;
 
-            if(schedule[k].date == date.date && schedule[k].block_id == block.block_id)
+            if(schedule[k].date == date.date && schedule[k].block_id == block.block_id && schedule[k].location_id == location.location_id)
               filteredSchedule.push(schedule[k]);
           }
 

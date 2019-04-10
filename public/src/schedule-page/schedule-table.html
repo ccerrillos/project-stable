@@ -204,15 +204,15 @@ Example:
         return locations;
       },
       _gotoPresentation: function(e) {
-        console.log(e.model);
+        // console.log(e.model);
         var target = Polymer.dom(e).localTarget;
         var p_id = target.getAttribute("data-id");
         var date = e.model.get("date");
         var block = e.model.get("block");
 
-        console.log(p_id);
-        console.log(date);
-        console.log(block);
+        // console.log(p_id);
+        // console.log(date);
+        // console.log(block);
 
         if(p_id && date && block) {
           console.log(this.fire('goto-presentation', { presentation_id: p_id, date: date.date, block_id: block.block_id }));
@@ -220,14 +220,14 @@ Example:
       },
       _hasPresentations: function(date, block, location, presentations, schedule) {
         if(date && block && location && presentations) {
-          var filteredPres = this._getPresentationsByLocation(location, presentations);
+          var filteredPres = this._objToArray(presentations);
 
           var filteredSchedule = [];
 
           for(var k in schedule) {
             if(!schedule.hasOwnProperty(k)) continue;
 
-            if(schedule[k].date == date.date && schedule[k].block_id == block.block_id)
+            if(schedule[k].date == date.date && schedule[k].block_id == block.block_id && schedule[k].location_id == location.location_id)
               filteredSchedule.push(schedule[k]);
           }
 
@@ -252,14 +252,14 @@ Example:
       },
       _getPresentations: function(date, block, location, presentations, schedule, idOnly) {
         if(date && block && location && presentations) {
-          var filteredPres = this._getPresentationsByLocation(location, presentations);
+          var filteredPres = this._objToArray(presentations);
 
           var filteredSchedule = [];
 
           for(var k in schedule) {
             if(!schedule.hasOwnProperty(k)) continue;
 
-            if(schedule[k].date == date.date && schedule[k].block_id == block.block_id)
+            if(schedule[k].date == date.date && schedule[k].block_id == block.block_id && schedule[k].location_id == location.location_id)
               filteredSchedule.push(schedule[k]);
           }
 
@@ -297,7 +297,7 @@ Example:
           if(presentations[k].location_id == location.location_id)
             arr.push(presentations[k]);
         }
-        
+
         return arr;
 
         var str = arr.length > 0 ? arr.join(", ") : "None";

@@ -80,7 +80,7 @@ Example:
       <div class="flex layout horizontal">
         <div class="noselect expand vcenter" id="topic">[[data.topic]] <div style="display: inline-block;" hidden$="[[!full]]">- FULL</div></div>
         <b class="noselect expand vcenter" hidden$="[[!names]]">[[data.first_name]] [[data.last_name]]</b>
-        <div class="noselect vcenter" hidden$="[[!showDetails]]">[[_getAttrFromObj(data.location_id, 'location_name', locations)]]</div>
+        <div class="noselect vcenter" hidden$="[[!showDetails]]">[[_getAttrFromObj(locationId, 'location_name', locations)]]</div>
       </div>
       <div class="vcenter" hidden$="[[_checkCo(data.presentation_id)]]">
         * Has a Corequisite
@@ -175,6 +175,13 @@ Example:
         locations: {
           type: Object
         },
+        locationId: {
+          type: Number,
+          computed: '_computeLocation(data, schedule, date, blockId)'
+        },
+        schedule: {
+          type: Array
+        },
         full: {
           type: Boolean,
           value: false,
@@ -193,6 +200,17 @@ Example:
       ],
       _full: function(e) {
         this.$.topic.style.color = e ? "red" : "black";
+      },
+      _computeLocation(data, schedule, date, blockId) {
+        if(data !== undefined && schedule !== undefined && date !== undefined && blockId !== undefined) {
+          for(var x = 0; x < schedule.length; x++) {
+            if(schedule[x].date == date && schedule[x].block_id == blockId && schedule[x].presentation_id == data.presentation_id) {
+              console.warn(schedule[x].location_id);
+              return schedule[x].location_id;
+            }
+          }
+        }
+        return undefined;
       },
       _computeNumber: function (order, data) {
         var number = -1;
@@ -222,19 +240,20 @@ Example:
         return number;
       },
       _checkCo: function(e) {
-        return true;
         if(e == undefined) {
           return true;
         }
         // return true;
-        if(e == 11 ||
-            e == 20 ||
-            e == 39 ||
-            e == 59 ||
-            e == 74 ||
-            e == 86 ||
-            e == 99 ||
-            e == 132
+        if(e == 165 ||
+          e == 166 ||
+          e == 157 ||
+          e == 159 ||
+          e == 52 ||
+          e == 55 ||
+          e == 87 ||
+          e == 93 ||
+          e == 153 ||
+          e == 156
           )
           return false;
         return true;

@@ -154,6 +154,10 @@ Example:
         selectedPresentation: {
           type: Number,
           value: -1
+        },
+        prepPresentationId: {
+          type: Number,
+          value: 167
         }
       },
       listeners: {
@@ -243,7 +247,7 @@ Example:
           for(var k in schedule) {
             if(!schedule.hasOwnProperty(k)) continue;
 
-            if(schedule[k].block_id == block.block_id && schedule[k].presentation_id < 142)
+            if(schedule[k].block_id == block.block_id && schedule[k].presentation_id != this.prepPresentationId)
               arr.push(presentations[schedule[k].presentation_id]);
           }
         }

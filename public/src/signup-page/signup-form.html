@@ -97,11 +97,18 @@ Example:
     </style>
     <paper-material elevation="1">
       <div class="layout vertical" id="mainForm" hidden$="[[!_dataReady]]">
+        <h3>Signup Schedule</h3>
+        <li>Seniors - 1PM Wednesday</li>
+        <li>Juniors - 1PM Thursday</li>
+        <li>Sophmores - 1PM Friday</li>
+        <li>Freshman - 1PM Friday</li>
         <!-- <h4>Signup!</h4> -->
         <paper-input id="fn" label="First Name" value="{{firstname::input}}"></paper-input>
         <paper-input id="ln" label="Last Name" value="{{lastname::input}}"></paper-input>
-        <gold-email-input id="email" label="Email" type="email" value="{{email::input}}"
-        auto-validate></gold-email-input>
+        <paper-input id="email" label="Email" type="email" value="{{email::input}}"
+        pattern=".*@ipolyhighschool.org"
+        error-message="Must be @ipolyhighschool.org"
+        auto-validate></paper-input>
         
         <paper-input id="password" label="Password" type="password" value="{{password::input}}"></paper-input>
         <paper-input id="passwordConfirm" label="Confirm Password" type="password" value="{{passwordConfirm::input}}"></paper-input>
