@@ -210,7 +210,11 @@ Example:
         }
       },
       _datesChanged: function(e) {
-        this.$.selector.select();
+        try {
+          this.$.selector.select();
+        } catch (ex) {
+
+        }
       },
       _activeChanged: function(e) {
         if(e)

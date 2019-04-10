@@ -221,7 +221,11 @@ Example:
         
       },
       _blocksChanged: function(e) {
-        this.$.selector.select();
+        try {
+          this.$.selector.select();
+        } catch (ex) {
+
+        }
       },
       _error: function(e) {
         console.log(e);
