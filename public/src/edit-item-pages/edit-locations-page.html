@@ -104,7 +104,7 @@ Example:
           <!-- <iron-selector attr-for-selected="data-id"> -->
           <template is="dom-repeat" items="[[_objToArray(locations)]]">
             
-            <paper-item data-id="[[item.location_id]]">
+            <paper-item data-id$="[[item.location_id]]">
               <paper-icon-button icon="create" on-tap="_doPreEdit"></paper-icon-button>
 
               <paper-icon-button icon="delete" on-tap="_doPreDelete"></paper-icon-button>
