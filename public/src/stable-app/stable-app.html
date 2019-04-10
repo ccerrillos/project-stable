@@ -154,7 +154,7 @@
     <paper-drawer-panel id="paperDrawerPanel" responsive-width="960px">
       <paper-header-panel drawer>
         <paper-toolbar>
-          <div>iPoly Senior Symposium 2019 1.0</div>
+          <div>iPoly Senior Symposium 2019 [[version]]</div>
         </paper-toolbar>
         <div class="layout vertical side-bar-content">
           <paper-menu attr-for-selected="name" selected="{{routeData.page}}" on-tap="_closeDrawer">
@@ -188,7 +188,7 @@
         <paper-toolbar>
           <paper-icon-button id="backButton" icon="icons:arrow-back" on-tap="_goBack" hidden></paper-icon-button>
           <paper-icon-button id="menuButton" icon="icons:menu" paper-drawer-toggle></paper-icon-button>
-          <div>iPoly Senior Symposium 2019 1.0 [[titleText]]</div>
+          <div>iPoly Senior Symposium 2019 [[version]] [[titleText]]</div>
         </paper-toolbar>
         <div class="container">
           <div class="content">
@@ -342,6 +342,10 @@
         defaultToRegister: {
           type: Boolean,
           value: true
+        },
+        version: {
+          type: String,
+          value: "1.0.1"
         }
       },
       observers: [
