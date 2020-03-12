@@ -54,6 +54,10 @@
         bottom: 8px;
         width: 100%;
       }
+      .flag {
+        width: 32px;
+        padding: 4px;
+      }
     </style>
     <app-localstorage-document id="adminCodeStorage" key="admincode" data="{{adminCode}}"></app-localstorage-document>
     <app-localstorage-document id="userDataSorage" key="stable" data="{{userData}}">
@@ -151,7 +155,7 @@
     <paper-drawer-panel id="paperDrawerPanel" responsive-width="960px">
       <paper-header-panel drawer>
         <paper-toolbar>
-          <div>iPoly Career Day 2019</div>
+          <div>iPoly Career Day 2020</div>
         </paper-toolbar>
         <div class="layout vertical side-bar-content">
           <paper-menu attr-for-selected="name" selected="{{routeData.page}}" on-tap="_closeDrawer">
@@ -166,19 +170,29 @@
           <div class="flex"></div>
           <!-- <login-form admin="{{isAdmin}}"></login-form> -->
         </div>
-        <div class="shameless layout horizontal">
-        <div class="flex"></div>
-          <a href="https://github.com/cacerrillos/project-stable" target="_blank">
-            <paper-icon-button src="github.png"></paper-icon-button>
-          </a>
-          <div class="flex"></div>
+        <div class="shameless">
+          <div class="layout vertical">
+            <div class="layout horizontal">
+              <div class="flex"></div>
+                <img class="flag" src="lgbt_flag.svg"></img>
+                <img class="flag" src="trans_flag.svg"></img>
+              <div class="flex"></div>
+            </div>
+            <div class="layout horizontal">
+              <div class="flex"></div>
+              <a href="https://github.com/cacerrillos/project-stable" target="_blank">
+                <paper-icon-button src="github.png"></paper-icon-button>
+              </a>
+              <div class="flex"></div>
+            </div>
+          </div>
         </div>
       </paper-header-panel>
       <paper-header-panel main>
         <paper-toolbar>
           <paper-icon-button id="backButton" icon="icons:arrow-back" on-tap="_goBack" hidden></paper-icon-button>
           <paper-icon-button id="menuButton" icon="icons:menu" paper-drawer-toggle></paper-icon-button>
-          <div>iPoly Career Day 2019 [[titleText]]</div>
+          <div>iPoly Career Day 2020 [[titleText]]</div>
         </paper-toolbar>
         <div class="container">
           <div class="content">
